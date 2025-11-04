@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Leaderboard - Class 7 Science</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #334155;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Background Pattern */
+        .pattern-bg {
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.12) 0%, transparent 50%);
+            background-size: 200px 200px, 300px 300px;
+            animation: pattern-move 20s linear infinite;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes pattern-move {
+            0% { background-position: 0 0, 0 0; }
+            100% { background-position: 200px 200px, -300px -300px; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 50px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        .header h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            color: #64748b;
+        }
+
+        .leaderboard-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 32px;
+            margin-bottom: 50px;
+        }
+
+        .leaderboard {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leaderboard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .chapter-title {
+            text-align: center;
+            font-size: 2rem;
+            color: #1e293b;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            position: relative;
+            font-weight: 600;
+        }
+
+        .chapter-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 2px;
+        }
+
+        .chapter-meta {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .meta-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 0 6px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .meta-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .student-list {
+            list-style: none;
+        }
+
+        .student-item {
+            display: flex;
+            align-items: center;
+            padding: 24px;
+            margin-bottom: 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid transparent;
+        }
+
+        .student-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
+            border-radius: 20px;
+        }
+
+        .student-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .rank-1 {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: white;
+            box-shadow: 0 12px 30px rgba(251, 191, 36, 0.4);
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+
+        .rank-1::before {
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+        }
+
+        .rank-2 {
+            background: linear-gradient(135deg, #94a3b8, #64748b);
+            color: white;
+            box-shadow: 0 12px 30px rgba(148, 163, 184, 0.4);
+            border-color: rgba(148, 163, 184, 0.3);
+        }
+
+        .rank-2::before {
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+        }
+
+        .rank-3 {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            color: white;
+            box-shadow: 0 12px 30px rgba(217, 119, 6, 0.4);
+            border-color: rgba(217, 119, 6, 0.3);
+        }
+
+        .rank-3::before {
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+        }
+
+        .rank-4, .rank-5 {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .rank-4::before, .rank-5::before {
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+        }
+
+        .rank-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            min-width: 70px;
+            text-align: center;
+            margin-right: 24px;
+            position: relative;
+            z-index: 1;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .rank-1 .rank-number::after {
+            content: '🏆';
+            position: absolute;
+            right: -12px;
+            top: -8px;
+            font-size: 0.7em;
+            animation: bounce 2s infinite;
+        }
+
+        .rank-2 .rank-number::after {
+            content: '🥈';
+            position: absolute;
+            right: -12px;
+            top: -8px;
+            font-size: 0.7em;
+            animation: bounce 2s infinite 0.5s;
+        }
+
+        .rank-3 .rank-number::after {
+            content: '🥉';
+            position: absolute;
+            right: -12px;
+            top: -8px;
+            font-size: 0.7em;
+            animation: bounce 2s infinite 1s;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-8px);
+            }
+            60% {
+                transform: translateY(-4px);
+            }
+        }
+
+        .student-info {
+            flex-grow: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .student-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .student-score {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .score-badge {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-left: 24px;
+            min-width: 70px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .perfect-score {
+            background: rgba(255, 255, 255, 0.4) !important;
+            animation: pulse 2s infinite;
+            border-color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+
+        .stats-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            margin-top: 32px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .stats-title {
+            text-align: center;
+            font-size: 2rem;
+            color: #1e293b;
+            margin-bottom: 32px;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 32px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .stat-value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* Fade-in animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .fade-in:nth-child(1) { animation-delay: 0.1s; }
+        .fade-in:nth-child(2) { animation-delay: 0.2s; }
+        .fade-in:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Student item animations */
+        .student-item {
+            opacity: 0;
+            transform: translateX(-50px);
+            animation: slideInLeft 0.4s ease forwards;
+        }
+
+        .student-item:nth-child(1) { animation-delay: 0.1s; }
+        .student-item:nth-child(2) { animation-delay: 0.2s; }
+        .student-item:nth-child(3) { animation-delay: 0.3s; }
+        .student-item:nth-child(4) { animation-delay: 0.4s; }
+        .student-item:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .leaderboard-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .student-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+                padding: 24px 16px;
+            }
+            
+            .rank-number {
+                margin-right: 0;
+                margin-bottom: 8px;
+            }
+            
+            .score-badge {
+                margin-left: 0;
+                margin-top: 12px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pattern-bg"></div>
+    
+    <div class="container">
+        <div class="header fade-in">
+            <h1>Student Leaderboard</h1>
+            <p>Class 7 Science - Top Performers</p>
+        </div>
+
+        <div class="leaderboard-container">
+            <!-- Photosynthesis Leaderboard -->
+            <div class="leaderboard fade-in">
+                <h2 class="chapter-title">Photosynthesis</h2>
+                <div class="chapter-meta">
+                    <span class="meta-badge">Science</span>
+                    <span class="meta-badge">Class 7</span>
+                </div>
+                <ul class="student-list" id="photosynthesis-leaderboard">
+                    <!-- Students will be populated here -->
+                </ul>
+            </div>
+
+            <!-- Respiration Leaderboard -->
+            <div class="leaderboard fade-in">
+                <h2 class="chapter-title">Respiration</h2>
+                <div class="chapter-meta">
+                    <span class="meta-badge">Science</span>
+                    <span class="meta-badge">Class 7</span>
+                </div>
+                <ul class="student-list" id="respiration-leaderboard">
+                    <!-- Students will be populated here -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Overall Statistics -->
+        <div class="stats-section fade-in">
+            <h2 class="stats-title">Overall Performance Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-students">5</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-photo">0</div>
+                    <div class="stat-label">Avg Photosynthesis</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-resp">0</div>
+                    <div class="stat-label">Avg Respiration</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="perfect-scores">0</div>
+                    <div class="stat-label">Perfect Scores</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dummy data - easily replaceable with backend API calls
+        const photosynthesisData = {
+            students: ['Sahil', 'Priya Sharma', 'Arjun Patel', 'Sneha Singh', 'Rohan Gupta'],
+            scores: [9, 8, 10, 6, 9]
+        };
+
+        const respirationData = {
+            students: ['Sahil', 'Priya Sharma', 'Arjun Patel', 'Sneha Singh', 'Rohan Gupta'],
+            scores: [8, 8, 9, 10, 6]
+        };
+
+        // Function to create leaderboard data and sort by score
+        function createLeaderboard(data) {
+            const leaderboard = [];
+            for (let i = 0; i < data.students.length; i++) {
+                leaderboard.push({
+                    name: data.students[i],
+                    score: data.scores[i]
+                });
+            }
+            
+            // Sort by score in descending order (highest first)
+            return leaderboard.sort((a, b) => b.score - a.score);
+        }
+
+        // Function to render leaderboard
+        function renderLeaderboard(leaderboardData, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            leaderboardData.forEach((student, index) => {
+                const rank = index + 1;
+                const listItem = document.createElement('li');
+                listItem.className = `student-item rank-${rank}`;
+                
+                // Add perfect score animation if score is 10
+                const scoreClass = student.score === 10 ? 'perfect-score' : '';
+                
+                listItem.innerHTML = `
+                    <div class="rank-number">${rank}</div>
+                    <div class="student-info">
+                        <div class="student-name">${student.name}</div>
+                        <div class="student-score">Chapter Score</div>
+                    </div>
+                    <div class="score-badge ${scoreClass}">${student.score}/10</div>
+                `;
+                
+                container.appendChild(listItem);
+            });
+        }
+
+        // Function to calculate statistics with animation
+        function calculateStats(photoData, respData) {
+            const photoScores = photoData.map(student => student.score);
+            const respScores = respData.map(student => student.score);
+            
+            const avgPhoto = (photoScores.reduce((a, b) => a + b, 0) / photoScores.length).toFixed(1);
+            const avgResp = (respScores.reduce((a, b) => a + b, 0) / respScores.length).toFixed(1);
+            const perfectScores = [...photoScores, ...respScores].filter(score => score === 10).length;
+            
+            // Animate the numbers
+            animateValue('avg-photo', 0, parseFloat(avgPhoto), 1000);
+            animateValue('avg-resp', 0, parseFloat(avgResp), 1200);
+            animateValue('perfect-scores', 0, perfectScores, 1400);
+        }
+
+        // Animate number counting
+        function animateValue(id, start, end, duration) {
+            const element = document.getElementById(id);
+            const range = end - start;
+            const increment = end > start ? 0.1 : -0.1;
+            const stepTime = Math.abs(Math.floor(duration / (range / increment)));
+            
+            let current = start;
+            const timer = setInterval(() => {
+                current += increment;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.round(current * 10) / 10;
+            }, stepTime);
+        }
+
+        // Initialize the page
+        function initializeLeaderboards() {
+            // Create and render leaderboards
+            const photosynthesisLeaderboard = createLeaderboard(photosynthesisData);
+            const respirationLeaderboard = createLeaderboard(respirationData);
+            
+            renderLeaderboard(photosynthesisLeaderboard, 'photosynthesis-leaderboard');
+            renderLeaderboard(respirationLeaderboard, 'respiration-leaderboard');
+            
+            // Calculate and display statistics with delay
+            setTimeout(() => {
+                calculateStats(photosynthesisLeaderboard, respirationLeaderboard);
+            }, 1000);
+        }
+
+        // Function to update data (for future backend integration)
+        function updateLeaderboardData(newPhotosynthesisData, newRespirationData) {
+            // This function can be called when new data comes from backend
+            Object.assign(photosynthesisData, newPhotosynthesisData);
+            Object.assign(respirationData, newRespirationData);
+            initializeLeaderboards();
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', () => {
+            // Delay the initialization to allow CSS animations to load
+            setTimeout(() => {
+                initializeLeaderboards();
+            }, 600);
+        });
+
+        // Example of how to integrate with backend in the future:
+        /*
+        async function fetchLeaderboardData() {
+            try {
+                const photoResponse = await fetch('/api/leaderboard/photosynthesis');
+                const respResponse = await fetch('/api/leaderboard/respiration');
+                
+                const photoData = await photoResponse.json();
+                const respData = await respResponse.json();
+                
+                updateLeaderboardData(photoData, respData);
+            } catch (error) {
+                console.error('Error fetching leaderboard data:', error);
+            }
+        }
+        */
+    </script>
+</body>
+</html>

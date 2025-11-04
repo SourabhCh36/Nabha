@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Teacher Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            color: #667eea !important;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .container-main {
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header h1 {
+            color: #1f2937;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filters select,
+        .filters input {
+            padding: 10px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .results-table {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        table {
+            margin-bottom: 0;
+        }
+
+        th {
+            background: #f3f4f6;
+            border: none;
+            color: #374151;
+            font-weight: 600;
+            padding: 15px;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 15px;
+            border-color: #e5e7eb;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge-passed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .score-bar {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+
+        .score-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .score-fill.passed {
+            background: #10b981;
+        }
+
+        .score-fill.failed {
+            background: #ef4444;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .no-data i {
+            font-size: 48px;
+            color: #d1d5db;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+            }
+
+            .filters select,
+            .filters input {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .results-table {
+                padding: 10px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="/manage-exam">
+                <i class="fas fa-arrow-left me-2"></i>Back to Exams
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">Teacher Dashboard</span>
+                <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-main">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-chart-bar me-3"></i>Student Performance Analytics</h1>
+            <p>View and analyze student exam results</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <select id="examFilter" onchange="filterResults()">
+                <option value="">All Exams</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="Search by student name..." onkeyup="searchResults()">
+            <button class="btn btn-primary" onclick="refreshData()">
+                <i class="fas fa-sync-alt me-2"></i>Refresh
+            </button>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid" id="statsGrid" style="display: none;">
+            <div class="stat-card">
+                <i class="fas fa-users" style="font-size: 24px; color: #667eea;"></i>
+                <div class="stat-number" id="totalStudents">0</div>
+                <div class="stat-label">Total Students</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-file-alt" style="font-size: 24px; color: #667eea;"></i>
+                <div class="stat-number" id="totalResults">0</div>
+                <div class="stat-label">Total Results</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-check-circle" style="font-size: 24px; color: #10b981;"></i>
+                <div class="stat-number" id="passRate" style="color: #10b981;">0%</div>
+                <div class="stat-label">Pass Rate</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-chart-line" style="font-size: 24px; color: #667eea;"></i>
+                <div class="stat-number" id="avgScore" style="color: #667eea;">0%</div>
+                <div class="stat-label">Average Score</div>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="results-table">
+            <!-- Loading State -->
+            <div id="loadingState" class="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Loading results...</p>
+            </div>
+
+            <!-- Table -->
+            <div id="tableContainer" style="display: none;">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Exam</th>
+                                <th>Score</th>
+                                <th>Percentage</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Questions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody">
+                            <!-- Results will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- No Data Message -->
+            <div id="noDataMessage" class="no-data" style="display: none;">
+                <i class="fas fa-inbox"></i>
+                <h3>No Results Available</h3>
+                <p>No exam results to display yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        let allResults = [];
+        let allExams = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+
+        async function loadData() {
+            try {
+                // Load teacher's exams
+                const examsRes = await fetch('/api/exams', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (examsRes.ok) {
+                    allExams = await examsRes.json();
+                    populateExamFilter();
+                }
+
+                // Load all results (we'll need to implement an endpoint for this)
+                await loadAllResults();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        function populateExamFilter() {
+            const filter = document.getElementById('examFilter');
+            allExams.forEach(exam => {
+                const option = document.createElement('option');
+                option.value = exam._id;
+                option.textContent = exam.title;
+                filter.appendChild(option);
+            });
+        }
+
+        async function loadAllResults() {
+            try {
+                // Note: This endpoint needs to be implemented on the backend
+                // For now, we'll fetch from /api/results endpoint that returns student results
+                const res = await fetch('/api/results/all-by-teacher', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) {
+                    // Fallback: try to load results a different way
+                    showNoData();
+                    return;
+                }
+
+                const response = await res.json();
+                allResults = response.data || [];
+
+                if (allResults.length === 0) {
+                    showNoData();
+                    return;
+                }
+
+                displayResults(allResults);
+                calculateStatistics(allResults);
+            } catch (error) {
+                console.error('Error loading results:', error);
+                // For demo purposes, we'll show an empty state
+                showNoData();
+            }
+        }
+
+        function displayResults(results) {
+            const container = document.getElementById('resultsBody');
+            const tableContainer = document.getElementById('tableContainer');
+            const loadingState = document.getElementById('loadingState');
+            const noData = document.getElementById('noDataMessage');
+
+            loadingState.style.display = 'none';
+            noData.style.display = 'none';
+            tableContainer.style.display = 'block';
+            container.innerHTML = '';
+
+            // Sort by date (newest first)
+            results.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+            results.forEach(result => {
+                const studentId = result.studentId?._id || result.studentId;
+                const studentName = result.studentId?.firstName && result.studentId?.lastName 
+                    ? `${result.studentId.firstName} ${result.studentId.lastName}`
+                    : 'Unknown Student';
+                const examTitle = result.examId?.title || 'Unknown Exam';
+                const passed = result.passed;
+                const percentage = result.percentage || 0;
+                const score = result.score || 0;
+                const totalMarks = result.totalMarks || 1;
+                const submittedDate = new Date(result.submittedAt).toLocaleDateString();
+                const totalQuestions = result.totalQuestions || 0;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${studentName}</td>
+                    <td>${examTitle}</td>
+                    <td>${score}/${totalMarks}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 60px;">
+                                <div class="score-bar">
+                                    <div class="score-fill ${passed ? 'passed' : 'failed'}" style="width: ${percentage}%"></div>
+                                </div>
+                            </div>
+                            <span><strong>${percentage.toFixed(1)}%</strong></span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge ${passed ? 'badge-passed' : 'badge-failed'}">
+                            ${passed ? '✓ Passed' : '✗ Failed'}
+                        </span>
+                    </td>
+                    <td>${submittedDate}</td>
+                    <td>${totalQuestions}</td>
+                `;
+                container.appendChild(row);
+            });
+
+            document.getElementById('statsGrid').style.display = 'grid';
+        }
+
+        function calculateStatistics(results) {
+            const uniqueStudents = new Set(results.map(r => r.studentId?._id || r.studentId)).size;
+            const totalResults = results.length;
+            const passedResults = results.filter(r => r.passed).length;
+            const passRate = totalResults > 0 ? (passedResults / totalResults) * 100 : 0;
+            const avgScore = results.length > 0 
+                ? results.reduce((sum, r) => sum + (r.percentage || 0), 0) / results.length 
+                : 0;
+
+            document.getElementById('totalStudents').textContent = uniqueStudents;
+            document.getElementById('totalResults').textContent = totalResults;
+            document.getElementById('passRate').textContent = passRate.toFixed(1) + '%';
+            document.getElementById('avgScore').textContent = avgScore.toFixed(1) + '%';
+        }
+
+        function filterResults() {
+            const examId = document.getElementById('examFilter').value;
+            if (examId) {
+                const filtered = allResults.filter(r => r.examId?._id === examId);
+                displayResults(filtered);
+                calculateStatistics(filtered);
+            } else {
+                displayResults(allResults);
+                calculateStatistics(allResults);
+            }
+        }
+
+        function searchResults() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (query) {
+                const filtered = allResults.filter(r => {
+                    const studentName = r.studentId?.firstName && r.studentId?.lastName 
+                        ? `${r.studentId.firstName} ${r.studentId.lastName}`.toLowerCase()
+                        : '';
+                    return studentName.includes(query);
+                });
+                displayResults(filtered);
+            } else {
+                displayResults(allResults);
+            }
+        }
+
+        function showNoData() {
+            const loadingState = document.getElementById('loadingState');
+            const tableContainer = document.getElementById('tableContainer');
+            const noData = document.getElementById('noDataMessage');
+
+            loadingState.style.display = 'none';
+            tableContainer.style.display = 'none';
+            noData.style.display = 'block';
+        }
+
+        function refreshData() {
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('tableContainer').style.display = 'none';
+            loadAllResults();
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

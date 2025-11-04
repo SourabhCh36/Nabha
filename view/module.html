@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Module 1 — Computer Basics (Multilingual)</title>
+  <style>
+    :root{
+      --bg:#1d3c6d;
+      --card:#1b3362;
+      --accent:#514e85;
+      --muted: #7e91a9;
+      --panel: rgba(255,255,255,0.03);
+    }
+    body{
+      margin:0;
+      font-family: "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
+      background: linear-gradient(180deg,#dddfe6 0%, #d3d7df 100%);
+      color:var(--muted);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px;
+    }
+    .wrap{
+      width:100%;
+      max-width:900px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:22px;
+      box-shadow: 0 10px 40px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:14px;
+    }
+    h1{
+      margin:0;
+      font-size:20px;
+      color:#fff;
+      letter-spacing:0.2px;
+    }
+    .lang-buttons{
+      display:flex;
+      gap:8px;
+    }
+    button.lang{
+      padding:8px 12px;
+      border-radius:8px;
+      border: none;
+      background:transparent;
+      color:var(--muted);
+      cursor:pointer;
+      font-weight:600;
+      transition: all .18s ease;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+    button.lang.active{
+      background: linear-gradient(90deg,var(--accent), #06b6d4);
+      color:#fff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(79,70,229,0.14);
+    }
+    .intro{
+      margin-bottom:18px;
+      color:#99a3b6;
+      line-height:1.45;
+    }
+    .card{
+      background: var(--card);
+      border-radius:10px;
+      padding:18px;
+      border: 1px solid var(--panel);
+    }
+    .section{
+      margin-bottom:14px;
+    }
+    .section h2{
+      margin:0 0 8px 0;
+      font-size:16px;
+      color:#fff;
+    }
+    .section p, .section li {
+      color:var(--muted);
+      margin:6px 0;
+      line-height:1.5;
+      font-size:14px;
+    }
+    ul { padding-left:18px; margin:6px 0; }
+    .controls {
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .note {
+      font-size:13px;
+      color:#9aa6b8;
+    }
+    .complete-bttn{
+      margin-top:12px;
+      padding:10px 18px;
+      border:none;
+      border-radius:8px;
+      background: linear-gradient(90deg, #06b6d4, #3b82f6);
+      color:#fff;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow: 0 6px 20px rgba(59,130,246,0.2);
+      transition: all .2s ease;
+    }
+    /* responsive */
+    @media (max-width:640px){
+      .wrap{ padding:14px; }
+      h1{ font-size:18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" role="main">
+    <header>
+      <h1>Module 1 — Computer Basics</h1>
+      <div class="lang-buttons" role="tablist" aria-label="Choose language">
+        <button class="lang active" data-lang="en" aria-selected="true">English</button>
+        <button class="lang" data-lang="pa">ਪੰਜਾਬੀ</button>
+        <button class="lang" data-lang="hi">हिन्दी</button>
+      </div>
+    </header>
+
+    <p class="intro">Read the short lesson below before starting the interactive game. Use the buttons on the top-right to switch the language.</p>
+
+    <div class="card" id="content">
+      <!-- ENGLISH content shown by default -->
+      <div data-lang="en" class="lang-content">
+        <div class="section">
+          <h2>🎯 Learning Objective</h2>
+          <p>Students will learn the main parts of a computer, common input & output devices, how a computer works, and basic terminology.</p>
+        </div>
+
+        <div class="section">
+          <h2>🖥️ What is a Computer?</h2>
+          <p>A computer is an <strong>electronic device</strong> that takes data (Input), processes it (Processing), and gives results (Output).</p>
+        </div>
+
+        <div class="section">
+          <h2>🔹 Main Parts of a Computer</h2>
+          <ul>
+            <li><strong>CPU</strong> – Brain of the computer.</li>
+            <li><strong>Monitor</strong> – Shows results on the screen.</li>
+            <li><strong>Keyboard</strong> – Used to type letters and numbers.</li>
+            <li><strong>Mouse</strong> – Moves the pointer and selects items.</li>
+            <li><strong>Speakers</strong> – For listening to sound.</li>
+            <li><strong>Printer</strong> – Prints documents on paper.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>🔹 Memory</h2>
+          <ul>
+            <li><strong>RAM</strong> – Temporary memory used while programs run.</li>
+            <li><strong>Hard Disk / Storage</strong> – Permanent storage for files and software.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>🔹 Input & Output Devices</h2>
+          <p><strong>Input:</strong> Keyboard, Mouse, Scanner, Microphone</p>
+          <p><strong>Output:</strong> Monitor, Speakers, Printer, Projector</p>
+        </div>
+
+        <div class="section">
+          <h2>🔹 Common Terms</h2>
+          <ul>
+            <li><strong>USB</strong> – Universal Serial Bus; used to connect devices (pen drive, mouse, keyboard).</li>
+            <li><strong>Operating System (OS)</strong> – Software that runs the computer (Windows, Linux, macOS).</li>
+            <li><strong>Software</strong> – Programs used for tasks (e.g., MS Word, Paint).</li>
+            <li><strong>Hardware</strong> – Physical parts of a computer.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>📝 Summary</h2>
+          <p>Computers work on the <strong>Input → Processing → Output</strong> principle. CPU, Monitor, Keyboard and Mouse are main parts. RAM is temporary memory and Hard Disk is permanent storage.</p>
+        </div>
+      </div>
+
+      <!-- PUNJABI -->
+      <div data-lang="pa" class="lang-content" style="display:none;">
+        <div class="section">
+          <h2>🎯 ਸਿਖਲਾਈ ਦਾ ਉਦੇਸ਼</h2>
+          <p>ਵਿਦਿਆਰਥੀ ਕੰਪਿਊਟਰ ਦੇ ਮੁੱਖ ਹਿੱਸੇ, ਆਮ ਇਨਪੁੱਟ ਅਤੇ ਆਉਟਪੁੱਟ ਯੰਤਰ, ਕੰਪਿਊਟਰ ਕਿਵੇਂ ਕੰਮ ਕਰਦਾ ਹੈ ਅਤੇ ਮੂਲ ਸ਼ਬਦਾਂ ਨੂੰ ਸਮਝਣਗੇ।</p>
+        </div>
+
+        <div class="section">
+          <h2>🖥️ ਕੰਪਿਊਟਰ ਕੀ ਹੈ?</h2>
+          <p>ਕੰਪਿਊਟਰ ਇੱਕ <strong>ਇਲੈਕਟ੍ਰਾਨਿਕ ਯੰਤਰ</strong> ਹੈ ਜੋ ਡਾਟਾ ਲੈਂਦਾ ਹੈ (Input), ਉਸਨੂੰ ਪ੍ਰੋਸੈਸ ਕਰਦਾ ਹੈ (Processing), ਅਤੇ ਨਤੀਜੇ ਦਿੰਦਾ ਹੈ (Output)।</p>
+        </div>
+
+        <div class="section">
+          <h2>🔹 ਕੰਪਿਊਟਰ ਦੇ ਮੁੱਖ ਹਿੱਸੇ</h2>
+          <ul>
+            <li><strong>CPU</strong> – ਕੰਪਿਊਟਰ ਦਾ ਦਿਮਾਗ।</li>
+            <li><strong>Monitor</strong> – ਨਤੀਜੇ ਸਕ੍ਰੀਨ 'ਤੇ ਵੇਖਾਏ ਜਾਂਦੇ ਹਨ।</li>
+            <li><strong>Keyboard</strong> – ਅੱਖਰ ਅਤੇ ਅੰਕ ਟਾਈਪ ਕਰਨ ਲਈ।</li>
+            <li><strong>Mouse</strong> – ਪੌਇੰਟਰ ਹਿਲਾਉਣ ਅਤੇ ਚੀਜ਼ਾਂ ਚੁਣਨ ਲਈ।</li>
+            <li><strong>Speakers</strong> – ਆਵਾਜ਼ ਸੁਣਨ ਲਈ।</li>
+            <li><strong>Printer</strong> – ਦਸਤਾਵੇਜ਼ ਕਾਗਜ਼ 'ਤੇ ਛਪਾਉਣ ਲਈ।</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>🔹 ਯਾਦਾਸ਼ਤ</h2>
+          <ul>
+            <li><strong>RAM</strong> – ਅਸਥਾਈ ਯਾਦਾਸ਼ਤ।</li>
+            <li><strong>Hard Disk / Storage</strong> – ਸਥਾਈ ਯਾਦਾਸ਼ਤ ਜਿੱਥੇ ਫਾਈਲਾਂ ਰੱਖੀਆਂ ਜਾਂਦੀਆਂ ਹਨ।</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>🔹 ਇਨਪੁੱਟ ਅਤੇ ਆਉਟਪੁੱਟ ਯੰਤਰ</h2>
+          <p><strong>Input:</strong> ਕੀਬੋਰਡ, ਮਾਊਸ, ਸਕੈਨਰ, ਮਾਈਕ੍ਰੋਫੋਨ</p>
+          <p><strong>Output:</strong> ਮਾਨੀਟਰ, ਸਪੀਕਰ, ਪ੍ਰਿੰਟਰ, ਪ੍ਰੋਜੈਕਟਰ</p>
+        </div>
+
+        <div class="section">
+          <h2>🔹 ਆਮ ਸ਼ਬਦਾਵਲੀ</h2>
+          <ul>
+            <li><strong>USB</strong> – ਪੈਂਡਰਾਈਵ, ਮਾਊਸ, ਕੀਬੋਰਡ ਆਦਿ ਜੋੜਨ ਲਈ।</li>
+            <li><strong>Operating System (OS)</strong> – Windows, Linux, macOS – ਜੋ ਕੰਪਿਊਟਰ ਚਲਾਉਂਦਾ ਹੈ।</li>
+            <li><strong>Software</strong> – ਕੰਮ ਕਰਨ ਲਈ ਪ੍ਰੋਗਰਾਮ (ਜਿਵੇਂ MS Word, Paint)।</li>
+            <li><strong>Hardware</strong> – ਉਹ ਹਿੱਸੇ ਜੋ ਛੂਹੇ ਜਾ ਸਕਦੇ ਹਨ।</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>📝 ਸਾਰ</h2>
+          <p>ਕੰਪਿਊਟਰ <strong>Input → Processing → Output</strong> ਨਿਯਮ 'ਤੇ ਕੰਮ ਕਰਦਾ ਹੈ। CPU, Monitor, Keyboard, Mouse ਮੁੱਖ ਹਿੱਸੇ ਹਨ। RAM ਅਸਥਾਈ ਅਤੇ Hard Disk ਸਥਾਈ ਯਾਦਾਸ਼ਤ ਹੈ।</p>
+        </div>
+      </div>
+
+      <!-- HINDI -->
+      <div data-lang="hi" class="lang-content" style="display:none;">
+        <div class="section">
+          <h2>🎯 सीखने का उद्देश्य</h2>
+          <p>विद्यार्थी कंप्यूटर के मुख्य भाग, इनपुट और आउटपुट यंत्र, कंप्यूटर कैसे काम करता है और सामान्य शब्द सीखेंगे।</p>
+        </div>
+
+        <div class="section">
+          <h2>🖥️ कंप्यूटर क्या है?</h2>
+          <p>कंप्यूटर एक <strong>इलेक्ट्रॉनिक यंत्र</strong> है जो डाटा लेता है (Input), उसे प्रोसेस करता है (Processing), और परिणाम देता है (Output)।</p>
+        </div>
+
+        <div class="section">
+          <h2>🔹 कंप्यूटर के मुख्य भाग</h2>
+          <ul>
+            <li><strong>CPU</strong> – कंप्यूटर का दिमाग।</li>
+            <li><strong>Monitor</strong> – परिणाम स्क्रीन पर दिखाता है।</li>
+            <li><strong>Keyboard</strong> – अक्षर और अंक टाइप करने के लिए।</li>
+            <li><strong>Mouse</strong> – पॉइंटर को हिलाने और वस्तुएँ चुनने के लिए।</li>
+            <li><strong>Speakers</strong> – ध्वनि सुनने के लिए।</li>
+            <li><strong>Printer</strong> – दस्तावेज़ कागज पर छापने के लिए।</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>🔹 स्मृति (Memory)</h2>
+          <ul>
+            <li><strong>RAM</strong> – अस्थायी स्मृति।</li>
+            <li><strong>Hard Disk / Storage</strong> – स्थायी स्मृति जहाँ फाइलें रखी जाती हैं।</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>🔹 इनपुट और आउटपुट यंत्र</h2>
+          <p><strong>Input:</strong> कीबोर्ड, माउस, स्कैनर, माइक्रोफ़ोन</p>
+          <p><strong>Output:</strong> मॉनिटर, स्पीकर, प्रिंटर, प्रोजेक्टर</p>
+        </div>
+
+        <div class="section">
+          <h2>🔹 सामान्य शब्दावली</h2>
+          <ul>
+            <li><strong>USB</strong> – पेनड्राइव, माउस, कीबोर्ड आदि जोड़ने के लिए।</li>
+            <li><strong>Operating System (OS)</strong> – Windows, Linux, macOS – जो कंप्यूटर चलाता है।</li>
+            <li><strong>Software</strong> – काम करने के लिए प्रोग्राम (जैसे MS Word, Paint)।</li>
+            <li><strong>Hardware</strong> – वे भौतिक हिस्से जिन्हें छुआ जा सकता है।</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>📝 सारांश</h2>
+          <p>कंप्यूटर <strong>Input → Processing → Output</strong> सिद्धांत पर काम करता है। CPU, Monitor, Keyboard, Mouse मुख्य भाग हैं। RAM अस्थायी और Hard Disk स्थायी स्मृति है।</p>
+        </div>
+      </div>
+
+    </div> <!-- card -->
+    <button id="Complete-bttn" class="complete-bttn" onclick="redirectToescape()">Complete</button>
+    <style>
+      #Complete-bttn.complete-bttn {
+      display: block;
+      margin: 24px auto 0 auto;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #06b6d4, #3b82f6);
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(59,130,246,0.18);
+      transition: background .2s, transform .15s;
+      letter-spacing: 0.2px;
+      }
+      #Complete-bttn.complete-bttn:hover,
+      #Complete-bttn.complete-bttn:focus {
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+      transform: translateY(-2px) scale(1.03);
+      outline: none;
+      }
+    </style>
+    <div class="controls">
+      <div class="note">Tip: Click a language to switch. Content is ready to be used before playing the game.</div>
+    </div>
+  </div>
+
+
+  <script>
+    // language switching logic
+    const langButtons = document.querySelectorAll('button.lang');
+    const contents = document.querySelectorAll('.lang-content');
+
+    function setActiveLang(code) {
+      // toggle active button
+      langButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === code);
+        btn.setAttribute('aria-selected', btn.dataset.lang === code ? 'true' : 'false');
+      });
+      // show/hide content
+      contents.forEach(c => {
+        c.style.display = (c.dataset.lang === code) ? 'block' : 'none';
+      });
+      // set html lang attribute for accessibility
+      document.documentElement.lang = code === 'pa' ? 'pa' : (code === 'hi' ? 'hi' : 'en');
+    }
+
+    langButtons.forEach(btn => {
+      btn.addEventListener('click', () => setActiveLang(btn.dataset.lang));
+    });
+    function redirectToescape(){
+      window.location.href = '/exam-admin';
+    }
+    // initial
+    setActiveLang('en');
+  </script>
+</body>
+</html>

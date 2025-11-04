@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class 7 Science - MCQ Exam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Background image section - Add your background image URL here */
+        body {
+            background-image: url('../assets/bg2.jpg'); /* Add your background image URL between the quotes */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        
+        /* Optional: Add overlay for better text readability */
+        .overlay {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Exam Header -->
+        <div class="overlay rounded-lg shadow-lg p-6 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Class 7 Science</h1>
+            <p class="text-gray-600 mb-4">Only for class six</p>
+            <div class="flex flex-wrap gap-4 text-sm">
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded">Duration: 5 minutes</span>
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded">Status: Active</span>
+                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded">Questions: 4</span>
+            </div>
+        </div>
+
+        <!-- Timer -->
+        <div class="overlay rounded-lg shadow-lg p-4 mb-6 text-center">
+            <h2 class="text-lg font-semibold mb-2">Time Remaining</h2>
+            <div id="timer" class="text-2xl font-bold text-red-600">05:00</div>
+        </div>
+
+        <!-- Questions Container -->
+        <div id="questionsContainer" class="space-y-6">
+            <!-- Questions will be dynamically inserted here -->
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-8 text-center">
+            <button onclick="submitExam()" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">
+                Submit Exam
+            </button>
+        </div>
+
+        <!-- Results Section (Initially Hidden) -->
+        <div id="resultsSection" class="hidden overlay rounded-lg shadow-lg p-6 mt-8">
+            <h2 class="text-2xl font-bold mb-4">Exam Results</h2>
+            <div id="resultsContent"></div>
+            <button onclick="goToDashboard()" class="mt-4 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition duration-200">
+                Back to dashboard
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Exam Data
+        const examData = {
+            id: 'default-class7-science',
+            title: 'Class 7 Science',
+            duration: 5,
+            status: 'active',
+            description: 'Only for class six',
+            teacherId: 'default-teacher',
+            createdAt: new Date().toISOString(),
+            createdBy: 'System',
+            questionCount: 4,
+            /*questions: [
+                {
+                    id: 1,
+                    text: 'Which part of the plant carries out photosynthesis?',
+                    type: 'multiple-choice',
+                    options: ['Root', 'Stem', 'Leaf', 'Flower'],
+                    correctAnswer: 2
+                },
+                {
+                    id: 2,
+                    text: 'What is the boiling point of water at sea level?',
+                    type: 'multiple-choice',
+                    options: ['0°C', '50°C', '100°C', '212°C'],
+                    correctAnswer: 2
+                },
+                {
+                    id: 3,
+                    text: 'Which gas do humans exhale during respiration?',
+                    type: 'multiple-choice',
+                    options: ['Oxygen', 'Carbon Dioxide', 'Nitrogen', 'Hydrogen'],
+                    correctAnswer: 1
+                },
+                {
+                    id: 4,
+                    text: 'Which of the following is a renewable source of energy?',
+                    type: 'multiple-choice',
+                    options: ['Coal', 'Petroleum', 'Solar Energy', 'Natural Gas'],
+                    correctAnswer: 2
+                }
+            ]*/
+           questions: [
+    {
+        id: 1,
+        text: '💻 What does CPU stand for?',
+        type: 'multiple-choice',
+        options: ['Central Processing Unit', 'Central Print Unit', 'Computer Personal Unit', 'Control Processing Utility'],
+        correctAnswer: 0
+    },
+    {
+        id: 2,
+        text: '⌨️ Which device is used for typing on a computer?',
+        type: 'multiple-choice',
+        options: ['Mouse', 'Keyboard', 'Monitor', 'Scanner'],
+        correctAnswer: 1
+    },
+    {
+        id: 3,
+        text: '🖱️ Which of these is an input device?',
+        type: 'multiple-choice',
+        options: ['Printer', 'Monitor', 'Mouse', 'Speaker'],
+        correctAnswer: 2
+    },
+    {
+        id: 4,
+        text: '🖨️ Which of these is an output device?',
+        type: 'multiple-choice',
+        options: ['Keyboard', 'Scanner', 'Printer', 'Mouse'],
+        correctAnswer: 2
+    },
+    {
+        id: 5,
+        text: '💾 What does RAM stand for?',
+        type: 'multiple-choice',
+        options: ['Read Access Memory', 'Random Access Memory', 'Run Access Module', 'Real Application Memory'],
+        correctAnswer: 1
+    },
+    {
+        id: 6,
+        text: '📀 Which of these is a secondary storage device?',
+        type: 'multiple-choice',
+        options: ['CPU', 'RAM', 'Hard Disk', 'Cache'],
+        correctAnswer: 2
+    },
+    {
+        id: 7,
+        text: '⚙️ Which of the following is software?',
+        type: 'multiple-choice',
+        options: ['Mouse', 'Monitor', 'MS Word', 'Keyboard'],
+        correctAnswer: 2
+    },
+    {
+        id: 8,
+        text: '🔌 Which of these is hardware?',
+        type: 'multiple-choice',
+        options: ['Windows', 'Linux', 'Google Chrome', 'Motherboard'],
+        correctAnswer: 3
+    },
+    {
+        id: 9,
+        text: '🌐 What does URL stand for?',
+        type: 'multiple-choice',
+        options: ['Uniform Resource Locator', 'Universal Reference Link', 'Unique Resource Link', 'Uniform Reference Locator'],
+        correctAnswer: 0
+    },
+    {
+        id: 10,
+        text: '📡 What does Wi-Fi allow a computer to do?',
+        type: 'multiple-choice',
+        options: ['Print Documents', 'Store Data', 'Connect to Internet Wirelessly', 'Increase Speed of CPU'],
+        correctAnswer: 2
+    }
+]
+
+        };
+
+        // Global variables
+        let userAnswers = {};
+        let timeRemaining = examData.duration * 60; // Convert to seconds
+        let timerInterval;
+
+        // Initialize exam
+        function initializeExam() {
+            renderQuestions();
+            startTimer();
+        }
+
+        // Render questions
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            examData.questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'overlay rounded-lg shadow-lg p-6';
+                
+                questionDiv.innerHTML = `
+                    <h3 class="text-lg font-semibold mb-4">Question ${index + 1}</h3>
+                    <p class="text-gray-700 mb-4">${question.text}</p>
+                    <div class="space-y-2">
+                        ${question.options.map((option, optionIndex) => `
+                            <label class="flex items-center p-3 rounded hover:bg-gray-100 cursor-pointer">
+                                <input type="radio" name="question${question.id}" value="${optionIndex}" 
+                                    onchange="saveAnswer(${question.id}, ${optionIndex})"
+                                    class="mr-3">
+                                <span>${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                
+                container.appendChild(questionDiv);
+            });
+        }
+
+        // Save answer
+        function saveAnswer(questionId, answerIndex) {
+            userAnswers[questionId] = answerIndex;
+        }
+
+        // Timer function
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitExam();
+                    return;
+                }
+
+                timeRemaining--;
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Submit exam
+        function submitExam() {
+            clearInterval(timerInterval);
+            
+            let correctAnswers = 0;
+            const results = examData.questions.map(question => {
+                const userAnswer = userAnswers[question.id];
+                const isCorrect = userAnswer === question.correctAnswer;
+                if (isCorrect) correctAnswers++;
+                
+                return {
+                    questionId: question.id,
+                    questionText: question.text,
+                    userAnswer: userAnswer !== undefined ? question.options[userAnswer] : 'Not answered',
+                    correctAnswer: question.options[question.correctAnswer],
+                    isCorrect: isCorrect
+                };
+            });
+
+            showResults(results, correctAnswers);
+        }
+
+        // Show results
+        function showResults(results, correctAnswers) {
+            document.getElementById('questionsContainer').classList.add('hidden');
+            document.querySelector('button[onclick="submitExam()"]').classList.add('hidden');
+            document.getElementById('resultsSection').classList.remove('hidden');
+
+            const percentage = (correctAnswers / examData.questionCount * 100).toFixed(1);
+            const resultsContent = document.getElementById('resultsContent');
+            
+            resultsContent.innerHTML = `
+                <div class="mb-6">
+                    <p class="text-xl mb-2">Score: <span class="font-bold">${correctAnswers}/${examData.questionCount}</span></p>
+                    <p class="text-lg">Percentage: <span class="font-bold">${percentage}%</span></p>
+                </div>
+                <div class="space-y-4">
+                    ${results.map((result, index) => `
+                        <div class="border rounded p-4 ${result.isCorrect ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'}">
+                            <p class="font-semibold mb-2">Question ${index + 1}: ${result.questionText}</p>
+                            <p>Your answer: <span class="${result.isCorrect ? 'text-green-700' : 'text-red-700'}">${result.userAnswer}</span></p>
+                            ${!result.isCorrect ? `<p>Correct answer: <span class="text-green-700">${result.correctAnswer}</span></p>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Retake exam
+        function retakeExam() {
+            userAnswers = {};
+            timeRemaining = examData.duration * 60;
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('questionsContainer').classList.remove('hidden');
+            document.querySelector('button[onclick="submitExam()"]').classList.remove('hidden');
+            initializeExam();
+        }
+       function goToDashboard() {
+            window.location.href = '/student-dashboard'; // Change this to your dashboard URL
+        }   
+        // Start the exam when page loads
+        window.onload = initializeExam;
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+Mongo URI is: mongodb+srv://Sourabhdb:Sourabhdb@sourabh.5spx909.mongodb.net/online_exam
+Server running on port 3002
+Home page: http://localhost:3002
+Uploads served from: /Users/sourabhchandrakar/Downloads/Rural-Digitalization-main/uploads
+MongoDB connected successfully
+Login attempt: Test Class-6
+User not found: Test Class-6
+Login attempt: Bob Class-6
+Login successful for: Bob Redirecting to: /student-dashboard

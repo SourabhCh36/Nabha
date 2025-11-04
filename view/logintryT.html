@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Teacher Login / Register</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Poppins",sans-serif}
+body{height:100vh;display:flex;justify-content:center;align-items:center;background:#07111d;overflow:hidden}
+.wrapper{width:900px;height:550px;border-radius:15px;overflow:hidden;box-shadow:0 0 20px cyan,0 0 40px cyan inset;background:#07111d;perspective:2000px}
+.inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 1s ease-in-out}
+.wrapper.active .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;color:#fff;backface-visibility:hidden;overflow:hidden}
+
+/* LOGIN */
+.face.login{z-index:2;transform:rotateY(0deg)}
+/* REGISTER */
+.face.register{transform:rotateY(180deg);z-index:1}
+
+/* Clean halves */
+.left,.right{width:50%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.black{background:#08121f}
+.cyan{background:linear-gradient(135deg,#00ffff,#0099cc);}
+
+/* Text + Form styling */
+h2.form-title{font-size:1.8em;margin-bottom:20px}
+p{font-size:.9em;line-height:1.6;color:#ddd;width:80%}
+.input-box{position:relative;margin:15px 0;width:100%;border-bottom:2px solid cyan}
+.input-box input{width:100%;padding:10px;background:transparent;border:none;outline:none;color:#fff;font-size:1em}
+.input-box label{position:absolute;top:50%;left:10px;transform:translateY(-50%);color:#aaa;pointer-events:none;transition:.3s}
+.input-box input:focus~label,.input-box input:valid~label{top:-10px;font-size:.85em;color:cyan}
+.input-box i{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:cyan}
+.btn{width:100%;padding:10px;background:linear-gradient(90deg,#00ffff,#0099cc);border:none;border-radius:25px;color:#000;font-weight:600;font-size:1em;margin-top:20px;cursor:pointer;transition:.3s}
+.btn:hover{background:linear-gradient(90deg,#0099cc,#00ffff)}
+.toggle{text-align:center;margin-top:15px;font-size:.9em}
+.toggle a{color:cyan;text-decoration:none;font-weight:600}
+.toggle a:hover{text-decoration:underline}
+.message{margin-top:10px;font-size:.9em;text-align:center;color:#fff;display:none}
+.message.show{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+form{animation:fadeIn 1s ease-in}
+
+/* Voice Control Panel */
+.voice-control-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(8, 18, 31, 0.95);
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid cyan;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  max-width: 320px;
+}
+
+.voice-control-panel h3 {
+  margin: 0 0 15px 0;
+  font-size: 18px;
+  color: cyan;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.voice-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 2px solid cyan;
+  background: transparent;
+  color: cyan;
+  transition: all 0.3s;
+  margin-bottom: 10px;
+}
+
+.voice-btn:hover {
+  background: cyan;
+  color: #000;
+}
+
+.voice-btn.active {
+  background: cyan;
+  color: #000;
+}
+
+.voice-status {
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(0, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+  color: #fff;
+}
+
+.voice-indicator {
+  margin-top: 12px;
+  padding: 8px;
+  background: rgba(220, 38, 38, 0.2);
+  border-radius: 6px;
+  text-align: center;
+  display: none;
+}
+
+.voice-indicator.active {
+  display: block;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.help-section {
+  background: rgba(0, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 15px;
+}
+
+.help-section strong {
+  color: cyan;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.help-section ul {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+  list-style: none;
+}
+
+.help-section li {
+  margin-bottom: 4px;
+  color: #ddd;
+}
+
+.help-section li:before {
+  content: "▸ ";
+  color: cyan;
+  font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<!-- Voice Control Panel -->
+<div class="voice-control-panel">
+  <h3>🎤 Voice Controls</h3>
+  
+  <button id="toggleVoiceCommands" class="voice-btn">
+    Start Voice Commands
+  </button>
+  <div id="voiceCommandStatus" class="voice-status">
+    Click to activate
+  </div>
+
+  <button id="toggleTextToSpeech" class="voice-btn">
+    Enable Text-to-Speech
+  </button>
+  <div id="ttsStatus" class="voice-status">
+    TTS: Inactive
+  </div>
+
+  <button id="stopSpeech" class="voice-btn">
+    Stop Speech
+  </button>
+
+  <div id="voiceIndicator" class="voice-indicator">
+    <span style="color: #ff4444;">🔴 Listening...</span>
+  </div>
+
+  <div class="help-section">
+    <strong>Keyboard Shortcuts:</strong>
+    <ul>
+      <li><strong>V</strong> - Toggle TTS</li>
+      <li><strong>O</strong> - Voice Commands</li>
+      <li><strong>Esc/S</strong> - Stop Speech</li>
+    </ul>
+    <strong>Voice Commands:</strong>
+    <ul>
+      <li>"switch to register"</li>
+      <li>"switch to login"</li>
+      <li>"fill name [name]"</li>
+      <li>"fill id [number]"</li>
+      <li>"submit" or "login"</li>
+      <li>"read this" - Read form</li>
+      <li>"stop reading"</li>
+    </ul>
+  </div>
+</div>
+
+<div class="wrapper" id="wrapper">
+  <div class="inner">
+    <!-- LOGIN -->
+    <div class="face login">
+      <div class="left black">
+        <h2 class="form-title">Teacher Login</h2>
+        <form id="loginForm">
+          <div class="input-box">
+            <input id="loginFullName" name="fullName" type="text" required>
+            <label>Full Name</label><i class="fa fa-user"></i>
+          </div>
+          <div class="input-box">
+            <input id="loginTeacherId" name="teacherId" type="number" required>
+            <label>Teacher ID</label><i class="fa fa-id-badge"></i>
+          </div>
+          <button class="btn" type="submit">Login</button>
+          <div class="toggle">Don't have an account? <a href="#" id="showRegister">Register</a></div>
+          <div id="loginMsg" class="message"></div>
+        </form>
+      </div>
+      <div class="right cyan" style="color:#001;">
+        <h2>WELCOME!</h2>
+        <p>Hope, you and your family have a great day.</p>
+      </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="face register">
+      <div class="left cyan" style="color:#001;">
+        <h2>WELCOME!</h2>
+        <p>Join us and start your journey today.</p>
+      </div>
+      <div class="right black">
+        <h2 class="form-title">Teacher Register</h2>
+        <form id="registerForm">
+          <div class="input-box">
+            <input id="regFullName" name="fullName" type="text" required>
+            <label>Full Name</label><i class="fa fa-user"></i>
+          </div>
+          <div class="input-box">
+            <input id="regTeacherId" name="teacherId" type="number" required>
+            <label>Teacher ID</label><i class="fa fa-id-badge"></i>
+          </div>
+          <div class="input-box">
+            <input id="regPassword" name="password" type="password" required>
+            <label>Password</label><i class="fa fa-lock"></i>
+          </div>
+          <div class="input-box">
+            <input id="regConfirm" name="confirmPassword" type="password" required>
+            <label>Confirm Password</label><i class="fa fa-lock"></i>
+          </div>
+          <button class="btn" type="submit">Register</button>
+          <div class="toggle">Already have an account? <a href="#" id="showLogin">Login</a></div>
+          <div id="regMsg" class="message"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const w=document.getElementById("wrapper");
+document.getElementById("showRegister").onclick=e=>{e.preventDefault();w.classList.add("active")};
+document.getElementById("showLogin").onclick=e=>{e.preventDefault();w.classList.remove("active")};
+
+async function handleLogin(e){
+ e.preventDefault();
+ const name=document.getElementById("loginFullName").value.trim();
+ const id=document.getElementById("loginTeacherId").value.trim();
+ const msg=document.getElementById("loginMsg");
+ msg.classList.remove("show");
+ try{
+   const r=await fetch("/api/auth/loginT",{method:"POST",headers:{"Content-Type":"application/json"},
+     body:JSON.stringify({fullName:name,teacherId:id})});
+   const d=await r.json();
+   msg.textContent=d.message||"";
+   msg.classList.add("show");
+   if(r.ok){
+     if(d.token)localStorage.setItem("token",d.token);
+     if(d.user)localStorage.setItem("user",JSON.stringify(d.user));
+     setTimeout(()=>location.replace("/admin-dashboardtry.html"),700);
+   }
+ }catch(err){msg.textContent="Network error";msg.classList.add("show")}
+}
+
+async function handleRegister(e){
+ e.preventDefault();
+ const f=document.getElementById("regFullName").value.trim(),
+       i=document.getElementById("regTeacherId").value.trim(),
+       p=document.getElementById("regPassword").value,
+       c=document.getElementById("regConfirm").value,
+       msg=document.getElementById("regMsg");
+ msg.classList.remove("show");
+ if(p!==c){msg.textContent="Passwords do not match";msg.classList.add("show");return}
+ try{
+   const r=await fetch("/api/auth/registerT",{method:"POST",headers:{"Content-Type":"application/json"},
+     body:JSON.stringify({fullName:f,teacherId:i,password:p,confirmPassword:c})});
+   const d=await r.json();
+   msg.textContent=d.message||"";
+   msg.classList.add("show");
+   if(r.ok){
+     setTimeout(()=>{w.classList.remove("active");document.getElementById("registerForm").reset();},800);
+   }
+ }catch(err){msg.textContent="Network error";msg.classList.add("show")}
+}
+
+document.getElementById("loginForm").onsubmit=handleLogin;
+document.getElementById("registerForm").onsubmit=handleRegister;
+let url = '/admin-dashboardtry';
+      if (!sessionStorage.getItem('redirectedOnce')) {
+        sessionStorage.setItem('redirectedOnce', '1');
+        location.replace(url);
+      }
+
+// Voice Control System for Login
+class VoiceLoginSystem {
+  constructor() {
+    this.synthesis = window.speechSynthesis;
+    this.recognition = null;
+    this.isListening = false;
+    this.isTTSEnabled = false;
+    this.voiceSpeed = 1;
+    this.currentUtterance = null;
+    this.hoverTimeout = null;
+    this.init();
+  }
+
+  init() {
+    this.setupSpeechRecognition();
+    this.setupControls();
+    this.setupKeyboardShortcuts();
+    this.setupHoverEvents();
+  }
+
+  setupSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+      console.warn('Speech recognition not supported');
+      return;
+    }
+
+    this.recognition = new SpeechRecognition();
+    this.recognition.continuous = true;
+    this.recognition.interimResults = false;
+    this.recognition.lang = 'en-US';
+
+    this.recognition.onstart = () => {
+      document.getElementById('voiceIndicator').classList.add('active');
+    };
+
+    this.recognition.onend = () => {
+      document.getElementById('voiceIndicator').classList.remove('active');
+      if (this.isListening) {
+        setTimeout(() => {
+          try {
+            this.recognition.start();
+          } catch(e) {
+            console.log('Recognition restart failed:', e);
+          }
+        }, 100);
+      }
+    };
+
+    this.recognition.onresult = (event) => {
+      const last = event.results.length - 1;
+      const command = event.results[last][0].transcript.toLowerCase().trim();
+      console.log('Voice command:', command);
+      this.processVoiceCommand(command);
+    };
+
+    this.recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      if (event.error === 'no-speech' && this.isListening) {
+        setTimeout(() => {
+          try {
+            this.recognition.start();
+          } catch(e) {
+            console.log('Recognition restart failed:', e);
+          }
+        }, 100);
+      }
+    };
+  }
+
+  setupControls() {
+    const toggleVoiceBtn = document.getElementById('toggleVoiceCommands');
+    const toggleTTSBtn = document.getElementById('toggleTextToSpeech');
+    const stopBtn = document.getElementById('stopSpeech');
+
+    if (toggleVoiceBtn) {
+      toggleVoiceBtn.addEventListener('click', () => this.toggleVoiceCommands());
+    }
+    
+    if (toggleTTSBtn) {
+      toggleTTSBtn.addEventListener('click', () => this.toggleTextToSpeech());
+    }
+
+    if (stopBtn) {
+      stopBtn.addEventListener('click', () => this.stopSpeaking());
+    }
+  }
+
+  setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+      const activeElement = document.activeElement;
+      const isTyping = activeElement.tagName === 'INPUT' || 
+                       activeElement.tagName === 'TEXTAREA';
+      
+      if (isTyping) return;
+      
+      if (e.key.toLowerCase() === 'v') {
+        e.preventDefault();
+        this.toggleTextToSpeech();
+      }
+      
+      if (e.key.toLowerCase() === 'o') {
+        e.preventDefault();
+        this.toggleVoiceCommands();
+      }
+      
+      if (e.key === 'Escape' || e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        this.stopSpeaking();
+      }
+    });
+  }
+
+  setupHoverEvents() {
+    const elements = document.querySelectorAll('h2, p, button, a, label, .message');
+    elements.forEach(el => {
+      el.addEventListener('mouseenter', (e) => {
+        if (!this.isTTSEnabled) return;
+        
+        clearTimeout(this.hoverTimeout);
+        this.hoverTimeout = setTimeout(() => {
+          let text = e.target.textContent.trim();
+          if (text && text.length > 1) {
+            this.speak(text);
+          }
+        }, 300);
+      });
+    });
+  }
+
+  toggleVoiceCommands() {
+    if (!this.recognition) {
+      this.speak('Voice commands are not supported in your browser. Please use Chrome or Edge.');
+      return;
+    }
+
+    this.isListening = !this.isListening;
+    const btn = document.getElementById('toggleVoiceCommands');
+    const status = document.getElementById('voiceCommandStatus');
+
+    if (this.isListening) {
+      try {
+        this.recognition.start();
+        btn.textContent = 'Stop Voice Commands';
+        btn.classList.add('active');
+        status.textContent = '🎤 Listening for commands...';
+        status.style.background = 'rgba(0, 255, 0, 0.2)';
+        this.speak('Voice commands activated. You can now speak commands like switch to register, fill name, or submit.');
+      } catch(e) {
+        console.error('Failed to start recognition:', e);
+        this.isListening = false;
+      }
+    } else {
+      this.recognition.stop();
+      btn.textContent = 'Start Voice Commands';
+      btn.classList.remove('active');
+      status.textContent = 'Click to activate';
+      status.style.background = 'rgba(0, 255, 255, 0.1)';
+      this.speak('Voice commands deactivated.');
+    }
+  }
+
+  toggleTextToSpeech() {
+    this.isTTSEnabled = !this.isTTSEnabled;
+    const btn = document.getElementById('toggleTextToSpeech');
+    const status = document.getElementById('ttsStatus');
+
+    if (this.isTTSEnabled) {
+      btn.textContent = 'Disable Text-to-Speech';
+      btn.classList.add('active');
+      status.textContent = 'TTS: Active ✓';
+      status.style.background = 'rgba(0, 255, 0, 0.2)';
+      this.speak('Text to speech enabled. Hover over any text to hear it read aloud.');
+    } else {
+      btn.textContent = 'Enable Text-to-Speech';
+      btn.classList.remove('active');
+      status.textContent = 'TTS: Inactive';
+      status.style.background = 'rgba(0, 255, 255, 0.1)';
+      this.stopSpeaking();
+      this.speak('Text to speech disabled.');
+    }
+  }
+
+  processVoiceCommand(command) {
+    console.log('Processing command:', command);
+    
+    // Switch forms
+    if (command.includes('register') || command.includes('registration')) {
+      this.speak('Switching to register form');
+      document.getElementById('showRegister').click();
+    }
+    else if (command.includes('back to login') || command.includes('show login')) {
+      this.speak('Switching to login form');
+      document.getElementById('showLogin').click();
+    }
+    // Fill fields
+    else if (command.includes('fill name') || command.includes('enter name')) {
+      const nameMatch = command.match(/(?:fill name|enter name)\s+(.+)/);
+      if (nameMatch) {
+        const name = nameMatch[1].trim();
+        const isLogin = !w.classList.contains('active');
+        const input = isLogin ? document.getElementById('loginFullName') : document.getElementById('regFullName');
+        input.value = name;
+        input.dispatchEvent(new Event('input'));
+        this.speak(`Name filled as ${name}`);
+      }
+    }
+    else if (command.includes('fill id') || command.includes('enter id')) {
+      const idMatch = command.match(/(?:fill id|enter id)\s+(\d+)/);
+      if (idMatch) {
+        const id = idMatch[1];
+        const isLogin = !w.classList.contains('active');
+        const input = isLogin ? document.getElementById('loginTeacherId') : document.getElementById('regTeacherId');
+        input.value = id;
+        input.dispatchEvent(new Event('input'));
+        this.speak(`Teacher ID filled as ${id}`);
+      }
+    }
+    else if (command.includes('fill password')) {
+      const passMatch = command.match(/fill password\s+(.+)/);
+      if (passMatch) {
+        const pass = passMatch[1].trim();
+        const input = document.getElementById('regPassword');
+        input.value = pass;
+        input.dispatchEvent(new Event('input'));
+        this.speak('Password filled');
+      }
+    }
+    // Submit
+    else if (command.includes('submit') || command.includes('sign in')) {
+      const isLogin = !w.classList.contains('active');
+      if (isLogin) {
+        this.speak('Submitting login form');
+        document.getElementById('loginForm').requestSubmit();
+      } else {
+        this.speak('Submitting register form');
+        document.getElementById('registerForm').requestSubmit();
+      }
+    }
+    // Read form
+    else if (command.includes('read this') || command.includes('read form')) {
+      const isLogin = !w.classList.contains('active');
+      if (isLogin) {
+        this.speak('Teacher Login form. Please enter your full name and teacher ID to login. You can also switch to register if you dont have an account.');
+      } else {
+        this.speak('Teacher Register form. Please enter your full name, teacher ID, password, and confirm password to create an account.');
+      }
+    }
+    // Stop
+    else if (command.includes('stop') || command.includes('quiet') || command.includes('silence')) {
+      this.stopSpeaking();
+    }
+    else {
+      this.speak('Command not recognized. Try saying switch to register, fill name, fill id, or submit.');
+    }
+  }
+
+  speak(text) {
+    this.synthesis.cancel();
+    
+    if (!text) return;
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = this.voiceSpeed;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    utterance.lang = 'en-US';
+
+    this.currentUtterance = utterance;
+    this.synthesis.speak(utterance);
+  }
+
+  stopSpeaking() {
+    this.synthesis.cancel();
+    clearTimeout(this.hoverTimeout);
+  }
+}
+
+// Initialize voice system
+let voiceLoginSystem;
+window.addEventListener('load', () => {
+  voiceLoginSystem = new VoiceLoginSystem();
+  console.log('Voice login system initialized');
+  
+  // Welcome message
+  setTimeout(() => {
+    voiceLoginSystem.speak('Welcome to Teacher Login. Press O to activate voice commands, or V for text to speech.');
+  }, 1500);
+});
+</script>
+</body>
+</html>

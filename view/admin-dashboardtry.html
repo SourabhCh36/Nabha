@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Nabha Digital Learning</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fd;
+            color: #2d3748;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 280px;
+            background: white;
+            padding: 2rem 1.5rem;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sidebar-logo-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+
+        .sidebar-logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            color: #718096;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: linear-gradient(135deg,#06b6d4 0%, #0891b2 100%);
+            color: white;
+        }
+
+        .sidebar-menu a i {
+            font-size: 1.25rem;
+            width: 24px;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 2rem;
+            left: 1.5rem;
+            right: 1.5rem;
+        }
+
+        .create-class-card {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .teacher-avatar {
+            width: 80px;
+            height: 50px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .create-class-card p {
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            opacity: 0.95;
+        }
+
+        .btn-create-class {
+            background: white;
+            color: #000;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-create-class:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .school-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: #f7fafc;
+            border-radius: 12px;
+        }
+
+        .school-badge i {
+            font-size: 1.5rem;
+        }
+
+        .school-badge span {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-section h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 0.25rem;
+        }
+
+        .welcome-section p {
+            color: #a0aec0;
+            font-size: 0.95rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .header-btn {
+            background: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .header-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .header-btn i {
+            color: #718096;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: #f56565;
+            border-radius: 50%;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg,#9f9a9a 0%, #838686 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgb(10, 9, 9);
+            font-weight: 600;
+        }
+
+        .user-profile i {
+            color: #000000;
+        }
+
+        /* Stats Grid */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.75rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-icon.purple { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .stat-icon.blue { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; }
+        .stat-icon.orange { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); color: white; }
+        .stat-icon.green { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-underline {
+            height: 3px;
+            width: 50px;
+            border-radius: 2px;
+        }
+
+        .stat-underline.purple { background: #667eea; }
+        .stat-underline.blue { background: #4299e1; }
+        .stat-underline.orange { background: #ed8936; }
+        .stat-underline.green { background: #48bb78; }
+
+        /* Profile Card in Stats */
+        .profile-stat-card {
+            background: white;
+            padding: 1.75rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .profile-name {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-email {
+            font-size: 0.875rem;
+            color: #718096;
+            margin-bottom: 1rem;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .profile-stat-item {
+            text-align: center;
+        }
+
+        .profile-stat-label {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .profile-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            padding: 1.75rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .view-all-btn {
+            color: #000;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        /* Messages */
+        .message-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .message-item:hover {
+            background: #f7fafc;
+        }
+
+        .message-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .message-avatar.dark {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: white;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-title {
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 0.25rem;
+        }
+
+        .message-text {
+            font-size: 0.875rem;
+            color: #718096;
+        }
+
+        .message-badge {
+            width: 28px;
+            height: 28px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Performance Chart */
+        .performance-chart {
+            width: 160px;
+            height: 160px;
+            margin: 1.5rem auto;
+            position: relative;
+        }
+
+        .chart-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .legend-color.excellent { background: #667eea; }
+        .legend-color.good { background: #ed8936; }
+        .legend-color.average { background: #48bb78; }
+
+        /* Calendar */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .calendar-month {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .calendar-nav button {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f7fafc;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #718096;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-nav button:hover {
+            background: #06b6d4;
+            color: white;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day.header {
+            font-weight: 600;
+            color: #718096;
+            cursor: default;
+        }
+
+        .calendar-day.other-month {
+            color: #cbd5e0;
+        }
+
+        .calendar-day.today {
+            background: #000;
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-day:not(.header):not(.other-month):hover {
+            background: #edf2f7;
+        }
+
+        /* Students Table */
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .table-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #718096;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .table-btn:hover {
+            border-color: #667eea;
+            color: #07080c;
+        }
+
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .students-table th {
+            text-align: left;
+            padding: 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #718096;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .students-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #2c64e9 0%, #b20808 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .grade-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .grade-a { background: #c6f6d5; color: #22543d; }
+        .grade-b { background: #bee3f8; color: #2c5282; }
+        .grade-c { background: #feebc8; color: #7c2d12; }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-badge.in-progress { background: #ddd6fe; color: #5b21b6; }
+        .status-badge.reviewed { background: #d1fae5; color: #065f46; }
+        .status-badge.not-viewed { background: #fed7d7; color: #7f1d1d; }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .action-menu {
+            background: none;
+            border: none;
+            color: #718096;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* Timetable */
+        .timetable-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            background: #f7fafc;
+        }
+
+        .timetable-time {
+            font-weight: 600;
+            color: #1a202c;
+            margin-right: 1rem;
+        }
+
+        .timetable-details {
+            flex: 1;
+        }
+
+        .timetable-title {
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 0.25rem;
+        }
+
+        .timetable-subtitle {
+            font-size: 0.875rem;
+            color: #718096;
+        }
+
+        .timetable-action {
+            width: 36px;
+            height: 36px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .timetable-action:hover {
+            transform: scale(1.1);
+        }
+
+        /* Notes */
+        .notes-input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.875rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .notes-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Add this right after the opening <body> tag, before the navigation -->
+<!-- 🎤 Voice & Text-to-Speech Panel -->
+<div id="voiceControlPanel" style="position: fixed; top: 80px; right: 20px; z-index: 1000; background: white; padding: 18px; border-radius: 14px; box-shadow: 0 10px 30px rgba(8,145,178,0.15); max-width: 300px; border: 1px solid rgba(6,182,212,0.12);">
+  <h3 style="margin: 0 0 14px 0; font-size: 17px; color: #0891b2; font-weight: 700;">🎤 Voice Assistant</h3>
+  
+  <button id="toggleVoiceCommands" style="width: 100%; padding: 11px; border-radius: 10px; font-size: 13px; cursor: pointer; background: linear-gradient(135deg, #0891b2, #06b6d4); border: none; color: white; font-weight: 600;">
+    Start Voice Commands
+  </button>
+  <div id="voiceCommandStatus" style="margin-top: 8px; text-align: center; font-size: 12px; color: #64748b;">Click to activate</div>
+
+  <hr style="margin: 14px 0; border: none; border-top: 1px solid #e5e7eb;">
+
+  <button id="toggleTextToSpeech" style="width: 100%; padding: 11px; border-radius: 10px; font-size: 13px; cursor: pointer; background: white; border: 2px solid #0891b2; color: #0891b2; font-weight: 600;">
+    Enable Text-to-Speech
+  </button>
+  <div id="ttsStatus" style="margin-top: 8px; text-align: center; font-size: 12px; color: #64748b;">TTS: Inactive</div>
+
+  <div style="margin-top: 10px;">
+    <label style="font-size: 12px; color: #64748b;">Speech Speed</label>
+    <input type="range" id="ttsSpeed" min="0.5" max="2" step="0.1" value="1" style="width: 100%; accent-color: #0891b2;">
+  </div>
+
+  <button id="stopSpeech" style="width: 100%; margin-top: 10px; padding: 9px; border-radius: 8px; font-size: 12px; cursor: pointer; background: #fee2e2; border: 1px solid #fecaca; color: #dc2626; font-weight: 600;">
+    ⏹ Stop Speech
+  </button>
+</div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span class="sidebar-logo-text">Nabha Digital</span>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active"><i class="fas fa-th-large"></i> Dashboard</a></li>
+            <li><a href="#" id="classroomsLink"><i class="fas fa-chalkboard"></i> Classrooms</a></li>
+            <li><a href="#" id="studentsLink"><i class="fas fa-user-graduate"></i> Students</a></li>
+            <li><a href="#" id="performanceLink"><i class="fas fa-chart-line"></i> Performance</a></li>
+            <li><a href="#"><i class="fas fa-book"></i> Books</a></li>
+            <li><a href="#"><i class="fas fa-calendar-alt"></i> Calendar</a></li>
+            <li><a href="#" id="resultsLink"><i class="fas fa-clipboard-check"></i> View Results</a></li>
+            <li><a href="#"><i class="fas fa-sticky-note"></i> Notes</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="create-class-card">
+                <div class="teacher-avatar">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <p>Create new class<br>chat now</p>
+                <button class="btn-create-class" id="createClassBtn">Create class</button>
+            </div>
+
+            <div class="school-badge">
+                <i class="fas fa-school"></i>
+                <span>School Name</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="welcome-section">
+                <h1>Welcome back, <span id="adminName">Administrator</span></h1>
+                <p id="currentDate">May 21 Wednesday</p>
+            </div>
+
+            <div class="header-actions">
+                <button class="header-btn"><i class="fas fa-search"></i></button>
+                <button class="header-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge"></span>
+                </button>
+                <button class="header-btn"><i class="fas fa-cog"></i></button>
+                <div class="user-profile">
+                    <div class="user-avatar">A</div>
+
+                    <i class="fas fa-chevron-down" ></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Overview Section -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: #1a202c; margin-bottom: 1.5rem;">Overview</h2>
+            
+            <div class="stats-container">
+                <!-- Total Students -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon purple"><i class="fas fa-user-graduate"></i></div>
+                        <span class="stat-title">No of Students</span>
+                    </div>
+                    <div class="stat-value" id="totalStudents">250</div>
+                    <div class="stat-underline purple"></div>
+                </div>
+
+                <!-- No of Classes -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon blue"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <span class="stat-title">No of Classes</span>
+                    </div>
+                    <div class="stat-value">10</div>
+                    <div class="stat-underline blue"></div>
+                </div>
+
+                <!-- Course in Progress -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon orange"><i class="fas fa-clipboard-list"></i></div>
+                        <span class="stat-title">Course in progress</span>
+                    </div>
+                    <div class="stat-value" id="activeExams">18</div>
+                    <div class="stat-underline orange"></div>
+                </div>
+
+                <!-- Course Completed -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                        <span class="stat-title">Course completed</span>
+                    </div>
+                    <div class="stat-value" id="completedExams">23</div>
+                    <div class="stat-underline green"></div>
+                </div>
+
+                <!-- Profile Card -->
+                <div class="profile-stat-card">
+                    <div class="profile-avatar">T</div>
+                    <div class="profile-name">Teacher Name</div>
+                    <div class="profile-email">walterwhite@gmail.com</div>
+                    <div class="profile-stats"
+                        <div class="profile-stat-item">
+                            <div class="profile-stat-label">Rank</div>
+                            <div class="profile-stat-value">12</div>
+                        </div>
+                        <div class="profile-stat-item">
+                            <div class="profile-stat-label">Classes</div>
+                            <div class="profile-stat-value">10</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Action Cards Section -->
+        <section style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: #1a202c; margin-bottom: 1.5rem;">Quick Actions</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                <!-- Manage Quizzes -->
+                <div class="card action-card" id="manageExamsBtn" style="cursor: pointer; text-align: center;">
+                    <div style="width: 64px; height: 64px; margin: 0 auto 1.5rem; border-radius: 16px; background: linear-gradient(135deg, #eaa511 0%, #f4e982 100%); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-clipboard-list" style="font-size: 1.75rem; color: white;"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #1a202c; margin-bottom: 0.75rem;">Manage Quizzes</h3>
+                    <p style="font-size: 0.875rem; color: #718096; margin-bottom: 1.5rem;">Create, edit, and manage quizzes for your students</p>
+                    <button style="background: linear-gradient(135deg, #f0be09 0%, #deb764 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-cog" style="margin-right: 0.5rem;"></i>Manage Quizzes
+                    </button>
+                </div>
+
+                <!-- Upload Videos -->
+                <div class="card action-card" id="openLiveProctoring" style="cursor: pointer; text-align: center;">
+                    <div style="width: 64px; height: 64px; margin: 0 auto 1.5rem; border-radius: 16px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-video" style="font-size: 1.75rem; color: white;"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #1a202c; margin-bottom: 0.75rem;">Upload Videos</h3>
+                    <p style="font-size: 0.875rem; color: #718096; margin-bottom: 1.5rem;">Upload educational videos for your students</p>
+                    <button style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;" onclick="redirectToLecture()">
+                        <i class="fas fa-upload" style="margin-right: 0.5rem;"></i>Upload Content
+                    </button>
+                </div>
+
+                <!-- Leaderboard -->
+                <div class="card action-card" style="cursor: pointer; text-align: center;">
+                    <div style="width: 64px; height: 64px; margin: 0 auto 1.5rem; border-radius: 16px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-trophy" style="font-size: 1.75rem; color: white;"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #1a202c; margin-bottom: 0.75rem;">Leaderboard</h3>
+                    <p style="font-size: 0.875rem; color: #718096; margin-bottom: 1.5rem;">View and manage student rankings and achievements</p>
+                    <button style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;" onclick="redirectToleaderboard()">
+                        <i class="fas fa-crown" style="margin-right: 0.5rem;"></i>View Rankings
+                    </button>
+                </div>
+
+                <!-- Profile Settings -->
+                <div class="card action-card" id="openExamchecking" style="cursor: pointer; text-align: center;">
+                    <div style="width: 64px; height: 64px; margin: 0 auto 1.5rem; border-radius: 16px; background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-cog" style="font-size: 1.75rem; color: white;"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #1a202c; margin-bottom: 0.75rem;">Profile Settings</h3>
+                    <p style="font-size: 0.875rem; color: #718096; margin-bottom: 1.5rem;">Update and manage your teacher profile</p>
+                    <button style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-edit" style="margin-right: 0.5rem;"></i>Manage Profile
+                    </button>
+                </div>
+
+                <!-- Reports & Analytics -->
+                <div class="card action-card" id="admin-analysisBtn" style="cursor: pointer; text-align: center;">
+                    <div style="width: 64px; height: 64px; margin: 0 auto 1.5rem; border-radius: 16px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-chart-bar" style="font-size: 1.75rem; color: white;"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #1a202c; margin-bottom: 0.75rem;">Reports & Analytics</h3>
+                    <p style="font-size: 0.875rem; color: #718096; margin-bottom: 1.5rem;">View detailed reports and student performance analytics</p>
+                    <button style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;" onclick="analysisadmin()">
+                        <i class="fas fa-chart-pie" style="margin-right: 0.5rem;"></i>View Reports
+                    </button>
+                </div>
+
+                <!-- Student Management -->
+                <div class="card action-card" style="cursor: pointer; text-align: center;">
+                    <div style="width: 64px; height: 64px; margin: 0 auto 1.5rem; border-radius: 16px; background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-users-cog" style="font-size: 1.75rem; color: white;"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #1a202c; margin-bottom: 0.75rem;">Student Management</h3>
+                    <p style="font-size: 0.875rem; color: #718096; margin-bottom: 1.5rem;">Manage student accounts and class assignments</p>
+                    <button style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-users" style="margin-right: 0.5rem;"></i>Manage Students
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Left Column -->
+            <div>
+                <!-- Messages Card -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div class="card-header">
+                        <h3 class="card-title">Messages</h3>
+                        <button class="view-all-btn">View all</button>
+                    </div>
+
+                    <div class="message-item">
+                        <div class="message-avatar dark">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-title">Teacher's Group</div>
+                            <div class="message-text">Einstein: Mr Heisenberg can I borrow your...</div>
+                        </div>
+                        <div class="message-badge">8</div>
+                    </div>
+
+                    <div class="message-item">
+                        <div class="message-avatar dark">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-title">Class 3A</div>
+                            <div class="message-text">You: Complete the equations and come...</div>
+                        </div>
+                        <div class="message-badge">3</div>
+                    </div>
+
+                    <div class="message-item">
+                        <div class="message-avatar dark">
+                            <i class="fas fa-atom"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-title">Class 3B</div>
+                            <div class="message-text">Edison: Sir can we solve the problems for...</div>
+                        </div>
+                        <div class="message-badge">3</div>
+                    </div>
+                </div>
+
+                <!-- Student Performance -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Student Performance</h3>
+                        <button class="action-menu"><i class="fas fa-ellipsis-v"></i></button>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <div class="performance-chart">
+                            <svg width="160" height="160" style="transform: rotate(-90deg);">
+                                <circle cx="80" cy="80" r="70" fill="none" stroke="#e2e8f0" stroke-width="12"></circle>
+                                <circle cx="80" cy="80" r="70" fill="none" stroke="#667eea" stroke-width="12" 
+                                    stroke-dasharray="439.6" stroke-dashoffset="110" stroke-linecap="round"></circle>
+                                <circle cx="80" cy="80" r="70" fill="none" stroke="#ed8936" stroke-width="12" 
+                                    stroke-dasharray="439.6" stroke-dashoffset="220" stroke-linecap="round"></circle>
+                                <circle cx="80" cy="80" r="70" fill="none" stroke="#48bb78" stroke-width="12" 
+                                    stroke-dasharray="439.6" stroke-dashoffset="330" stroke-linecap="round"></circle>
+                            </svg>
+                            <div class="chart-center" id="averageScore">75%</div>
+                        </div>
+
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color excellent"></div>
+                                <span>Excellent</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color good"></div>
+                                <span>Good</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color average"></div>
+                                <span>Average</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div>
+                <!-- Calendar Card -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div class="calendar-header">
+                        <h3 class="calendar-month">May 2025</h3>
+                        <div class="calendar-nav">
+                            <button><i class="fas fa-chevron-left"></i></button>
+                            <button><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="calendar-grid">
+                        <div class="calendar-day header">S</div>
+                        <div class="calendar-day header">M</div>
+                        <div class="calendar-day header">T</div>
+                        <div class="calendar-day header">W</div>
+                        <div class="calendar-day header">T</div>
+                        <div class="calendar-day header">F</div>
+                        <div class="calendar-day header">S</div>
+
+                        <div class="calendar-day other-month">29</div>
+                        <div class="calendar-day other-month">30</div>
+                        <div class="calendar-day other-month">31</div>
+                        <div class="calendar-day">1</div>
+                        <div class="calendar-day">2</div>
+                        <div class="calendar-day">3</div>
+                        <div class="calendar-day">4</div>
+
+                        <div class="calendar-day">5</div>
+                        <div class="calendar-day">6</div>
+                        <div class="calendar-day">7</div>
+                        <div class="calendar-day today">8</div>
+                        <div class="calendar-day">9</div>
+                        <div class="calendar-day">10</div>
+                        <div class="calendar-day">11</div>
+
+                        <div class="calendar-day">12</div>
+                        <div class="calendar-day">13</div>
+                        <div class="calendar-day">14</div>
+                        <div class="calendar-day">15</div>
+                        <div class="calendar-day">16</div>
+                        <div class="calendar-day">17</div>
+                        <div class="calendar-day">18</div>
+
+                        <div class="calendar-day">19</div>
+                        <div class="calendar-day">20</div>
+                        <div class="calendar-day">21</div>
+                        <div class="calendar-day">22</div>
+                        <div class="calendar-day">23</div>
+                        <div class="calendar-day">24</div>
+                        <div class="calendar-day">25</div>
+
+                        <div class="calendar-day">26</div>
+                        <div class="calendar-day">27</div>
+                        <div class="calendar-day">28</div>
+                        <div class="calendar-day">29</div>
+                        <div class="calendar-day">30</div>
+                        <div class="calendar-day other-month">1</div>
+                        <div class="calendar-day other-month">2</div>
+                    </div>
+                </div>
+
+                <!-- Weekly Timetable -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Weekly Timetable</h3>
+                        <button class="view-all-btn">View all</button>
+                    </div>
+
+                    <div class="timetable-item">
+                        <div class="timetable-time">10:00</div>
+                        <div class="timetable-details">
+                            <div class="timetable-title">Chemistry | Class 3A</div>
+                            <div class="timetable-subtitle">May 22, Offline</div>
+                        </div>
+                        <button class="timetable-action"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+
+                    <div class="timetable-item">
+                        <div class="timetable-time">11:30</div>
+                        <div class="timetable-details">
+                            <div class="timetable-title">Chemistry | Class 3A</div>
+                            <div class="timetable-subtitle">May 22, Offline</div>
+                        </div>
+                        <button class="timetable-action"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+
+                    <div class="timetable-item">
+                        <div class="timetable-time">15:30</div>
+                        <div class="timetable-details">
+                            <div class="timetable-title">Chemistry | Class 5C</div>
+                            <div class="timetable-subtitle">May 24, Offline</div>
+                        </div>
+                        <button class="timetable-action"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Table -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <div class="table-controls">
+                <h3 class="card-title">Students Table</h3>
+                <div class="table-actions">
+                    <button class="table-btn"><i class="fas fa-filter"></i> Filter</button>
+                    <button class="table-btn"><i class="fas fa-sort"></i> Sort</button>
+                    <button class="view-all-btn">View all</button>
+                </div>
+            </div>
+
+            <table class="students-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Student</th>
+                        <th>Chapter</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1.</td>
+                        <td>
+                            <div class="student-info">
+                                <div class="student-avatar">RJ</div>
+                                <span class="student-name">Robert Jones</span>
+                            </div>
+                        </td>
+                        <td>Chemistry</td>
+                        <td><span class="grade-badge grade-a">A (Very Good)</span></td>
+                        <td>
+                            <span class="status-badge in-progress">
+                                <span class="status-dot"></span>
+                                In Progress
+                            </span>
+                        </td>
+                        <td><button class="action-menu"><i class="fas fa-ellipsis-v"></i></button></td>
+                    </tr>
+                    <tr>
+                        <td>2.</td>
+                        <td>
+                            <div class="student-info">
+                                <div class="student-avatar">CF</div>
+                                <span class="student-name">Charlotte Fox</span>
+                            </div>
+                        </td>
+                        <td>Heuristics in UX</td>
+                        <td><span class="grade-badge grade-b">B+ (Good)</span></td>
+                        <td>
+                            <span class="status-badge in-progress">
+                                <span class="status-dot"></span>
+                                In Progress
+                            </span>
+                        </td>
+                        <td><button class="action-menu"><i class="fas fa-ellipsis-v"></i></button></td>
+                    </tr>
+                    <tr>
+                        <td>3.</td>
+                        <td>
+                            <div class="student-info">
+                                <div class="student-avatar">BW</div>
+                                <span class="student-name">Benjamin Wood</span>
+                            </div>
+                        </td>
+                        <td>Chemistry</td>
+                        <td><span class="grade-badge grade-c">C (Pass)</span></td>
+                        <td>
+                            <span class="status-badge reviewed">
+                                <span class="status-dot"></span>
+                                Reviewed
+                            </span>
+                        </td>
+                        <td><button class="action-menu"><i class="fas fa-ellipsis-v"></i></button></td>
+                    </tr>
+                    <tr>
+                        <td>4.</td>
+                        <td>
+                            <div class="student-info">
+                                <div class="student-avatar">SL</div>
+                                <span class="student-name">Samantha Lee</span>
+                            </div>
+                        </td>
+                        <td>Gestalt Principles in UX</td>
+                        <td><span class="grade-badge grade-a">A+ (Excellent)</span></td>
+                        <td>
+                            <span class="status-badge not-viewed">
+                                <span class="status-dot"></span>
+                                Not viewed
+                            </span>
+                        </td>
+                        <td><button class="action-menu"><i class="fas fa-ellipsis-v"></i></button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Notes</h3>
+            </div>
+            <textarea class="notes-input" placeholder="Type your notes here..."></textarea>
+        </div>
+    </main>
+
+    <script>
+        // Dynamic URL handling - Keep all backend functionality
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const teacherId = urlParams.get('teacherId');
+            
+            if (teacherId) {
+                const dynamicLinks = [
+                    'manageExamsBtn',
+                    'admin-analysisBtn', 
+                    'openLiveProctoring'
+                ];
+                
+                dynamicLinks.forEach(linkId => {
+                    const element = document.getElementById(linkId);
+                    if (element) {
+                        element.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            let baseUrl = '';
+                            
+                            switch(linkId) {
+                                case 'manageExamsBtn':
+                                    baseUrl = '/manage-exam.html';
+                                    break;
+                                case 'admin-analysisBtn':
+                                    baseUrl = '/admin-analysis.html';
+                                    break;
+                                case 'openLiveProctoring':
+                                    baseUrl = '/upload-videos.html';
+                                    break;
+                            }
+                            
+                            window.location.href = `${baseUrl}?teacherId=${encodeURIComponent(teacherId)}`;
+                        });
+                    }
+                });
+            }
+
+            // Update current date
+            const options = { month: 'long', day: 'numeric', weekday: 'long' };
+            const dateStr = new Date().toLocaleDateString('en-US', options);
+            document.getElementById('currentDate').textContent = dateStr;
+        });
+
+        // Sidebar link handlers
+        document.getElementById('classroomsLink')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Add your classrooms navigation logic
+        });
+
+        document.getElementById('studentsLink')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Add your students navigation logic
+        });
+
+        document.getElementById('performanceLink')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            const urlParams = new URLSearchParams(window.location.search);
+            const teacherId = urlParams.get('teacherId');
+            if (teacherId) {
+                window.location.href = `/admin-analysis.html?teacherId=${encodeURIComponent(teacherId)}`;
+            }
+        });
+
+        document.getElementById('resultsLink')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Add your results navigation logic
+        });
+
+        document.getElementById('createClassBtn')?.addEventListener('click', function() {
+            // Add your create class logic
+            alert('Create Class functionality');
+        });
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+
+        // Redirect to leaderboard
+        function redirectToleaderboard() {
+            window.location.href = "/leader-board";
+        }
+
+        // Analysis admin
+        function analysisadmin() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const teacherId = urlParams.get('teacherId');
+            if (teacherId) {
+                window.location.href = `/admin-analysis.html?teacherId=${encodeURIComponent(teacherId)}`;
+            } else {
+                window.location.href = '/admin-analysis.html';
+            }
+        }
+
+        // Redirect to lecture
+        function redirectToLecture() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const teacherId = urlParams.get('teacherId');
+            if (teacherId) {
+                window.location.href = `/upload-videos.html?teacherId=${encodeURIComponent(teacherId)}`;
+            } else {
+                window.location.href = '/upload-videos.html';
+            }
+        }
+    </script>
+    <script src="shared/admin.js"></script>
+    <script>
+let recognizing = false;
+let recognition;
+let ttsEnabled = false;
+let ttsSpeed = 1;
+
+// ✅ Text-to-Speech function
+function speak(text) {
+  if (!ttsEnabled) return;
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.rate = ttsSpeed;
+  msg.pitch = 1;
+  msg.lang = "en-US";
+  window.speechSynthesis.speak(msg);
+}
+
+// ✅ Initialize Speech Recognition
+if ("webkitSpeechRecognition" in window) {
+  recognition = new webkitSpeechRecognition();
+  recognition.continuous = false;
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+
+  recognition.onresult = function(event) {
+    const transcript = event.results[0][0].transcript.toLowerCase();
+    document.getElementById("voiceCommandStatus").textContent = `Heard: "${transcript}"`;
+    speak(`You said ${transcript}`);
+    handleVoiceCommand(transcript);
+  };
+
+  recognition.onstart = () => {
+    recognizing = true;
+    document.getElementById("voiceCommandStatus").textContent = "🎙 Listening...";
+    speak("Listening now");
+  };
+
+  recognition.onend = () => {
+    recognizing = false;
+    document.getElementById("voiceCommandStatus").textContent = "Click to activate";
+  };
+}
+
+// ✅ Voice command handler
+function handleVoiceCommand(command) {
+  if (command.includes("quiz")) {
+    speak("Opening manage quiz");
+    document.getElementById("manageExamsBtn")?.click();
+  } else if (command.includes("upload")) {
+    speak("Opening upload videos");
+    document.getElementById("openLiveProctoring")?.click();
+  } else if (command.includes("report") || command.includes("analytics")) {
+    speak("Opening reports and analytics");
+    document.getElementById("admin-analysisBtn")?.click();
+  } else if (command.includes("leaderboard")) {
+    speak("Opening leaderboard");
+    redirectToleaderboard();
+  } else if (command.includes("scroll down")) {
+    window.scrollBy({ top: 500, behavior: "smooth" });
+    speak("Scrolling down");
+  } else if (command.includes("scroll up")) {
+    window.scrollBy({ top: -500, behavior: "smooth" });
+    speak("Scrolling up");
+  } else {
+    speak("Sorry, I didn't understand that command");
+  }
+}
+
+// ✅ Button handlers
+document.getElementById("toggleVoiceCommands").addEventListener("click", () => {
+  if (!recognition) return alert("Speech recognition not supported in this browser");
+  if (recognizing) {
+    recognition.stop();
+  } else {
+    recognition.start();
+  }
+});
+
+document.getElementById("toggleTextToSpeech").addEventListener("click", () => {
+  ttsEnabled = !ttsEnabled;
+  document.getElementById("ttsStatus").textContent = `TTS: ${ttsEnabled ? "Active" : "Inactive"}`;
+  speak(ttsEnabled ? "Text to speech activated" : "Speech deactivated");
+});
+
+document.getElementById("ttsSpeed").addEventListener("input", (e) => {
+  ttsSpeed = parseFloat(e.target.value);
+  speak(`Speed set to ${ttsSpeed}`);
+});
+
+document.getElementById("stopSpeech").addEventListener("click", () => {
+  window.speechSynthesis.cancel();
+});
+
+// ✅ Keyboard shortcuts
+document.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "o") {
+    document.getElementById("toggleVoiceCommands").click();
+  } else if (e.key.toLowerCase() === "v") {
+    document.getElementById("toggleTextToSpeech").click();
+  } else if (e.key === "Escape") {
+    window.speechSynthesis.cancel();
+    if (recognizing) recognition.stop();
+  }
+});
+</script>
+
+</body>
+</html>

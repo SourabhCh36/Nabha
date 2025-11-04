@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Analysis Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .chapter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .chapter-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .chapter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .chapter-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .chapter-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ffa726);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            background: #fafafa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .chapter-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .chart-container {
+                height: 300px;
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Your Performance Analysis</h1>
+            <p>Track your exam results and performance metrics</p>
+        </div>
+
+        <div class="content">
+            <!-- Overall Statistics -->
+            <div class="chapter-section">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">📊 Overall Performance</h2>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalExamsCount">0</div>
+                        <div class="stat-label">Total Exams</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="passedExamsCount">0</div>
+                        <div class="stat-label">Passed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="failedExamsCount">0</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgScoreOverall">0%</div>
+                        <div class="stat-label">Average Score</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance by Exam -->
+            <div class="chapter-section">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">📈 Exam-wise Performance</h2>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="examPerformanceChart"></canvas>
+                </div>
+                
+                <!-- Results Table -->
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">Recent Results</h3>
+                    <div id="resultsTableContainer" style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.95em;">
+                            <thead>
+                                <tr style="background: #f5f5f5; border-bottom: 2px solid #ddd;">
+                                    <th style="padding: 12px; text-align: left;">Exam Title</th>
+                                    <th style="padding: 12px; text-align: center;">Score</th>
+                                    <th style="padding: 12px; text-align: center;">Percentage</th>
+                                    <th style="padding: 12px; text-align: center;">Status</th>
+                                    <th style="padding: 12px; text-align: left;">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTableBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 30px; color: #999;">
+                                        Loading results...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="noResultsMessage" style="text-align: center; padding: 40px; color: #999; display: none;">
+                        <p>No exam results yet. Start taking exams to see your performance!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let examPerformanceChart = null;
+
+        // Fetch student results from API
+        async function loadStudentAnalysis() {
+            try {
+                const token = localStorage.getItem('token');
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                
+                console.log('=== Student Analysis Loading ===');
+                console.log('User ID:', user._id);
+                console.log('Token exists:', !!token);
+
+                if (!token || !user._id) {
+                    console.error('No user data found');
+                    return;
+                }
+
+                const response = await fetch(`/api/results/student/${user._id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('API Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Full API Response:', data);
+                const results = data.data || data.results || [];
+                console.log('Parsed results count:', results.length);
+
+                if (results.length === 0) {
+                    document.getElementById('noResultsMessage').style.display = 'block';
+                    document.getElementById('resultsTableContainer').style.display = 'none';
+                    return;
+                }
+
+                // Display results
+                displayAnalysis(results);
+            } catch (error) {
+                console.error('Error loading analysis:', error);
+                alert('Error loading analysis. Please check the console.');
+            }
+        }
+
+        function displayAnalysis(results) {
+            // Calculate overall statistics
+            const totalExams = results.length;
+            const passedExams = results.filter(r => r.passed).length;
+            const failedExams = totalExams - passedExams;
+            const avgScore = Math.round(results.reduce((sum, r) => sum + r.percentage, 0) / totalExams);
+
+            // Update statistics
+            document.getElementById('totalExamsCount').textContent = totalExams;
+            document.getElementById('passedExamsCount').textContent = passedExams;
+            document.getElementById('failedExamsCount').textContent = failedExams;
+            document.getElementById('avgScoreOverall').textContent = avgScore + '%';
+
+            // Display results table
+            displayResultsTable(results);
+
+            // Create chart
+            createPerformanceChart(results);
+        }
+
+        function displayResultsTable(results) {
+            const tableBody = document.getElementById('resultsTableBody');
+            const sortedResults = [...results].sort((a, b) => 
+                new Date(b.submittedAt) - new Date(a.submittedAt)
+            );
+
+            tableBody.innerHTML = sortedResults.map(result => `
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 12px;">${result.examId.title}</td>
+                    <td style="padding: 12px; text-align: center;">${result.score}/${result.totalMarks}</td>
+                    <td style="padding: 12px; text-align: center;">${result.percentage}%</td>
+                    <td style="padding: 12px; text-align: center;">
+                        <span style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; 
+                        background: ${result.passed ? '#d4edda' : '#f8d7da'}; color: ${result.passed ? '#155724' : '#721c24'};">
+                            ${result.passed ? 'PASSED' : 'FAILED'}
+                        </span>
+                    </td>
+                    <td style="padding: 12px;">${new Date(result.submittedAt).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function createPerformanceChart(results) {
+            const ctx = document.getElementById('examPerformanceChart').getContext('2d');
+
+            // Prepare data
+            const labels = results.map(r => r.examId.title).slice(0, 10);
+            const percentages = results.map(r => r.percentage).slice(0, 10);
+            const statusColors = results.slice(0, 10).map(r => r.passed ? 'rgba(75, 192, 75, 0.8)' : 'rgba(255, 99, 99, 0.8)');
+
+            // Destroy existing chart if it exists
+            if (examPerformanceChart) {
+                examPerformanceChart.destroy();
+            }
+
+            examPerformanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Score Percentage',
+                        data: percentages,
+                        backgroundColor: statusColors,
+                        borderColor: statusColors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.x + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                color: '#666',
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#666'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Add animation on load
+        window.addEventListener('load', () => {
+            loadStudentAnalysis();
+            document.querySelectorAll('.chapter-section').forEach((section, index) => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(50px)';
+                setTimeout(() => {
+                    section.style.transition = 'all 0.6s ease';
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-lang="title_text">Nabha Digital Learning</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Poppins , sans-serif;
+      background: #ffffff;
+      color: #1f2937;
+    }
+
+    /* Navigation */
+    .nav-glass {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Buttons */
+    .btn-primary {
+      background: #0891b2;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary:hover {
+      background: #0e7490;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+    }
+
+    .btn-outline {
+      border: 2px solid #0891b2;
+      color: #0891b2;
+      background: white;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline:hover {
+      background: #0891b2;
+      color: white;
+    }
+
+    /* Cards */
+    .role-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      transition: all 0.2s ease;
+    }
+
+    .role-card:hover {
+      border-color: #0891b2;
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .feature-icon {
+      transition: transform 0.2s ease;
+    }
+
+    .feature-icon:hover {
+      transform: scale(1.05);
+    }
+
+    .gradient-text {
+      color: #0891b2;
+    }
+
+    /* Animated Role Cards */
+.role-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.5rem;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.role-card:hover {
+  border-color: #0891b2;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Hidden button container */
+.role-card .card__data {
+  position: absolute;
+  bottom: -8rem;
+  left: 0;
+  right: 0;
+  width: 80%;
+  margin: 0 auto;
+  background-color: rgb(255, 255, 255);
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(47, 43, 6, 0.113);
+  opacity: 0;
+  transition: opacity 1s 1s;
+  padding: 1.25rem 1.5rem;
+}
+
+/* Hover animations */
+.role-card:hover .card__data {
+  animation: show-data 1s forwards;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+.role-card:hover {
+  animation: remove-overflow 2s forwards;
+}
+
+.role-card:not(:hover) {
+  animation: show-overflow 2s forwards;
+}
+
+.role-card:not(:hover) .card__data {
+  animation: remove-data 1s forwards;
+}
+
+/* Keyframes */
+@keyframes show-data {
+  50% {
+    transform: translateY(-9rem);
+  }
+  100% {
+    transform: translateY(-6.5rem);
+  }
+}
+
+@keyframes remove-overflow {
+  to {
+    overflow: initial;
+  }
+}
+
+@keyframes remove-data {
+  0% {
+    transform: translateY(-6.5rem);
+  }
+  50% {
+    transform: translateY(-9rem);
+  }
+  100% {
+    transform: translateY(0.5rem);
+  }
+}
+
+@keyframes show-overflow {
+  0% {
+    overflow: initial;
+    pointer-events: none;
+  }
+  50% {
+    overflow: hidden;
+  }
+}
+
+
+    /* Scroll appear animation */
+    .scroll-appear {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+
+    .scroll-appear.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Staggered delay for multiple elements */
+    [data-delay="1"] { transition-delay: 0.1s; }
+    [data-delay="2"] { transition-delay: 0.2s; }
+    [data-delay="3"] { transition-delay: 0.3s; }
+    [data-delay="4"] { transition-delay: 0.4s; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav-glass sticky top-0 w-full z-50 px-6 lg:px-8 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+      <!-- Language Switcher -->
+        <div class="relative group">
+          <button id="lang-switcher-btn" class="btn-outline px-4 py-2 rounded-lg font-medium flex items-right space-x-2">
+            <span id="current-lang-display" data-lang="current_lang_display">EN</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </button>
+          <div id="lang-dropdown" class="absolute right-0 mt-2 w-24 bg-white border border-gray-200 rounded-lg shadow-xl hidden group-hover:block z-20">
+            <button data-lang-code="en" class="lang-option block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-50" data-lang="lang_en">English</button>
+            <button data-lang-code="hi" class="lang-option block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-50" data-lang="lang_hi">हिन्दी</button>
+            <button data-lang-code="pa" class="lang-option block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-50" data-lang="lang_pa">ਪੰਜਾਬੀ</button>
+          </div>
+        </div>  
+        <span class="text-xl font-semibold text-black-900" data-lang="logo_text"> Nabha Digital Learning</span>
+      </div>
+       
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="#hero" class="text-gray-600 hover:text-cyan-600 transition-colors font-medium" data-lang="nav_home">Home</a>
+        <a href="#roles" class="text-gray-600 hover:text-cyan-600 transition-colors font-medium" data-lang="nav_roles">Roles</a>
+        <a href="#features" class="text-gray-600 hover:text-cyan-600 transition-colors font-medium" data-lang="nav_features">Features</a>
+        <a href="#impact" class="text-gray-600 hover:text-cyan-600 transition-colors font-medium" data-lang="nav_impact">Impact</a>
+        
+       
+        <!-- Language Switcher -->
+        
+        <button class="btn-primary px-6 py-2 rounded-lg font-medium text-white" onclick="regirectToLogin()" data-lang="btn_get_started">
+          Get Started
+        </button>
+      </div>
+
+      <button class="md:hidden" id="mobile-menu-btn">
+        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </nav>
+  
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden md:hidden fixed inset-0 bg-white z-40 p-6 pt-20 shadow-2xl">
+    <a href="#hero" class="block py-3 text-lg text-gray-700 hover:text-cyan-600 border-b" data-lang="nav_home">Home</a>
+    <a href="#roles" class="block py-3 text-lg text-gray-700 hover:text-cyan-600 border-b" data-lang="nav_roles">Roles</a>
+    <a href="#features" class="block py-3 text-lg text-gray-700 hover:text-cyan-600 border-b" data-lang="nav_features">Features</a>
+    <a href="#impact" class="block py-3 text-lg text-gray-700 hover:text-cyan-600 border-b" data-lang="nav_impact">Impact</a>
+    <div class="py-3 border-b">
+      <h4 class="text-md mb-2 text-gray-500" data-lang="mobile_lang_heading">Language</h4>
+      <button data-lang-code="en" class="lang-option w-full text-left py-2 text-gray-700 hover:bg-indigo-50 rounded-md" data-lang="lang_en">English</button>
+      <button data-lang-code="hi" class="lang-option w-full text-left py-2 text-gray-700 hover:bg-indigo-50 rounded-md" data-lang="lang_hi">हिन्दी</button>
+      <button data-lang-code="pa" class="lang-option w-full text-left py-2 text-gray-700 hover:bg-indigo-50 rounded-md" data-lang="lang_pa">ਪੰਜਾਬੀ</button>
+    </div>
+    <button class="btn-primary w-full mt-6 py-3 rounded-xl text-lg font-semibold text-white" onclick="regirectToLogin()" data-lang="btn_start_learning">Start Learning</button>
+  </div>
+
+  <!-- Hero Section -->
+  <section id="hero" class="scroll-appear min-h-screen flex items-center justify-center pt-20 px-6 lg:px-8 bg-cover bg-center relative"
+  style="background-image: url(/assets/Rural-vs-Urban-Educationin-infographic-bkgrd-UWA.jpg)">
+  <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+  <div class="max-w-7xl mx-auto relative z-10 text-white">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <div class="text-center lg:text-left">
+        <h1 class="text-5xl lg:text-6xl font-bold mb-6">
+          <span class="text-red-300" data-lang="hero_nabha">Nabha</span><br>
+          <span data-lang="hero_brand">Digital Learning</span>
+        </h1>
+        <p class="text-xl lg:text-2xl mb-8 text-gray-200" data-lang="hero_promo">
+          Premium Digital Learning for Every Child,<br>
+          <span class="text-cyan-400 font-medium" data-lang="hero_tagline">Anytime, Anywhere</span>
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          <button class="btn-primary px-8 py-4 rounded-lg text-lg font-semibold text-white" onclick="regirectToLogin()" data-lang="hero_start_learning">Start Learning</button>
+          <button class="btn-outline px-8 py-4 rounded-lg text-lg font-semibold" data-lang="hero_learn_more">Learn More</button>
+        </div>
+      </div>
+
+      <div class="relative flex justify-center">
+        <div class="bg-white bg-opacity-90 border border-gray-200 p-8 rounded-2xl w-80 h-80 flex flex-col items-center justify-center scroll-appear">
+          <div class="text-6xl mb-6" data-lang="hero_emoji">📚</div>
+          <h3 class="text-2xl font-semibold mb-4 text-black" data-lang="hero_learn_together">Learn Together</h3>
+          <div class="flex space-x-4 mb-4">
+            <div class="w-12 h-12 bg-yellow-600 rounded-full flex items-center justify-center text-black text-xl" data-lang="hero_student_emoji">👨‍🎓</div>
+            <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-black text-xl" data-lang="hero_student2_emoji">👩‍🎓</div>
+            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-black text-xl" data-lang="hero_phone_emoji">📱</div>
+          </div>
+          <p class="text-black text-center" data-lang="hero_connected">Rural Students Connected</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- Roles Section -->
+  <section id="roles" class="py-20 px-6 lg:px-8 bg-white">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl lg:text-5xl font-bold mb-4 text-gray-900" data-lang="roles_heading">Choose Your <span class="gradient-text" data-lang="roles_heading_span">Role</span></h2>
+        <p class="text-xl text-gray-600 max-w-xl mx-auto" data-lang="roles_subtitle">Select your path to start your learning journey</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+        <!-- Students Card -->
+        <div class="role-card text-center p-8">
+          <div class="w-20 h-20 bg-green-500 rounded-xl flex items-center justify-center mx-auto mb-6 feature-icon" data-lang="students_card_emoji">🎓</div>
+          <h3 class="text-2xl font-semibold mb-3 text-gray-900" data-lang="students_card_title">Students</h3>
+          <p class="text-gray-600 mb-4" data-lang="students_card_desc">Access interactive lessons and practice exercises to improve your skills.</p>
+
+          <div class="card__data">
+            <button class="btn-primary w-full py-3 rounded-lg font-semibold text-white" onclick="regirectToLogin()" data-lang="students_card_btn">Start Learning</button>
+          </div>
+        </div>
+
+        <!-- Teachers Card -->
+        <div class="role-card text-center p-8">
+          <div class="w-20 h-20 bg-yellow-600 rounded-xl flex items-center justify-center mx-auto mb-6 feature-icon" data-lang="teachers_card_emoji">👩‍🏫</div>
+          <h3 class="text-2xl font-semibold mb-3 text-gray-900" data-lang="teachers_card_title">Teachers</h3>
+          <p class="text-gray-600 mb-4" data-lang="teachers_card_desc">Monitor student progress, upload resources, and manage assessments.</p>
+
+          <div class="card__data">
+            <button class="btn-primary w-full py-3 rounded-lg font-semibold text-white" onclick="regirectToLoginT()" data-lang="teachers_card_btn">Teacher Dashboard</button>
+          </div>
+        </div>
+
+        <!-- Authority Card -->
+        <div class="role-card text-center p-8">
+          <div class="w-20 h-20 bg-gray-500 rounded-xl flex items-center justify-center mx-auto mb-6 feature-icon" data-lang="authority_card_emoji">👨‍💼</div>
+          <h3 class="text-2xl font-semibold mb-3 text-gray-900" data-lang="authority_card_title">Authority</h3>
+          <p class="text-gray-600 mb-4" data-lang="authority_card_desc">Gain insights into institutional performance and oversee academic activities.</p>
+
+          <div class="card__data">
+            <button class="btn-primary w-full py-3 rounded-lg font-semibold text-white" data-lang="authority_card_btn">Authority Dashboard</button>
+          </div>
+        </div>
+
+        <!-- Parents/Admin Card -->
+        <div class="role-card text-center p-8">
+          <div class="w-20 h-20 bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-6 feature-icon" data-lang="parents_card_emoji">👨‍👩‍👧</div>
+          <h3 class="text-2xl font-semibold mb-3 text-gray-900" data-lang="parents_card_title">Parents/Admin</h3>
+          <p class="text-gray-600 mb-4" data-lang="parents_card_desc">Track student performance, attendance, and overall progress reports.</p>
+
+          <div class="card__data">
+            <button class="btn-primary w-full py-3 rounded-lg font-semibold text-white" onclick="regirectTo" data-lang="parents_card_btn">View Reports</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  
+
+  <!-- Features Section -->
+  <section id="features" class="scroll-appear py-20 px-6 lg:px-8 bg-gray-50">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl lg:text-5xl font-bold mb-4 text-gray-900" data-lang="features_heading">Why Choose <span class="gradient-text" data-lang="features_heading_span">Nabha Digital Learning?</span></h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto" data-lang="features_subtitle">Designed specifically for rural schools</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="text-center scroll-appear" data-delay="1">
+          <div class="w-16 h-16 bg-amber-500 rounded-xl flex items-center justify-center mx-auto mb-6 feature-icon" data-lang="feature1_icon">📱</div>
+          <h3 class="text-xl font-semibold mb-3 text-gray-900" data-lang="feature1_title">Works Offline</h3>
+          <p class="text-gray-600" data-lang="feature1_desc">Download lessons and study without internet</p>
+        </div>
+
+        <div class="text-center scroll-appear" data-delay="2">
+          <div class="w-16 h-16 bg-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-6 feature-icon" data-lang="feature2_icon">🌐</div>
+          <h3 class="text-xl font-semibold mb-3 text-gray-900" data-lang="feature2_title">Local Languages</h3>
+          <p class="text-gray-600" data-lang="feature2_desc">Available in Punjabi, Hindi, and English</p>
+        </div>
+
+        <div class="text-center scroll-appear" data-delay="3">
+          <div class="w-16 h-16 bg-teal-500 rounded-xl flex items-center justify-center mx-auto mb-6 feature-icon" data-lang="feature3_icon">🎮</div>
+          <h3 class="text-xl font-semibold mb-3 text-gray-900" data-lang="feature3_title">Interactive Lessons</h3>
+          <p class="text-gray-600" data-lang="feature3_desc">Gamified learning with quizzes</p>
+        </div>
+
+        <div class="text-center scroll-appear" data-delay="4">
+          <div class="w-16 h-16 bg-sky-500 rounded-xl flex items-center justify-center mx-auto mb-6 feature-icon" data-lang="feature4_icon">📊</div>
+          <h3 class="text-xl font-semibold mb-3 text-gray-900" data-lang="feature4_title">Track Progress</h3>
+          <p class="text-gray-600" data-lang="feature4_desc">Detailed analytics and reports</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+   <!-- Impact Section -->
+   <section id="impact" class="py-20 px-6 lg:px-8 bg-cyan-600 text-gray">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl lg:text-5xl font-bold mb-6" data-lang="impact_heading">Bridging the Education Gap</h2>
+        <p class="text-xl text-cyan-100 max-w-4xl mx-auto" data-lang="impact_subtext">
+          Every child deserves quality education. Our platform ensures rural students have the same opportunities.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8 mb-16">
+        <div class="text-center bg-white bg-opacity-10 p-8 rounded-xl">
+          <div class="text-5xl font-bold mb-2" data-lang="impact_stat_students">500+</div>
+          <p class="text-cyan-100 text-lg" data-lang="impact_stat_students_label">Students Enrolled</p>
+        </div>
+        <div class="text-center bg-white bg-opacity-10 p-8 rounded-xl">
+          <div class="text-5xl font-bold mb-2" data-lang="impact_stat_schools">50+</div>
+          <p class="text-cyan-100 text-lg" data-lang="impact_stat_schools_label">Rural Schools</p>
+        </div>
+        <div class="text-center bg-white bg-opacity-10 p-8 rounded-xl">
+          <div class="text-5xl font-bold mb-2" data-lang="impact_stat_completion">98%</div>
+          <p class="text-cyan-100 text-lg" data-lang="impact_stat_completion_label">Completion Rate</p>
+        </div>
+      </div>
+
+      <div class="bg-white bg-opacity-10 p-12 rounded-2xl text-center">
+        <div class="flex items-center justify-center space-x-8 mb-6">
+          <div class="text-center">
+            <div class="text-5xl mb-2" data-lang="impact_icon_school">🏫</div>
+            <p class="text-cyan-100" data-lang="impact_text_rural">Rural Schools</p>
+          </div>
+          <div class="text-4xl font-bold" data-lang="impact_equal">=</div>
+          <div class="text-center">
+            <div class="text-5xl mb-2" data-lang="impact_icon_urban">🏢</div>
+            <p class="text-cyan-100" data-lang="impact_text_urban">Urban Schools</p>
+          </div>
+        </div>
+        <h3 class="text-2xl font-semibold" data-lang="impact_equal_title">Equal Opportunities for All</h3>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-16 px-6 lg:px-8 bg-gray-50 border-t border-gray-200">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center">
+        <div class="flex items-center justify-center space-x-3 mb-6">
+          <div class="w-12 h-12 bg-cyan-600 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-xl" data-lang="footer_logo">N</span>
+          </div>
+          <span class="text-2xl font-semibold text-gray-900" data-lang="footer_brand">Nabha Digital Learning</span>
+        </div>
+        
+        <p class="text-gray-600 mb-8" data-lang="footer_support">Supported by Punjab Education Department</p>
+        
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+          <button class="bg-white hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-lg transition-colors border border-gray-200" data-lang="footer_contact">📧 Contact Us</button>
+          <button class="bg-white hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-lg transition-colors border border-gray-200" data-lang="footer_feedback">💬 Feedback</button>
+          <button class="bg-white hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-lg transition-colors border border-gray-200" data-lang="footer_support_btn">📞 Support</button>
+        </div>
+        
+        <div class="border-t border-gray-200 pt-6">
+          <p class="text-gray-500" data-lang="footer_copyright">© 2024 Nabha Digital Learning Platform. Empowering rural education in Punjab.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // --- Localization Data ---
+        const localization = {
+            en: {
+                // existing keys (kept)
+                logo_text: "Nabha Digital Learning",
+                nav_home: "Home",
+                nav_roles: "Roles",
+                nav_features: "Features",
+                nav_impact: "Impact",
+                btn_get_started: "Get Started",
+                btn_start_learning: "Start Learning",
+
+                // title / current language display
+                title_text: "Nabha Digital Learning",
+                current_lang_display: "EN",
+                lang_en: "English",
+                lang_hi: "हिन्दी",
+                lang_pa: "ਪੰਜਾਬੀ",
+                mobile_lang_heading: "Language",
+                
+                // Hero
+                hero_nabha: "Nabha",
+                hero_brand: "Digital Learning",
+                hero_promo: "Premium Digital Learning for Every Child,\nAnytime, Anywhere",
+                hero_tagline: "Anytime, Anywhere",
+                hero_start_learning: "Start Learning",
+                hero_learn_more: "Learn More",
+                hero_emoji: "📚",
+                hero_learn_together: "Learn Together",
+                hero_student_emoji: "👨‍🎓",
+                hero_student2_emoji: "👩‍🎓",
+                hero_phone_emoji: "📱",
+                hero_connected: "Rural Students Connected",
+
+                // Roles
+                roles_heading: "Choose Your",
+                roles_heading_span: "Role",
+                roles_subtitle: "Select your path to start your learning journey",
+                students_card_emoji: "🎓",
+                students_card_title: "Students",
+                students_card_desc: "Access interactive lessons and practice exercises to improve your skills.",
+                students_card_btn: "Start Learning",
+                teachers_card_emoji: "👩‍🏫",
+                teachers_card_title: "Teachers",
+                teachers_card_desc: "Monitor student progress, upload resources, and manage assessments.",
+                teachers_card_btn: "Teacher Dashboard",
+                authority_card_emoji: "👨‍💼",
+                authority_card_title: "Authority",
+                authority_card_desc: "Gain insights into institutional performance and oversee academic activities.",
+                authority_card_btn: "Authority Dashboard",
+                parents_card_emoji: "👨‍👩‍👧",
+                parents_card_title: "Parents/Admin",
+                parents_card_desc: "Track student performance, attendance, and overall progress reports.",
+                parents_card_btn: "View Reports",
+
+                // Features
+                features_heading: "Why Choose",
+                features_heading_span: "Nabha Digital Learning?",
+                features_subtitle: "Designed specifically for rural schools",
+                feature1_icon: "📱",
+                feature1_title: "Works Offline",
+                feature1_desc: "Download lessons and study without internet",
+                feature2_icon: "🌐",
+                feature2_title: "Local Languages",
+                feature2_desc: "Available in Punjabi, Hindi, and English",
+                feature3_icon: "🎮",
+                feature3_title: "Interactive Lessons",
+                feature3_desc: "Gamified learning with quizzes",
+                feature4_icon: "📊",
+                feature4_title: "Track Progress",
+                feature4_desc: "Detailed analytics and reports",
+
+                // Impact
+                impact_heading: "Bridging the Education Gap",
+                impact_subtext: "Every child deserves quality education. Our platform ensures rural students have the same opportunities.",
+                impact_stat_students: "500+",
+                impact_stat_students_label: "Students Enrolled",
+                impact_stat_schools: "50+",
+                impact_stat_schools_label: "Rural Schools",
+                impact_stat_completion: "98%",
+                impact_stat_completion_label: "Completion Rate",
+                impact_icon_school: "🏫",
+                impact_text_rural: "Rural Schools",
+                impact_equal: "=",
+                impact_icon_urban: "🏢",
+                impact_text_urban: "Urban Schools",
+                impact_equal_title: "Equal Opportunities for All",
+
+                // Footer
+                footer_logo: "N",
+                footer_brand: "Nabha Digital Learning",
+                footer_support: "Supported by Punjab Education Department",
+                footer_contact: "📧 Contact Us",
+                footer_feedback: "💬 Feedback",
+                footer_support_btn: "📞 Support",
+                footer_copyright: "© 2024 Nabha Digital Learning Platform. Empowering rural education in Punjab.",
+
+                // voice guides (if needed)
+                btn_logout: "Logout",
+            },
+            hi: {
+                // existing keys (kept)
+                logo_text: "नाभा डिजिटल लर्निंग",
+                nav_home:"होम",
+                nav_roles: "भूमिकाएँ",
+                nav_features: "विशेषताएँ",
+                nav_impact: "प्रभाव",
+                btn_get_started: "शुरू करें",
+                btn_start_learning: "सीखना शुरू करें",
+
+                title_text: "नाभा डिजिटल लर्निंग",
+                current_lang_display: "HI",
+                lang_en: "English",
+                lang_hi: "हिन्दी",
+                lang_pa: "ਪੰਜਾਬੀ",
+                mobile_lang_heading: "भाषा",
+
+                // Hero
+                hero_nabha: "नाभा",
+                hero_brand: "डिजिटल लर्निंग",
+                hero_promo: "हर बच्चे के लिए प्रीमियम डिजिटल लर्निंग,\nकभी भी, कहीं भी",
+                hero_tagline: "कभी भी, कहीं भी",
+                hero_start_learning: "सीखना शुरू करें",
+                hero_learn_more: "और जानें",
+                hero_emoji: "📚",
+                hero_learn_together: "साथ में सीखें",
+                hero_student_emoji: "👨‍🎓",
+                hero_student2_emoji: "👩‍🎓",
+                hero_phone_emoji: "📱",
+                hero_connected: "ग्रामीण छात्रों को जोड़ा गया",
+
+                // Roles
+                roles_heading: "अपनी चुनें",
+                roles_heading_span: "भूमिका",
+                roles_subtitle: "अपनी यात्रा शुरू करने के लिए अपना मार्ग चुनें",
+                students_card_emoji: "🎓",
+                students_card_title: "छात्र",
+                students_card_desc: "इंटरएक्टिव पाठ और अभ्यास करने के लिए एक्सेस करें ताकि आपके कौशल सुधार सकें।",
+                students_card_btn: "सीखना शुरू करें",
+                teachers_card_emoji: "👩‍🏫",
+                teachers_card_title: "शिक्षक",
+                teachers_card_desc: "छात्र की प्रगति का निरीक्षण करें, संसाधन अपलोड करें, और मूल्यांकन प्रबंधित करें।",
+                teachers_card_btn: "टीचर डैशबोर्ड",
+                authority_card_emoji: "👨‍💼",
+                authority_card_title: "अधिकारी",
+                authority_card_desc: "संस्थागत प्रदर्शन में अंतर्दृष्टि प्राप्त करें और शैक्षणिक गतिविधियों की निगरानी करें।",
+                authority_card_btn: "अधिकारी डैशबोर्ड",
+                parents_card_emoji: "👨‍👩‍👧",
+                parents_card_title: "अभिभावक/प्रशासक",
+                parents_card_desc: "छात्र प्रदर्शन, उपस्थिति और समग्र प्रगति रिपोर्ट ट्रैक करें।",
+                parents_card_btn: "रिपोर्ट देखें",
+
+                // Features
+                features_heading: "क्यों चुनें",
+                features_heading_span: "नाभा डिजिटल लर्निंग?",
+                features_subtitle: "विशेष रूप से ग्रामीण स्कूलों के लिए डिज़ाइन किया गया",
+                feature1_icon: "📱",
+                feature1_title: "ऑफ़लाइन काम करता है",
+                feature1_desc: "पाठ डाउनलोड करें और बिना इंटरनेट के पढ़ें",
+                feature2_icon: "🌐",
+                feature2_title: "स्थानीय भाषाएँ",
+                feature2_desc: "पंजाबी, हिंदी और अंग्रेज़ी में उपलब्ध",
+                feature3_icon: "🎮",
+                feature3_title: "इंटरऐक्टिव पाठ",
+                feature3_desc: "क्विज़ के साथ गेमिफाइड लर्निंग",
+                feature4_icon: "📊",
+                feature4_title: "प्रगति ट्रैक करें",
+                feature4_desc: "विस्तृत विश्लेषण और रिपोर्ट",
+
+                // Impact
+                impact_heading: "शिक्षा अंतर को बंद करना",
+                impact_subtext: "हर बच्चे को गुणवत्तापूर्ण शिक्षा का हक है। हमारा प्लेटफ़ॉर्म सुनिश्चित करता है कि ग्रामीण छात्रों को वही अवसर मिलें।",
+                impact_stat_students: "500+",
+                impact_stat_students_label: "नामांकित छात्र",
+                impact_stat_schools: "50+",
+                impact_stat_schools_label: "ग्रामीण स्कूल",
+                impact_stat_completion: "98%",
+                impact_stat_completion_label: "समाप्ति दर",
+                impact_icon_school: "🏫",
+                impact_text_rural: "ग्रामीण स्कूल",
+                impact_equal: "=",
+                impact_icon_urban: "🏢",
+                impact_text_urban: "शहरी स्कूल",
+                impact_equal_title: "सभी के लिए समान अवसर",
+
+                // Footer
+                footer_logo: "N",
+                footer_brand: "नाभा डिजिटल लर्निंग",
+                footer_support: "पंजाब शिक्षा विभाग द्वारा समर्थित",
+                footer_contact: "📧 संपर्क करें",
+                footer_feedback: "💬 प्रतिक्रिया",
+                footer_support_btn: "📞 सहायता",
+                footer_copyright: "© 2024 नाभा डिजिटल लर्निंग प्लेटफ़ॉर्म। पंजाब में ग्रामीण शिक्षा को सशक्त बनाना।",
+
+                btn_logout: "लॉगआउट",
+            },
+            pa: {
+                // Punjabi translations
+                logo_text: "ਨਭਾ ਡਿਜੀਟਲ ਲਰਨਿੰਗ",
+                nav_home: "ਹੋਮ",
+                nav_roles: "ਭੂਮਿਕਾਵਾਂ",
+                nav_features: "ਖਾਸੀਅਤਾਂ",
+                nav_impact: " ਪ੍ਰਭਾਵ",
+                btn_get_started: "ਸ਼ੁਰੂ ਕਰੋ",
+                btn_start_learning: "ਸਿੱਖਣਾ ਸ਼ੁਰੂ ਕਰੋ",
+
+                title_text: "ਨਭਾ ਡਿਜੀਟਲ ਲਰਨਿੰਗ",
+                current_lang_display: "PA",
+                lang_en: "English",
+                lang_hi: "हिन्दी",
+                lang_pa: "ਪੰਜਾਬੀ",
+                mobile_lang_heading: "ਭਾਸ਼ਾ",
+
+                // Hero
+                hero_nabha: "ਨਭਾ",
+                hero_brand: "ਡਿਜੀਟਲ ਲਰਨਿੰਗ",
+                hero_promo: "ਹਰ ਬੱਚੇ ਲਈ ਪ੍ਰੀਮੀਅਮ ਡਿਜੀਟਲ ਲਰਨਿੰਗ,\nਕਦੀ ਵੀ, ਕਿਹੇ ਵੀ ਥਾਂ",
+                hero_tagline: "ਕਦੀ ਵੀ, ਕਿਹੇ ਵੀ ਥਾਂ",
+                hero_start_learning: "ਸਿੱਖਣਾ ਸ਼ੁਰੂ ਕਰੋ",
+                hero_learn_more: "ਹੋਰ ਜਾਣਕਾਰੀ",
+                hero_emoji: "📚",
+                hero_learn_together: "ਇਕੱਠੇ ਸਿੱਖੋ",
+                hero_student_emoji: "👨‍🎓",
+                hero_student2_emoji: "👩‍🎓",
+                hero_phone_emoji: "📱",
+                hero_connected: "ਪਿੰਡ ਦੇ ਵਿਦਿਆਰਥੀਆਂ ਨਾਲ ਜੁੜਿਆ",
+
+                // Roles
+                roles_heading: "ਚੁਣੋ ਆਪਣੀ",
+                roles_heading_span: "ਭੂਮਿਕਾ",
+                roles_subtitle: "ਆਪਣਾ ਰਸਤਾ ਚੁਣੋ ਅਤੇ ਆਪਣੀ ਸਿੱਖਿਆ ਯਾਤਰਾ ਸ਼ੁਰੂ ਕਰੋ",
+                students_card_emoji: "🎓",
+                students_card_title: "ਵਿਦਿਆਰਥੀ",
+                students_card_desc: "ਇंटरਐਕਟਿਵ ਪਾਠਾਂ ਅਤੇ ਅਭਿਆਸਾਂ ਤੱਕ ਪਹੁੰਚ ਪ੍ਰਾਪਤ ਕਰੋ।",
+                students_card_btn: "ਸਿੱਖਣਾ ਸ਼ੁਰੂ ਕਰੋ",
+                teachers_card_emoji: "👩‍🏫",
+                teachers_card_title: "ਅਧਿਆਪਕ",
+                teachers_card_desc: "ਵਿਦਿਆਰਥੀਆਂ ਦੀ ਤਰੱਕੀ ਦੀ ਨਿਗਰਾਨੀ ਕਰੋ, ਸਰੋਤ ਅਪਲੋਡ ਕਰੋ ਅਤੇ ਮੁਲਿਆਂਕਣ ਪ੍ਰਬੰਧਿਤ ਕਰੋ।",
+                teachers_card_btn: "ਟੀਚਰ ਡੈਸ਼ਬੋਰਡ",
+                authority_card_emoji: "👨‍💼",
+                authority_card_title: "ਅਥਾਰਟੀ",
+                authority_card_desc: "ਸੰਸਥਾਗਤ ਪ੍ਰਦਰਸ਼ਨ ਬਾਰੇ ਜਾਣਕਾਰੀ ਪ੍ਰਾਪਤ ਕਰੋ ਅਤੇ ਐਕਟਿਵਿਟੀ ਨੂੰ ਨਿਗਰਾਨੀ ਕਰੋ।",
+                authority_card_btn: "ਅਥਾਰਟੀ ਡੈਸ਼ਬੋਰਡ",
+                parents_card_emoji: "👨‍👩‍👧",
+                parents_card_title: "ਮਾਪੇ/ਐਡਮਿੰ",
+                parents_card_desc: "ਵਿਦਿਆਰਥੀਆਂ ਦੀ ਕਾਰਕਿਰਦਗੀ, ਹਾਜ਼ਰੀ, ਅਤੇ ਰਿਪੋਰਟਾਂ ਟਰੈਕ ਕਰੋ।",
+                parents_card_btn: "ਰਿਪੋਰਟ ਵੇਖੋ",
+
+                // Features
+                features_heading: "ਕਿਉਂ ਚੁਣੋ",
+                features_heading_span: "ਨਭਾ ਡਿਜੀਟਲ ਲਰਨਿੰਗ?",
+                features_subtitle: "ਖ਼ਾਸ ਤੌਰ 'ਤੇ ਪਿੰਡਾਂ ਦੇ ਸਕੂਲਾਂ ਲਈ ਡਿਜ਼ਾਈਨ ਕੀਤਾ ਗਿਆ",
+                feature1_icon: "📱",
+                feature1_title: "ਆਫਲਾਈਨ ਕੰਮ ਕਰਦਾ ਹੈ",
+                feature1_desc: "ਪਾਠ ਡਾਊਨਲੋਡ ਕਰੋ ਅਤੇ ਬਿਨਾਂ ਇੰਟਰਨੈਟ ਦੇ ਪੜ੍ਹੋ",
+                feature2_icon: "🌐",
+                feature2_title: "ਸਥਾਨਕ ਭਾਸ਼ਾਵਾਂ",
+                feature2_desc: "ਪੰਜਾਬੀ, ਹਿੰਦੀ ਅਤੇ ਅੰਗਰੇਜ਼ੀ ਵਿੱਚ ਉਪਲਬਧ",
+                feature3_icon: "🎮",
+                feature3_title: "ਇੰਟਰਐਕਟਿਵ ਪਾਠ",
+                feature3_desc: "ਕੁਇਜ਼ ਨਾਲ ਗੇਮੀਫਾਇਡ ਸਿੱਖਿਆ",
+                feature4_icon: "📊",
+                feature4_title: "ਤਰੱਕੀ ਟਰੈਕ ਕਰੋ",
+                feature4_desc: "ਵਿਸਥਾਰਿਕ ਵਿਸ਼ਲੇਸ਼ਣ ਅਤੇ ਰਿਪੋਰਟ",
+
+                // Impact
+                impact_heading: "ਸਿੱਖਿਆ ਦੀ ਖਾਈ ਨੂੰ ਪੂਰਾ ਕਰਨਾ",
+                impact_subtext: "ਹਰ ਬੱਚੇ ਨੂੰ ਗੁਣਵੱਤਾ ਵਾਲੀ ਸਿੱਖਿਆ ਮਿਲਣੀ ਚਾਹੀਦੀ ਹੈ। ਸਾਡਾ ਪਲੇਟਫਾਰਮ ਯਕੀਨੀ ਬਣਾਉਂਦਾ ਹੈ ਕਿ ਪਿੰਡ ਦੇ ਵਿਦਿਆਰਥੀਆਂ ਨੂੰ ਉਹੇ ਮੌਕੇ ਮਿਲਣ।",
+                impact_stat_students: "500+",
+                impact_stat_students_label: "ਦਾਖ਼ਲ ਵਿਦਿਆਰਥੀ",
+                impact_stat_schools: "50+",
+                impact_stat_schools_label: "ਪਿੰਡ ਸਕੂਲ",
+                impact_stat_completion: "98%",
+                impact_stat_completion_label: "ਪੂਰੇ ਕੀਤੇ ਜਾਨ ਵਾਲੀ ਦਰ",
+                impact_icon_school: "🏫",
+                impact_text_rural: "ਪਿੰਡ ਸਕੂਲ",
+                impact_equal: "=",
+                impact_icon_urban: "🏢",
+                impact_text_urban: "ਸ਼ਹਿਰੀ ਸਕੂਲ",
+                impact_equal_title: "ਸਭ ਲਈ ਬਰਾਬਰ ਮੌਕੇ",
+
+                // Footer
+                footer_logo: "N",
+                footer_brand: "ਨਭਾ ਡਿਜੀਟਲ ਲਰਨਿੰਗ",
+                footer_support: "ਪੰਜਾਬ ਐਜੂਕੇਸ਼ਨ ਡਿਪਾਰਟਮੈਂਟ ਵੱਲੋਂ ਸਮਰਥਿਤ",
+                footer_contact: "📧 ਸੰਪਰਕ ਕਰੋ",
+                footer_feedback: "💬 ਫੀਡਬੈਕ",
+                footer_support_btn: "📞 ਸਹਾਇਤਾ",
+                footer_copyright: "© 2024 ਨਭਾ ਡਿਜੀਟਲ ਲਰਨਿੰਗ ਪਲੇਟਫਾਰਮ। ਪੰਜਾਬ ਵਿੱਚ ਪਿੰਡਾਂ ਦੀ ਸਿੱਖਿਆ ਸਸ਼ਕਤ ਕਰਨਾ।",
+
+                btn_logout: "ਲਾਗਆਊਟ",
+            }
+        };
+    let currentLang = 'en';
+
+    // --- Core Translation Function ---
+    function translateContent(langCode) {
+        const translations = localization[langCode];
+        if (!translations) return;
+
+        currentLang = langCode;
+        localStorage.setItem('userLang', langCode);
+        
+        // Update current language display
+        document.getElementById('current-lang-display').textContent = (translations.current_lang_display || langCode.toUpperCase());
+        
+        // Iterate over all elements with data-lang attribute
+        document.querySelectorAll('[data-lang]').forEach(element => {
+            const key = element.getAttribute('data-lang');
+            if (!key) return;
+            if (translations[key]) {
+                // Use textContent for plain text replacement
+                // Preserve innerHTML only for elements that explicitly contain emoji-only text? We'll use textContent to be safe.
+                element.textContent = translations[key];
+            }
+        });
+    }
+
+    // --- Initialization and Event Listeners ---
+    function initializeLang() {
+        const savedLang = localStorage.getItem('userLang');
+        if (savedLang && localization[savedLang]) {
+            translateContent(savedLang);
+        } else {
+            const browserLang = (navigator.language || navigator.userLanguage || 'en').substring(0, 2);
+            if (localization[browserLang]) {
+                translateContent(browserLang);
+            } else {
+                translateContent('en');
+            }
+        }
+    }
+
+    // Attach event listeners to language option buttons
+    document.querySelectorAll('.lang-option').forEach(button => {
+        button.addEventListener('click', function() {
+            const langCode = this.getAttribute('data-lang-code');
+            translateContent(langCode);
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+            }
+            // close dropdown (if visible)
+            const dropdown = document.getElementById('lang-dropdown');
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+              dropdown.classList.add('hidden');
+            }
+        });
+    });
+
+    // Language Dropdown Toggle
+    document.getElementById('lang-switcher-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const dropdown = document.getElementById('lang-dropdown');
+        dropdown.classList.toggle('hidden');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('lang-dropdown');
+        const button = document.getElementById('lang-switcher-btn');
+        
+        if (dropdown && button && !dropdown.contains(e.target) && !button.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+
+    // Mobile Menu Toggle
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+      const mobile = document.getElementById('mobile-menu');
+      mobile.classList.toggle('hidden');
+    });
+    
+    // Smooth Scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          const mobileMenu = document.getElementById('mobile-menu');
+          if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+          }
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Scroll appear effect
+    const scrollElements = document.querySelectorAll('.scroll-appear');
+
+    const elementInView = (el, dividend = 1.2) => {
+      const elementTop = el.getBoundingClientRect().top;
+      return elementTop <= (window.innerHeight || document.documentElement.clientHeight) / dividend;
+    };
+
+    const displayScrollElement = (element) => {
+      element.classList.add('visible');
+    };
+
+    const hideScrollElement = (element) => {
+      element.classList.remove('visible');
+    };
+
+    const handleScrollAnimation = () => {
+      scrollElements.forEach((el) => {
+        if (elementInView(el, 1.25)) {
+          displayScrollElement(el);
+        } else {
+          hideScrollElement(el);
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScrollAnimation);
+    window.addEventListener('load', () => {
+        initializeLang();
+        handleScrollAnimation();
+    });
+
+    // Navigation functions
+    function regirectToLogin() {
+      window.location.href = "/logintry";
+    }
+    function regirectToLoginT() {
+      window.location.href = "/logintryT";
+    }
+    
+  </script>
+  <!-- Add this right after the navigation section, before the Hero Section -->
+<div id="voiceControlPanel" style="position: fixed; top: 80px; right: 20px; z-index: 1000; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); max-width: 320px;">
+  <h3 style="margin: 0 0 15px 0; font-size: 18px; color: #0891b2;" data-lang="voice_heading">🎤 Voice Controls</h3>
+  
+  
+  <div style="margin-bottom: 15px;">
+    <button id="toggleVoiceCommands" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; cursor: pointer;" data-lang="voice_btn_start">
+      Start Voice Commands
+    </button>
+    <div id="voiceCommandStatus" style="margin-top: 8px; padding: 8px; background: #f3f4f6; border-radius: 6px; font-size: 13px; text-align: center;" data-lang="voice_status_click">
+      Click to activate
+    </div>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <button id="toggleTextToSpeech" class="btn-outline" style="width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; cursor: pointer;" data-lang="tts_btn_enable">
+      Enable Text-to-Speech
+    </button>
+    <div id="ttsStatus" style="margin-top: 8px; padding: 8px; background: #f3f4f6; border-radius: 6px; font-size: 13px; text-align: center;" data-lang="tts_status_inactive">
+      TTS: Inactive
+    </div>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #4b5563;" data-lang="tts_speed_label">Speech Speed</label>
+    <input type="range" id="ttsSpeed" min="0.5" max="2" step="0.1" value="1" style="width: 100%;">
+    <div style="display: flex; justify-content: space-between; font-size: 11px; color: #6b7280;">
+      <span data-lang="tts_speed_slow">Slow</span>
+      <span data-lang="tts_speed_normal">Normal</span>
+      <span data-lang="tts_speed_fast">Fast</span>
+    </div>
+  </div>
+
+  <button id="stopSpeech" class="btn-outline" style="width: 100%; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; margin-bottom: 15px;" data-lang="stop_speech">
+    Stop Speech
+  </button>
+
+ <!-- Replace the existing help section div -->
+<div style="background: #e0f2fe; padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.5;" data-lang="voice_help_block">
+  <strong style="color: #0891b2;" data-lang="voice_shortcuts_heading">Keyboard Shortcuts:</strong>
+  <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+    <li><strong>V</strong> - Toggle Text-to-Speech</li>
+    <li><strong>O</strong> - Toggle Voice Commands</li>
+    <li><strong>Esc</strong> or <strong>S</strong> - Stop Speech</li>
+  </ul>
+  <strong style="color: #0891b2; display: block; margin-top: 10px;" data-lang="voice_commands_heading">Voice Commands:</strong>
+  <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+    <li data-lang="voice_cmd_go_home">"go home" - Navigate to home</li>
+    <li data-lang="voice_cmd_show_roles">"show roles" - View roles</li>
+    <li data-lang="voice_cmd_show_features">"show features" - View features</li>
+    <li data-lang="voice_cmd_read_this">"read this" - Read section</li>
+    <li data-lang="voice_cmd_scroll">"scroll down/up" - Scroll</li>
+    <li data-lang="voice_cmd_get_started">"get started" - Start learning</li>
+    <li data-lang="voice_cmd_stop_reading">"stop reading" - Stop speech</li>
+    <li data-lang="voice_cmd_teacher_dashboard">"Teacher Dashboard" - Teacher Dasboard</li>
+  </ul>
+</div>
+
+  <div id="voiceIndicator" style="margin-top: 12px; padding: 8px; background: #fee2e2; border-radius: 6px; text-align: center; display: none;">
+    <span style="color: #dc2626; font-size: 13px;" data-lang="voice_listening">🔴 Listening...</span>
+  </div>
+</div>
+
+<!-- Add this JavaScript before the closing </body> tag, after your existing scripts -->
+<script>
+  // Advanced Voice Control System
+  class VoiceControlSystem {
+    constructor() {
+      this.synthesis = window.speechSynthesis;
+      this.recognition = null;
+      this.isListening = false;
+      this.isTTSEnabled = false;
+      this.voiceSpeed = 1;
+      this.currentUtterance = null;
+      this.hoverTimeout = null;
+      this.init();
+    }
+
+    init() {
+      this.setupSpeechRecognition();
+      this.setupControls();
+      this.setupKeyboardShortcuts();
+    }
+
+    setupSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      
+      if (!SpeechRecognition) {
+        console.warn('Speech recognition not supported');
+        return;
+      }
+
+      this.recognition = new SpeechRecognition();
+      this.recognition.continuous = true;
+      this.recognition.interimResults = false;
+      this.recognition.lang = 'en-US';
+
+      this.recognition.onstart = () => {
+        document.getElementById('voiceIndicator').style.display = 'block';
+      };
+
+      this.recognition.onend = () => {
+        document.getElementById('voiceIndicator').style.display = 'none';
+        if (this.isListening) {
+          setTimeout(() => {
+            try {
+              this.recognition.start();
+            } catch(e) {
+              console.log('Recognition restart failed:', e);
+            }
+          }, 100);
+        }
+      };
+
+      this.recognition.onresult = (event) => {
+        const last = event.results.length - 1;
+        const command = event.results[last][0].transcript.toLowerCase().trim();
+        console.log('Voice command:', command);
+        this.processVoiceCommand(command);
+      };
+
+      this.recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'no-speech' && this.isListening) {
+          setTimeout(() => {
+            try {
+              this.recognition.start();
+            } catch(e) {
+              console.log('Recognition restart failed:', e);
+            }
+          }, 100);
+        }
+      };
+    }
+
+    setupControls() {
+      const toggleVoiceBtn = document.getElementById('toggleVoiceCommands');
+      const toggleTTSBtn = document.getElementById('toggleTextToSpeech');
+      const speedControl = document.getElementById('ttsSpeed');
+      const stopBtn = document.getElementById('stopSpeech');
+
+      if (toggleVoiceBtn) {
+        toggleVoiceBtn.addEventListener('click', () => this.toggleVoiceCommands());
+      }
+      
+      if (toggleTTSBtn) {
+        toggleTTSBtn.addEventListener('click', () => this.toggleTextToSpeech());
+      }
+      
+      if (speedControl) {
+        speedControl.addEventListener('input', (e) => {
+          this.voiceSpeed = parseFloat(e.target.value);
+        });
+      }
+
+      if (stopBtn) {
+        stopBtn.addEventListener('click', () => this.stopSpeaking());
+      }
+    }
+
+    <!-- Replace the existing setupKeyboardShortcuts() function in the script -->
+
+  setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+      const activeElement = document.activeElement;
+      const isTyping = activeElement.tagName === 'INPUT' || 
+                       activeElement.tagName === 'TEXTAREA' || 
+                       activeElement.isContentEditable;
+      
+      // Don't trigger if user is typing
+      if (isTyping) return;
+      
+      // V key to toggle text-to-speech
+      if (e.key.toLowerCase() === 'v') {
+        e.preventDefault();
+        this.toggleTextToSpeech();
+      }
+      
+      // O key to toggle voice commands
+      if (e.key.toLowerCase() === 'o') {
+        e.preventDefault();
+        this.toggleVoiceCommands();
+      }
+      
+      // Escape to stop speaking
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        this.stopSpeaking();
+      }
+      
+      // S key to stop speaking (alternative)
+      if (e.key.toLowerCase() === 's' && !e.ctrlKey) {
+        e.preventDefault();
+        this.stopSpeaking();
+      }
+    });
+  
+
+    }
+
+    toggleVoiceCommands() {
+      if (!this.recognition) {
+        this.speak('Voice commands are not supported in your browser. Please use Chrome or Edge.');
+        return;
+      }
+
+      this.isListening = !this.isListening;
+      const btn = document.getElementById('toggleVoiceCommands');
+      const status = document.getElementById('voiceCommandStatus');
+
+      if (this.isListening) {
+        try {
+          this.recognition.start();
+          btn.textContent = 'Stop Voice Commands';
+          btn.style.background = '#dc2626';
+          status.textContent = '🎤 Listening for commands...';
+          status.style.background = '#fee2e2';
+          this.speak('Voice commands activated. You can now speak commands.');
+        } catch(e) {
+          console.error('Failed to start recognition:', e);
+          this.isListening = false;
+        }
+      } else {
+        this.recognition.stop();
+        btn.textContent = 'Start Voice Commands';
+        btn.style.background = '#0891b2';
+        status.textContent = 'Click to activate';
+        status.style.background = '#f3f4f6';
+        this.speak('Voice commands deactivated.');
+      }
+    }
+
+    toggleTextToSpeech() {
+      this.isTTSEnabled = !this.isTTSEnabled;
+      const btn = document.getElementById('toggleTextToSpeech');
+      const status = document.getElementById('ttsStatus');
+
+      if (this.isTTSEnabled) {
+        btn.textContent = 'Disable Text-to-Speech';
+        btn.style.background = '#0891b2';
+        btn.style.color = 'white';
+        status.textContent = 'TTS: Active ✓';
+        status.style.background = '#dcfce7';
+        status.style.color = '#166534';
+        this.speak('Text to speech enabled. Hover over any text to hear it read aloud.');
+        this.enableHoverReading();
+      } else {
+        btn.textContent = 'Enable Text-to-Speech';
+        btn.style.background = 'white';
+        btn.style.color = '#0891b2';
+        status.textContent = 'TTS: Inactive';
+        status.style.background = '#f3f4f6';
+        status.style.color = '#4b5563';
+        this.stopSpeaking();
+        this.disableHoverReading();
+        this.speak('Text to speech disabled.');
+      }
+    }
+
+    enableHoverReading() {
+      const readableElements = document.querySelectorAll('h1, h2, h3, h4, p, button, a, .role-card');
+      readableElements.forEach(el => {
+        el.addEventListener('mouseenter', this.handleHover);
+        el.dataset.ttsEnabled = 'true';
+      });
+    }
+
+    disableHoverReading() {
+      const readableElements = document.querySelectorAll('[data-tts-enabled="true"]');
+      readableElements.forEach(el => {
+        el.removeEventListener('mouseenter', this.handleHover);
+        delete el.dataset.ttsEnabled;
+      });
+    }
+
+    handleHover = (e) => {
+      if (!this.isTTSEnabled) return;
+      
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = setTimeout(() => {
+        let text = '';
+        const el = e.target;
+        
+        if (el.tagName === 'BUTTON') {
+          text = `Button: ${el.textContent.trim()}`;
+        } else if (el.tagName === 'A') {
+          text = `Link: ${el.textContent.trim()}`;
+        } else if (el.classList.contains('role-card')) {
+          const title = el.querySelector('h3')?.textContent || '';
+          const desc = el.querySelector('p')?.textContent || '';
+          text = `${title}. ${desc}`;
+        } else {
+          text = el.textContent.trim();
+        }
+        
+        if (text && text.length > 2) {
+          this.speak(text);
+        }
+      }, 300);
+    }
+
+    processVoiceCommand(command) {
+      console.log('Processing command:', command);
+      
+      // Navigation commands
+      if (command.includes('go home') || command.includes('home')) {
+        this.speak('Going to home section');
+        document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
+      }
+      else if (command.includes('show roles') || command.includes('roles')) {
+        this.speak('Showing roles section');
+        document.getElementById('roles')?.scrollIntoView({ behavior: 'smooth' });
+      }
+      else if (command.includes('show features') || command.includes('features')) {
+        this.speak('Showing features section');
+        document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+      }
+      else if (command.includes('show impact') || command.includes('impact')) {
+        this.speak('Showing impact section');
+        document.getElementById('impact')?.scrollIntoView({ behavior: 'smooth' });
+      }
+      // Scroll commands
+      else if (command.includes('scroll down')) {
+        this.speak('Scrolling down');
+        window.scrollBy({ top: 500, behavior: 'smooth' });
+      }
+      else if (command.includes('scroll up')) {
+        this.speak('Scrolling up');
+        window.scrollBy({ top: -500, behavior: 'smooth' });
+      }
+      // Read commands
+      else if (command.includes('read this') || command.includes('read page')) {
+        this.readCurrentSection();
+      }
+      // Action commands
+      else if (command.includes('get started') || command.includes('start learning')) {
+        this.speak('Opening login page');
+        regirectToLogin();
+      }
+      else if (command.includes('teacher') || (command.includes('dashboard') )) {
+        this.speak('Opening teacher dashboard');
+        regirectToLoginT();
+      }
+      // Stop command
+      else if (command.includes('stop') || command.includes('quiet') || command.includes('silence')) {
+        this.stopSpeaking();
+      }
+      // Language commands
+      else if (command.includes('english')) {
+        translateContent('en');
+        this.speak('Language changed to English');
+      }
+      else if (command.includes('hindi')) {
+        translateContent('hi');
+        this.speak('Language changed to Hindi');
+      }
+      else if (command.includes('punjabi')) {
+        translateContent('pa');
+        this.speak('Language changed to Punjabi');
+      }
+      else {
+        this.speak('Command not recognized. Please try again.');
+      }
+    }
+
+    readCurrentSection() {
+      const sections = ['hero', 'roles', 'features', 'impact'];
+      let currentSection = null;
+      
+      for (const sectionId of sections) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          const rect = section.getBoundingClientRect();
+          if (rect.top >= 0 && rect.top < window.innerHeight / 2) {
+            currentSection = section;
+            break;
+          }
+        }
+      }
+      
+      if (currentSection) {
+        const text = currentSection.textContent.replace(/\s+/g, ' ').trim();
+        this.speak(text);
+      } else {
+        this.speak('No section found to read');
+      }
+    }
+
+    speak(text) {
+      this.synthesis.cancel();
+      
+      if (!text) return;
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = this.voiceSpeed;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      utterance.lang = 'en-US';
+
+      utterance.onend = () => {
+        console.log('Speech finished');
+      };
+
+      utterance.onerror = (event) => {
+        console.error('Speech error:', event);
+      };
+
+      this.currentUtterance = utterance;
+      this.synthesis.speak(utterance);
+    }
+
+    stopSpeaking() {
+      this.synthesis.cancel();
+      clearTimeout(this.hoverTimeout);
+    }
+  }
+
+  // Initialize the voice control system. 
+  let voiceSystem;
+  window.addEventListener('load', () => {
+    voiceSystem = new VoiceControlSystem();
+    console.log('Voice control system initialized');
+  
+   // Welcome message
+    setTimeout(() => {
+      voiceSystem.speak('Welcome to Nabha Digital Learning. Press O to activate voice login, or V for text to speech.');
+    }, 1000);
+  });
+  
+</script>
+  
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Candy Exam Levels</title>
+<link rel="stylesheet" href="/candy.css">
+</head>
+<body class="candy-bg">
+<div id="candies"></div>
+
+<div class="map-container">
+  <h1 class="map-title">Game Map</h1>
+  
+  <svg class="map-path" viewBox="0 0 400 800" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div class="map-levels"></div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const totalLevels = 10;
+  const unlocked = parseInt(localStorage.getItem("unlockedLevel")) || 1;
+  const mapLevels = document.querySelector(".map-levels");
+  const mapPath = document.querySelector(".map-path");
+  const positions = [];
+
+  for (let i = 0; i < totalLevels; i++) {
+    const node = document.createElement("div");
+    node.classList.add("level-node");
+    node.dataset.level = i + 1;
+
+    const top = 50 + i*80 + Math.floor(Math.random()*30);
+    const left = 50 + (i%2===0 ? Math.random()*100 : 150 + Math.random()*100);
+    node.style.top = top + "px";
+    node.style.left = left + "px";
+
+    /*if (i+1 <= unlocked) {
+      node.textContent = i+1;
+      node.addEventListener("click", () => {
+        localStorage.setItem("currentLevel", i+1);
+        window.location.href = "/escape";
+      });
+    } else {
+      node.classList.add("locked");
+      node.textContent = "🔒";
+    }*/
+    if (i+1 <= unlocked) {
+  node.textContent = i+1;
+  node.addEventListener("click", () => {
+    localStorage.setItem("currentLevel", i+1);
+    if (i+1 === 2) {
+      window.location.href = "/gameNO3";
+    } else {
+      window.location.href = "/escape";
+    }
+  });
+} else {
+  node.classList.add("locked");
+  node.textContent = "🔒";
+}
+
+    mapLevels.appendChild(node);
+    positions.push({top: top+30, left: left+30});
+  }
+
+  // Draw connecting paths
+  for (let i = 0; i < positions.length-1; i++) {
+    const p1 = positions[i];
+    const p2 = positions[i+1];
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+    path.setAttribute("d", `M${p1.left} ${p1.top} C ${(p1.left+p2.left)/2} ${p1.top}, ${(p1.left+p2.left)/2} ${p2.top}, ${p2.left} ${p2.top}`);
+    
+    if(i+1 < unlocked){
+      path.classList.add("path-glow");
+      path.style.animationDelay = `${i*0.3}s`;
+    } else {
+      path.setAttribute("stroke", "#555");
+      path.setAttribute("stroke-width", "4");
+      path.setAttribute("fill", "none");
+    }
+
+    mapPath.appendChild(path);
+  }
+});
+</script>
+<script src="/shared/candy.js"></script>
+</body>
+</html>

@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title data-lang="student_title">Student Dashboard - Nabha Digital Learning</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+    :root{
+      --cyan-600: #0891b2;
+      --cyan-500: #06b6d4;
+      --muted: #64748b;
+      --glass-border: rgba(6,182,212,0.12);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Inter',sans-serif;
+      background: linear-gradient(135deg,#f0f9ff 0%, #e0f6ff 100%);
+      color:#0f172a;
+      min-height:100vh;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    h1,h2,h3{font-family:'Space Grotesk',sans-serif}
+
+    /* Navigation */
+    .nav-glass{
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(6,182,212,0.08);
+      box-shadow: 0 6px 18px rgba(8,145,178,0.06);
+    }
+    .nav-link{ color:var(--muted); padding:0.5rem 0.9rem; border-bottom:2px solid transparent; transition:all .25s; font-weight:600}
+    .nav-link.active, .nav-link:hover{ color:var(--cyan-600); border-bottom-color:var(--cyan-600) }
+
+    /* hero */
+    .hero-card{
+      background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(8,145,178,0.12));
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 12px 30px rgba(6,182,212,0.06);
+      border: 1px solid rgba(6,182,212,0.06);
+    }
+
+    /* cards */
+    .glass-card{
+      background: #fff;
+      border-radius: 14px;
+      padding:1.25rem;
+      border:1px solid var(--glass-border);
+      box-shadow: 0 10px 30px rgba(8,145,178,0.04);
+    }
+
+    .stat-card{ background:#fff; border-radius:12px; padding:1rem; border:1px solid var(--glass-border); }
+    .action-card{ background:#fff; border-radius:16px; padding:1.5rem; border:1px solid var(--glass-border); transition: all .25s; cursor: pointer; }
+    .action-card:hover { transform: translateY(-6px); box-shadow:0 18px 40px rgba(6,182,212,0.06); }
+
+    .action-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #0891b2, #06b6d4);
+      border-radius: 20px;
+      display: flex;
+      align-items: center relative;
+      justify-content: center;
+      margin: 0 auto 1.25rem;
+      font-size: 1.5rem;
+      color: white;
+      box-shadow: 0 8px 20px rgba(8, 145, 178, 0.18);
+    }
+    .action-icon.pink {
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      box-shadow: 0 8px 20px rgba(236, 72, 153, 0.18);
+    }
+
+    .progress-circle{ position:relative; width:100px; height:100px; }
+
+    .see-all-btn { color:var(--cyan-600); font-weight:600; font-size:.9rem; display:inline-flex; align-items:center; gap:.5rem }
+
+    /* Language switcher dropdown */
+    .lang-dropdown-desktop {
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.2s ease-in-out;
+      pointer-events: none;
+    }
+    .lang-dropdown-desktop.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .lang-option {
+      transition: background-color 0.2s;
+    }
+    .lang-option:hover {
+      background-color: #f3f4f6;
+    }
+    .lang-option:first-child {
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+    .lang-option:last-child {
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+
+    @media (max-width:1024px){
+      .hero-card{ padding:1.4rem }
+      .action-card{ padding:1rem }
+    }
+  </style>
+</head>
+<body>
+  <!-- Voice & Lang panel (reused) -->
+  <div id="voiceControlPanel" style="position: fixed; top: 80px; right: 20px; z-index: 1000; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); max-width: 320px;">
+    <h3 style="margin: 0 0 15px 0; font-size: 18px; color: #0891b2;" data-lang="voice_heading">🎤 Voice Controls</h3>
+
+    <div style="margin-bottom: 15px;">
+      <button id="toggleVoiceCommands" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; cursor: pointer;" data-lang="voice_btn_start">
+        Start Voice Commands
+      </button>
+      <div id="voiceCommandStatus" style="margin-top: 8px; padding: 8px; background: #f3f4f6; border-radius: 6px; font-size: 13px; text-align: center;" data-lang="voice_status_click">
+        Click to activate
+      </div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <button id="toggleTextToSpeech" class="btn-outline" style="width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; cursor: pointer;" data-lang="tts_btn_enable">
+        Enable Text-to-Speech
+      </button>
+      <div id="ttsStatus" style="margin-top: 8px; padding: 8px; background: #f3f4f6; border-radius: 6px; font-size: 13px; text-align: center;" data-lang="tts_status_inactive">
+        TTS: Inactive
+      </div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #4b5563;" data-lang="tts_speed_label">Speech Speed</label>
+      <input type="range" id="ttsSpeed" min="0.5" max="2" step="0.1" value="1" style="width: 100%;">
+      <div style="display: flex; justify-content: space-between; font-size: 11px; color: #6b7280;">
+        <span data-lang="tts_speed_slow">Slow</span>
+        <span data-lang="tts_speed_normal">Normal</span>
+        <span data-lang="tts_speed_fast">Fast</span>
+      </div>
+    </div>
+
+    <button id="stopSpeech" class="btn-outline" style="width: 100%; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; margin-bottom: 15px;" data-lang="stop_speech">
+      Stop Speech
+    </button>
+
+    <div style="background: #e0f2fe; padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.5;" data-lang="voice_help_block">
+      <strong style="color: #0891b2;" data-lang="voice_shortcuts_heading">Keyboard Shortcuts:</strong>
+      <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+        <li><strong>V</strong> - Toggle Text-to-Speech</li>
+        <li><strong>O</strong> - Toggle Voice Commands</li>
+        <li><strong>Esc</strong> or <strong>S</strong> - Stop Speech</li>
+      </ul>
+      <strong style="color: #0891b2; display: block; margin-top: 10px;" data-lang="voice_commands_heading">Voice Commands:</strong>
+      <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+        <li data-lang="voice_cmd_take_quiz">"take quiz" - Open quiz</li>
+        <li data-lang="voice_cmd_start_learning">"start learning" - Digital module</li>
+        <li data-lang="voice_cmd_ask_ai">"ask AI" - AI doubt solver</li>
+        <li data-lang="voice_cmd_view_report">"view report" - See analysis</li>
+        <li data-lang="voice_cmd_leaderboard">"leaderboard" - Rankings</li>
+        <li data-lang="voice_cmd_lectures">"lectures" - Recorded videos</li>
+        <li data-lang="voice_cmd_scroll">"scroll down/up" - Scroll</li>
+      </ul>
+    </div>
+
+    <div id="voiceIndicator" style="margin-top: 12px; padding: 8px; background: #fee2e2; border-radius: 6px; text-align: center; display: none;">
+      <span style="color: #dc2626; font-size: 13px;" data-lang="voice_listening">🔴 Listening...</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav-glass sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-6">
+          <div class="flex items-center gap-3">
+            <div>
+              <div class="text-lg font-semibold text-gray-800" data-lang="logo_text">Nabha Digital Learning</div>
+              <div class="text-xs text-gray-500" data-lang="logo_sub">Student Dashboard</div>
+            </div>
+          </div>
+
+          <div class="hidden md:flex items-center ml-6 space-x-2">
+            <a href="#" class="nav-link active" data-lang="nav_dashboard">Dashboard</a>
+            <a href="#" class="nav-link" data-lang="nav_materials">Materials</a>
+            <a href="#" class="nav-link" data-lang="nav_classes">Classes</a>
+            <a href="#" class="nav-link" data-lang="nav_inbox">Inbox</a>
+            <a href="#" class="nav-link" data-lang="nav_settings">Settings</a>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- Language Switcher -->
+          <div class="relative hidden md:block">
+            <button id="lang-switcher-btn" class="px-3 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-cyan-600 to-cyan-500 flex items-center gap-2 hover:shadow-lg transition-shadow">
+              <i class="fas fa-globe text-white"></i>
+              <span id="current-lang-display-desktop" data-lang="current_lang_display">EN</span>
+              <i class="fas fa-chevron-down text-xs transition-transform" id="lang-chevron"></i>
+            </button>
+            <div id="lang-dropdown-desktop" class="lang-dropdown-desktop absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg border">
+              <button data-lang-code="en" class="block w-full text-left px-4 py-2 text-sm text-gray-700 lang-option" data-lang="lang_en">English</button>
+              <button data-lang-code="hi" class="block w-full text-left px-4 py-2 text-sm text-gray-700 lang-option" data-lang="lang_hi">हिन्दी</button>
+              <button data-lang-code="pa" class="block w-full text-left px-4 py-2 text-sm text-gray-700 lang-option" data-lang="lang_pa">ਪੰਜਾਬੀ</button>
+            </div>
+          </div>
+
+          <button class="text-gray-600 hover:text-cyan-600 bg-gray-100 w-10 h-10 rounded-lg flex items-center justify-center" title="Settings" data-lang="icon_settings">
+            <i class="fas fa-cog"></i>
+          </button>
+
+          <button class="relative text-gray-600 hover:text-cyan-600 bg-gray-100 w-10 h-10 rounded-lg flex items-center justify-center" title="Notifications" data-lang="icon_notifications">
+            <i class="fas fa-bell"></i>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main content area -->
+  <div class="max-w-7xl mx-auto px-6 pb-12">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- Left column (main) -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Top Hero / Greeting -->
+        <div class="hero-card grid lg:grid-cols-3 gap-6 items-center">
+          <div class="lg:col-span-2">
+            <h1 class="text-3xl lg:text-4xl font-bold text-gray-800">
+              <span id="welcomeGreeting" data-lang="welcome_greeting">Hello, Bob!</span>
+            </h1>
+            <p class="text-gray-600 mt-2" data-lang="welcome_subtitle">Let's jump into your learning experience</p>
+          </div>
+
+          <!-- Right side inside hero -->
+          <div class="text-right">
+            <div class="text-sm text-gray-600" data-lang="recent_heading">Recent activities</div>
+            <div class="mt-2 space-y-3">
+              <div class="glass-card p-3 text-left">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center text-white text-xs">ML</div>
+                  <div class="flex-1">
+                    <div class="text-sm font-semibold text-gray-800" data-lang="activity_1_title">Ms Lynn left feedback</div>
+                    <div class="text-xs text-gray-500" data-lang="activity_1_time">Behavioural report — 10/07/2023</div>
+                  </div>
+                </div>
+              </div>
+              <div class="glass-card p-3 text-left">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs">TL</div>
+                  <div class="flex-1">
+                    <div class="text-sm font-semibold text-gray-800" data-lang="activity_2_title">Mr Lopez gave feedback</div>
+                    <div class="text-xs text-gray-500" data-lang="activity_2_time">Reflective essay — 10/07/2023</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4">
+              <button class="px-4 py-2 rounded-lg bg-white border text-cyan-600 font-semibold" onclick="location.href='#recent'" data-lang="btn_see_all">See all</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW: Quick Actions as a separate card below greeting (slight gap mt-6) -->
+        <div class="glass-card mt-6">
+          <h2 class="text-2xl font-bold text-gray-800 mb-4" data-lang="quick_actions_heading">Quick Actions</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <div class="action-card" onclick="viewQuiz()" data-lang="card_take_quiz_wrap">
+              <div class="w-16 h-16 mx-auto rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center text-white text-2xl mb-4">
+                <i class="fas fa-brain"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800" data-lang="card_take_quiz_title">Take Quiz</h3>
+              <p class="text-sm text-gray-600 mb-4" data-lang="card_take_quiz_desc">5 available Course related Quiz</p>
+              <div class="text-center">
+                <button class="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-cyan-600 to-cyan-500 font-semibold" data-lang="card_take_quiz_btn">
+                  <i class="fas fa-play mr-2"></i>Start Quiz
+                </button>
+              </div>
+            </div>
+
+            <div class="action-card" onclick="defaullevel()" data-lang="card_digital_module_wrap">
+              <div class="w-16 h-16 mx-auto rounded-xl bg-gradient-to-r from-blue-500 to-blue-400 flex items-center justify-center text-white text-2xl mb-4">
+                <i class="fas fa-graduation-cap"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800" data-lang="card_digital_module_title">Digital Module</h3>
+              <p class="text-sm text-gray-600 mb-4" data-lang="card_digital_module_desc">Digital Literacy Module</p>
+              <div class="text-center">
+                <button class="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-cyan-600 to-cyan-500 font-semibold" data-lang="card_digital_module_btn">
+                  <i class="fas fa-rocket mr-2"></i>Start Learning
+                </button>
+              </div>
+            </div>
+
+            <div class="action-card" onclick="openAiDoubtSolver()" data-lang="card_ai_wrap">
+              <div class="w-16 h-16 mx-auto rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center text-white text-2xl mb-4">
+                <i class="fas fa-robot"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800" data-lang="card_ai_title">AI Doubt Solver</h3>
+              <p class="text-sm text-gray-600 mb-4" data-lang="card_ai_desc">Get instant help with your academic questions</p>
+              <div class="text-center">
+                <button class="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-cyan-600 to-cyan-500 font-semibold" data-lang="card_ai_btn">
+                  <i class="fas fa-question mr-2"></i>Ask AI
+                </button>
+              </div>
+            </div>
+
+            <div class="action-card" onclick="viewAnalysis()" data-lang="card_view_report_wrap">
+              <div class="w-16 h-16 mx-auto rounded-xl bg-gradient-to-r from-orange-400 to-red-400 flex items-center justify-center text-white text-2xl mb-4">
+                <i class="fas fa-chart-bar"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800" data-lang="card_view_report_title">View Report</h3>
+              <p class="text-sm text-gray-600 mb-4" data-lang="card_view_report_desc">Review quiz results</p>
+              <div class="text-center">
+                <button class="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-cyan-600 to-cyan-500 font-semibold" data-lang="card_view_report_btn">
+                  <i class="fas fa-chart-pie mr-2"></i>View Reports
+                </button>
+              </div>
+            </div>
+
+            <div class="action-card" onclick="leaderboard()" data-lang="card_leaderboard_wrap">
+              <div class="w-16 h-16 mx-auto rounded-xl bg-gradient-to-r from-yellow-400 to-orange-400 flex items-center justify-center text-white text-2xl mb-4">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800" data-lang="card_leaderboard_title">Leaderboard</h3>
+              <p class="text-sm text-gray-600 mb-4" data-lang="card_leaderboard_desc">Check your ranking</p>
+              <div class="text-center">
+                <button class="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-cyan-600 to-cyan-500 font-semibold" data-lang="card_leaderboard_btn">
+                  <i class="fas fa-crown mr-2"></i>View Rankings
+                </button>
+              </div>
+            </div>
+
+            <div class="action-card" onclick="openRecordedLectures()" data-lang="card_recorded_wrap">
+              <div class="action-icon pink">
+                <i class="fas fa-video"></i>
+              </div>
+              <h3 class="text-lg font-bold mb-2 text-gray-800" data-lang="card_recorded_title">Recorded Lectures</h3>
+              <p class="text-sm text-gray-600 mb-4" data-lang="card_recorded_desc">Access all your recorded classes</p>
+              <div class="text-center">
+                <button class="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-cyan-600 to-cyan-500 font-semibold" data-lang="card_recorded_btn">
+                  <i class="fas fa-play-circle mr-2"></i>View Lectures
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <!-- end Quick Actions (separate card) -->
+
+        <!-- Performance & Attendance card -->
+        <div class="glass-card">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold text-gray-800" data-lang="charts_heading">Performance & Attendance</h3>
+            <div class="flex items-center gap-3">
+              <button class="see-all-btn" data-lang="charts_overview">Overview</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="col-span-2 bg-white p-4 rounded-lg border" style="border-color: var(--glass-border)">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h4 class="font-semibold text-gray-800" data-lang="attendance_trend_title">Attendance trend</h4>
+                  <div class="text-xs text-gray-500" data-lang="attendance_trend_sub">Past 7 days</div>
+                </div>
+                <div class="text-sm text-gray-600" data-lang="attendance_rate">Rate: <span class="font-semibold text-cyan-600" data-lang="attendance_rate_value">92%</span></div>
+              </div>
+              <canvas id="attendanceBar" style="max-height:220px"></canvas>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg border flex flex-col items-center justify-center" style="border-color: var(--glass-border)">
+              <h4 class="font-semibold text-gray-800 mb-2" data-lang="progress_by_cat_title">Progress by category</h4>
+              <canvas id="progressPie" width="220" height="220"></canvas>
+              <div class="mt-3 text-sm text-gray-600" data-lang="progress_by_cat_sub">Completed vs Remaining</div>
+            </div>
+
+            <div class="col-span-2 bg-white p-4 rounded-lg border mt-4 md:mt-0" style="border-color: var(--glass-border)">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h4 class="font-semibold text-gray-800" data-lang="perf_over_time_title">Performance over time</h4>
+                  <div class="text-xs text-gray-500" data-lang="perf_over_time_sub">Quiz scores - last 6 attempts</div>
+                </div>
+                <div class="text-sm text-gray-600">Avg: <span class="font-semibold text-green-600" data-lang="perf_avg_value">85%</span></div>
+              </div>
+              <canvas id="performanceLine" style="max-height:220px"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attendance calendar -->
+        <div class="glass-card">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800" data-lang="attendance_heading">Attendance</h3>
+            <button class="see-all-btn" data-lang="attendance_week_btn">This week <i class="fas fa-chevron-down"></i></button>
+          </div>
+
+          <div class="grid grid-cols-7 gap-2 text-center text-xs text-gray-500 mb-3">
+            <div data-lang="dow_mon">Mon</div><div data-lang="dow_tue">Tue</div><div data-lang="dow_wed">Wed</div><div data-lang="dow_thu">Thu</div><div data-lang="dow_fri">Fri</div><div data-lang="dow_sat">Sat</div><div data-lang="dow_sun">Sun</div>
+          </div>
+
+          <div class="grid grid-cols-7 gap-2">
+            <div class="p-3 rounded-lg bg-green-50 text-green-700 font-semibold" data-lang="date_17">17</div>
+            <div class="p-3 rounded-lg bg-green-50 text-green-700 font-semibold" data-lang="date_18">18</div>
+            <div class="p-3 rounded-lg bg-green-50 text-green-700 font-semibold" data-lang="date_19">19</div>
+            <div class="p-3 rounded-lg bg-green-50 text-green-700 font-semibold" data-lang="date_20">20</div>
+            <div class="p-3 rounded-lg bg-cyan-600 text-white font-semibold" data-lang="date_21">21</div>
+            <div class="p-3 rounded-lg bg-gray-50 text-gray-600" data-lang="date_22">22</div>
+            <div class="p-3 rounded-lg bg-gray-50 text-gray-600" data-lang="date_23">23</div>
+          </div>
+
+          <div class="flex items-center justify-between text-sm text-gray-600 mt-4">
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 inline-block"></span> <span data-lang="legend_on_time">On time</span></div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-400 inline-block"></span> <span data-lang="legend_absent">Absent</span></div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-orange-400 inline-block"></span> <span data-lang="legend_tardy">Tardy</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right column (sidebar) -->
+      <div class="space-y-6">
+        <div id="recent" class="glass-card">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800" data-lang="recent_activities_heading">Recent activities</h3>
+            <button class="see-all-btn" data-lang="recent_seeall">See all <i class="fas fa-chevron-right"></i></button>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex items-start gap-3 bg-gray-50 p-3 rounded-md border">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center text-white">TK</div>
+              <div class="flex-1">
+                <div class="text-sm font-medium text-gray-800" data-lang="recent_item_1">Teacher Mr Lopez left feedback on "Reflective essay"</div>
+                <div class="text-xs text-gray-500 mt-1" data-lang="recent_item_1_time">10:00 10/07/2023</div>
+              </div>
+              <button class="text-cyan-600 text-sm font-semibold" data-lang="recent_item_read">Read it</button>
+            </div>
+
+            <div class="flex items-start gap-3 bg-gray-50 p-3 rounded-md border">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white">TM</div>
+              <div class="flex-1">
+                <div class="text-sm font-medium text-gray-800" data-lang="recent_item_2">Teacher Ms Lynn left a feedback on "Behavioural report"</div>
+                <div class="text-xs text-gray-500 mt-1" data-lang="recent_item_2_time">18:00 10/07/2023</div>
+              </div>
+              <button class="text-cyan-600 text-sm font-semibold" data-lang="recent_item_read2">Read it</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800" data-lang="upcoming_heading">Upcoming events</h3>
+            <button class="see-all-btn" data-lang="upcoming_seeall">See all</button>
+          </div>
+
+          <div class="space-y-3">
+            <div class="p-3 rounded-lg bg-purple-50 border border-purple-100">
+              <div class="text-xs text-purple-600 mb-1" data-lang="event1_time">03:00 pm</div>
+              <div class="font-semibold text-gray-800" data-lang="event1_title">Lesson with Charles Dickenson</div>
+              <div class="text-xs text-gray-500" data-lang="event1_sub">Behavioural Psychology</div>
+            </div>
+            <div class="p-3 rounded-lg bg-cyan-50 border border-cyan-100">
+              <div class="text-xs text-cyan-600 mb-1" data-lang="event2_time">04:00 pm</div>
+              <div class="font-semibold text-gray-800" data-lang="event2_title">Webinar</div>
+              <div class="text-xs text-gray-500" data-lang="event2_sub">New ways of treatment</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4" data-lang="learning_progress_heading">Learning Progress</h3>
+
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-xs text-gray-500" data-lang="avg_grade_label">Average grade</div>
+              <div class="text-3xl font-bold text-cyan-600" data-lang="avg_grade_value">75%</div>
+            </div>
+
+            <div class="text-right">
+              <div class="text-xs text-gray-500" data-lang="xp_label">XP</div>
+              <div class="text-xl font-semibold text-gray-800" data-lang="xp_value">+340</div>
+            </div>
+          </div>
+
+          <div class="mt-4 space-y-3">
+            <div>
+              <div class="flex justify-between text-sm text-gray-600 mb-2">
+                <span data-lang="lp_course1">Human Behaviour</span>
+                <span data-lang="lp_course1_score">4.3</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2">
+                <div class="h-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" style="width:60%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-sm text-gray-600 mb-2">
+                <span data-lang="lp_course2">Cognitive Psychology</span>
+                <span data-lang="lp_course2_score">4.9</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2">
+                <div class="h-2 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500" style="width:80%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-sm text-gray-600 mb-2">
+                <span data-lang="lp_course3">Social Psychology</span>
+                <span data-lang="lp_course3_score">4.0</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2">
+                <div class="h-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-400" style="width:45%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto px-6 pb-12">
+    <div class="glass-card text-center">
+      <p class="text-gray-600" data-lang="footer_powered">Powered by Nabha Digital Learning Initiative</p>
+      <div class="mt-3 flex justify-center gap-6">
+        <button class="text-cyan-600" data-lang="footer_contact">Contact Support</button>
+        <button class="text-green-600" data-lang="footer_feedback">Feedback</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script>
+    /******************************
+     * Username (dynamic)
+     ******************************/
+    // We use a JS variable for username; you can replace this with real data later.
+    const username = "Bob";
+
+    /******************************
+     * Localization object (EN/HI/PA)
+     ******************************/
+    const localization = {
+      en: {
+        student_title: "Student Dashboard - Nabha Digital Learning",
+        logo_text: "Nabha Digital Learning",
+        logo_sub: "Student Dashboard",
+        nav_dashboard: "Dashboard",
+        nav_materials: "Materials",
+        nav_classes: "Classes",
+        nav_inbox: "Inbox",
+        nav_settings: "Settings",
+        current_lang_display: "EN",
+        lang_en: "English",
+        lang_hi: "हिन्दी",
+        lang_pa: "ਪੰਜਾਬੀ",
+
+        // greeting uses placeholder {name}
+        welcome_greeting: "Hello, {name}!",
+        welcome_subtitle: "Let's jump into your learning experience",
+
+        // quick actions & cards
+        quick_actions_heading: "Quick Actions",
+        
+        card_take_quiz_title: "Take Quiz",
+        card_take_quiz_desc: "5 available Course related Quiz",
+        card_take_quiz_btn: "Start Quiz",
+
+        
+        card_digital_module_title: "Digital Module",
+        card_digital_module_desc: "Digital Literacy Module",
+        card_digital_module_btn: "Start Learning",
+
+        
+        card_ai_title: "AI Doubt Solver",
+        card_ai_desc: "Get instant help with your academic questions",
+        card_ai_btn: "Ask AI",
+
+        
+        card_view_report_title: "View Report",
+        card_view_report_desc: "Review quiz results",
+        card_view_report_btn: "View Reports",
+
+        
+        card_leaderboard_title: "Leaderboard",
+        card_leaderboard_desc: "Check your ranking",
+        card_leaderboard_btn: "View Rankings",
+
+        
+        card_recorded_title: "Recorded Lectures",
+        card_recorded_desc: "Access all your recorded classes",
+        card_recorded_btn: "View Lectures",
+
+        // small dashboard labels & stats
+        stat_avg_label: "Average rate",
+        stat_avg_value: "4.1",
+        stat_attendance_label: "Attendance rate",
+        stat_attendance_value: "76%",
+        stat_lessons_label: "Lessons completed",
+        stat_lessons_value: "24",
+        stat_dskills_label: "Digital Skills",
+        stat_dskills_value: "8 / 10",
+        stat_quiz_label: "Quiz Attempted",
+        stat_quiz_value: "12",
+        stat_perf_label: "Performance",
+        stat_perf_value: "87%",
+
+        recent_heading: "Recent activities",
+        activity_1_title: "Ms Lynn left feedback",
+        activity_1_time: "Behavioural report — 10/07/2023",
+        activity_2_title: "Mr Lopez gave feedback",
+        activity_2_time: "Reflective essay — 10/07/2023",
+        btn_see_all: "See all",
+
+        // charts & attendance
+        charts_heading: "Performance & Attendance",
+        charts_overview: "Overview",
+        attendance_trend_title: "Attendance trend",
+        attendance_trend_sub: "Past 7 days",
+        attendance_rate: "Rate:",
+        attendance_rate_value: "92%",
+        progress_by_cat_title: "Progress by category",
+        progress_by_cat_sub: "Completed vs Remaining",
+        perf_over_time_title: "Performance over time",
+        perf_over_time_sub: "Quiz scores - last 6 attempts",
+        perf_avg_value: "85%",
+
+        attendance_heading: "Attendance",
+        attendance_week_btn: "This week",
+        dow_mon: "Mon", dow_tue: "Tue", dow_wed: "Wed", dow_thu: "Thu", dow_fri: "Fri", dow_sat: "Sat", dow_sun: "Sun",
+        date_17: "17", date_18: "18", date_19: "19", date_20: "20", date_21: "21", date_22: "22", date_23: "23",
+        legend_on_time: "On time", legend_absent: "Absent", legend_tardy: "Tardy",
+
+        // recent events
+        recent_activities_heading: "Recent activities",
+        recent_seeall: "See all",
+        recent_item_1: 'Teacher Mr Lopez left feedback on "Reflective essay"',
+        recent_item_1_time: "10:00 10/07/2023",
+        recent_item_read: "Read it",
+        recent_item_2: 'Teacher Ms Lynn left a feedback on "Behavioural report"',
+        recent_item_2_time: "18:00 10/07/2023",
+        recent_item_read2: "Read it",
+
+        upcoming_heading: "Upcoming events",
+        upcoming_seeall: "See all",
+        event1_time: "03:00 pm",
+        event1_title: "Lesson with Charles Dickenson",
+        event1_sub: "Behavioural Psychology",
+        event2_time: "04:00 pm",
+        event2_title: "Webinar",
+        event2_sub: "New ways of treatment",
+
+        learning_progress_heading: "Learning Progress",
+        avg_grade_label: "Average grade",
+        avg_grade_value: "75%",
+        xp_label: "XP",
+        xp_value: "+340",
+
+        lp_course1: "Human Behaviour", lp_course1_score: "4.3",
+        lp_course2: "Cognitive Psychology", lp_course2_score: "4.9",
+        lp_course3: "Social Psychology", lp_course3_score: "4.0",
+
+        footer_powered: "Powered by Nabha Digital Learning Initiative",
+        footer_contact: "Contact Support",
+        footer_feedback: "Feedback",
+
+        // voice panel
+        voice_heading: "🎤 Voice Controls",
+        voice_btn_start: "Start Voice Commands",
+        voice_status_click: "Click to activate",
+        tts_btn_enable: "Enable Text-to-Speech",
+        tts_status_inactive: "TTS: Inactive",
+        tts_speed_label: "Speech Speed",
+        tts_speed_slow: "Slow",
+        tts_speed_normal: "Normal",
+        tts_speed_fast: "Fast",
+        stop_speech: "Stop Speech",
+        voice_help_block: "",
+        voice_shortcuts_heading: "Keyboard Shortcuts:",
+        voice_commands_heading: "Voice Commands:",
+        voice_cmd_take_quiz: '"take quiz" - Open quiz',
+        voice_cmd_start_learning: '"start learning" - Digital module',
+        voice_cmd_ask_ai: '"ask AI" - AI doubt solver',
+        voice_cmd_view_report: '"view report" - See analysis',
+        voice_cmd_leaderboard: '"leaderboard" - Rankings',
+        voice_cmd_lectures: '"lectures" - Recorded videos',
+        voice_cmd_scroll: '"scroll down/up" - Scroll',
+        voice_listening: "🔴 Listening...",
+        icon_settings: "Settings",
+        icon_notifications: "Notifications"
+      },
+      hi: {
+        student_title: "छात्र डैशबोर्ड - नाभा डिजिटल लर्निंग",
+        logo_text: "नाभा डिजिटल लर्निंग",
+        logo_sub: "छात्र डैशबोर्ड",
+        nav_dashboard: "डैशबोर्ड",
+        nav_materials: "सामग्री",
+        nav_classes: "कक्षाएँ",
+        nav_inbox: "इनबॉक्स",
+        nav_settings: "सेटिंग्स",
+        current_lang_display: "HI",
+        lang_en: "English",
+        lang_hi: "हिन्दी",
+        lang_pa: "ਪੰਜਾਬੀ",
+
+        welcome_greeting: "नमस्ते, {name}!",
+        welcome_subtitle: "आइए आपकी सीखने का अनुभव शुरू करें",
+
+        quick_actions_heading: "त्वरित क्रियाएँ",
+        card_take_quiz_title: "क्विज़ लें",
+        card_take_quiz_desc: "5 उपलब्ध पाठ्यक्रम संबंधित क्विज़",
+        card_take_quiz_btn: "क्विज़ शुरू करें",
+
+        card_digital_module_title: "डिजिटल मॉड्यूल",
+        card_digital_module_desc: "डिजिटल साक्षरता मॉड्यूल",
+        card_digital_module_btn: "सीखना शुरू करें",
+
+        card_ai_title: "AI संदेह समाधानकर्ता",
+        card_ai_desc: "अपने शैक्षिक प्रश्नों के लिए त्वरित मदद प्राप्त करें",
+        card_ai_btn: "AI से पूछें",
+
+        card_view_report_title: "रिपोर्ट देखें",
+        card_view_report_desc: "क्विज़ परिणामों की समीक्षा करें",
+        card_view_report_btn: "रिपोर्ट देखें",
+
+        card_leaderboard_title: "लीडरबोर्ड",
+        card_leaderboard_desc: "अपनी रैंकिंग देखें",
+        card_leaderboard_btn: "रैंकिंग देखें",
+
+        card_recorded_title: "रेकॉर्डेड लेक्चर",
+        card_recorded_desc: "अपनी सभी रिकॉर्ड की गई कक्षाओं तक पहुंचें",
+        card_recorded_btn: "लेक्चर देखें",
+
+        stat_avg_label: "औसत रेट",
+        stat_avg_value: "4.1",
+        stat_attendance_label: "उपस्थिति दर",
+        stat_attendance_value: "76%",
+        stat_lessons_label: "पूर्ण पाठ",
+        stat_lessons_value: "24",
+        stat_dskills_label: "डिजिटल स्किल्स",
+        stat_dskills_value: "8 / 10",
+        stat_quiz_label: "प्रश्नोत्तरी प्रयास",
+        stat_quiz_value: "12",
+        stat_perf_label: "प्रदर्शन",
+        stat_perf_value: "87%",
+
+        recent_heading: "हाल की गतिविधियाँ",
+        activity_1_title: "Ms Lynn ने प्रतिक्रिया छोड़ी",
+        activity_1_time: "व्यवहारिक रिपोर्ट — 10/07/2023",
+        activity_2_title: "Mr Lopez ने प्रतिक्रिया दी",
+        activity_2_time: "प्रतिबिंब निबंध — 10/07/2023",
+        btn_see_all: "सभी देखें",
+
+        charts_heading: "प्रदर्शन और उपस्थिति",
+        charts_overview: "ओवरव्यू",
+        attendance_trend_title: "उपस्थिति प्रवृत्ति",
+        attendance_trend_sub: "पिछले 7 दिन",
+        attendance_rate: "दर:",
+        attendance_rate_value: "92%",
+        progress_by_cat_title: "श्रेणी द्वारा प्रगति",
+        progress_by_cat_sub: "पूर्ण बनाम शेष",
+        perf_over_time_title: "समय के साथ प्रदर्शन",
+        perf_over_time_sub: "क्विज़ स्कोर - पिछले 6 प्रयास",
+        perf_avg_value: "85%",
+
+        attendance_heading: "उपस्थिति",
+        attendance_week_btn: "यह सप्ताह",
+        dow_mon: "सोम", dow_tue: "मंगल", dow_wed: "बुध", dow_thu: "गुरु", dow_fri: "शुक्र", dow_sat: "शनि", dow_sun: "रवि",
+        date_17: "17", date_18: "18", date_19: "19", date_20: "20", date_21: "21", date_22: "22", date_23: "23",
+        legend_on_time: "समय पर", legend_absent: "अनुपस्थित", legend_tardy: "देर",
+
+        recent_activities_heading: "हालिया गतिविधियाँ",
+        recent_seeall: "सभी देखें",
+        recent_item_1: 'शिक्षक Mr Lopez ने "Reflective essay" पर प्रतिक्रिया छोड़ी',
+        recent_item_1_time: "10:00 10/07/2023",
+        recent_item_read: "इसे पढ़ें",
+        recent_item_2: 'शिक्षक Ms Lynn ने "Behavioural report" पर प्रतिक्रिया छोड़ी',
+        recent_item_2_time: "18:00 10/07/2023",
+        recent_item_read2: "इसे पढ़ें",
+
+        upcoming_heading: "आगामी कार्यक्रम",
+        upcoming_seeall: "सभी देखें",
+        event1_time: "03:00 अपराह्न",
+        event1_title: "Charles Dickenson के साथ पाठ",
+        event1_sub: "Behavioural Psychology",
+        event2_time: "04:00 अपराह्न",
+        event2_title: "वेबिनार",
+        event2_sub: "इलाज के नए तरीके",
+
+        learning_progress_heading: "सिखने की प्रगति",
+        avg_grade_label: "औसत ग्रेड",
+        avg_grade_value: "75%",
+        xp_label: "XP",
+        xp_value: "+340",
+
+        lp_course1: "Human Behaviour", lp_course1_score: "4.3",
+        lp_course2: "Cognitive Psychology", lp_course2_score: "4.9",
+        lp_course3: "Social Psychology", lp_course3_score: "4.0",
+
+        footer_powered: "नाभा डिजिटल लर्निंग पहल द्वारा संचालित",
+        footer_contact: "सहायता संपर्क करें",
+        footer_feedback: "प्रतिक्रिया",
+
+        voice_heading: "🎤 वॉइस कंट्रोल",
+        voice_btn_start: "वॉइस कमांड शुरू करें",
+        voice_status_click: "सक्रिय करने के लिए क्लिक करें",
+        tts_btn_enable: "टेक्स्ट-ટू-स्पीच सक्षम करें",
+        tts_status_inactive: "TTS: निष्क्रिय",
+        tts_speed_label: "स्पीच स्पीड",
+        tts_speed_slow: "धीमा",
+        tts_speed_normal: "सामान्य",
+        tts_speed_fast: "तेज़",
+        stop_speech: "स्पीच बंद करें",
+        voice_listening: "🔴 सुन रहा है...",
+        icon_settings: "सेटिंग्स",
+        icon_notifications: "अधिसूचना"
+      },
+      pa: {
+        student_title: "ਸਟੂਡੈਂਟ ਡੈਸ਼ਬੋਰਡ - ਨਭਾ ਡਿਜੀਟਲ ਲਰਨਿੰਗ",
+        logo_text: "ਨਭਾ ਡਿਜੀਟਲ ਲਰਨਿੰਗ",
+        logo_sub: "ਸਟੂਡੈਂਟ ਡੈਸ਼ਬੋਰਡ",
+        nav_dashboard: "ਡੈਸ਼ਬੋਰਡ",
+        nav_materials: "ਸਮੱਗਰੀ",
+        nav_classes: "ਕਲਾਸਾਂ",
+        nav_inbox: "ਇਨਬਾਕਸ",
+        nav_settings: "ਸੈਟਿੰਗਜ਼",
+        current_lang_display: "PA",
+        lang_en: "English",
+        lang_hi: "हिन्दी",
+        lang_pa: "ਪੰਜਾਬੀ",
+
+        welcome_greeting: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ, {name}!",
+        welcome_subtitle: "ਆਓ ਤੁਹਾਡੇ ਸਿੱਖਣ ਦੇ ਅਨੁਭਵ ਵਿੱਚ ਚੱਲੀਏ",
+
+        quick_actions_heading: "ਝਟਪਟ ਕਾਰਵਾਈਆਂ",
+        card_take_quiz_title: "ਕੁਇਜ਼ ਲਓ",
+        card_take_quiz_desc: "5 ਉਪਲਬਧ ਕੋਰਸ ਸੰਬੰਧੀ ਕੁਇਜ਼",
+        card_take_quiz_btn: "ਕੁਇਜ਼ ਸ਼ੁਰੂ ਕਰੋ",
+
+        card_digital_module_title: "ਡਿਜੀਟਲ ਮੋਡੀਊਲ",
+        card_digital_module_desc: "ਡਿਜੀਟਲ ਪਾਠਕ੍ਰਮ",
+        card_digital_module_btn: "ਸਿੱਖਣਾ ਸ਼ੁਰੂ ਕਰੋ",
+
+        card_ai_title: "AI ਸਵਾਲ ਹੱਲ",
+        card_ai_desc: "ਤੁਰੰਤ ਮਦਦ ਪ੍ਰਾਪਤ ਕਰੋ",
+        card_ai_btn: "AI ਨੂੰ ਪੁੱਛੋ",
+
+        card_view_report_title: "ਰਿਪੋਰਟ ਵੇਖੋ",
+        card_view_report_desc: "ਕੁਇਜ਼ ਨਤੀਜੇ ਵੇਖੋ",
+        card_view_report_btn: "ਰਿਪੋਰਟ ਵੇਖੋ",
+
+        card_leaderboard_title: "ਲੀਡਰਬੋਰਡ",
+        card_leaderboard_desc: "ਆਪਣੀ ਰੈਂਕਿੰਗ ਵੇਖੋ",
+        card_leaderboard_btn: "ਰੈਂਕਿੰਗ ਵੇਖੋ",
+
+        card_recorded_title: "ਰੀਕਾਰਡ ਕੀਤੇ ਲੈਕਚਰ",
+        card_recorded_desc: "ਆਪਣੀਆਂ ਸਾਰੀਆਂ ਰਿਕਾਰਡ ਕੀਤੀਆਂ ਕਲਾਸਾਂ ਤੱਕ ਪਹੁੰਚ",
+        card_recorded_btn: "ਲੈਕਚਰ ਵੇਖੋ",
+
+        stat_avg_label: "ਔਸਤ ਰੇਟ",
+        stat_avg_value: "4.1",
+        stat_attendance_label: "ਹਾਜ਼ਰੀ ਦਰ",
+        stat_attendance_value: "76%",
+        stat_lessons_label: "ਪੂਰੇ ਕੀਤੇ ਪਾਠ",
+        stat_lessons_value: "24",
+        stat_dskills_label: "ਡਿਜੀਟਲ ਸਕਿਲਸ",
+        stat_dskills_value: "8 / 10",
+        stat_quiz_label: "ਕੁਇਜ਼ ਕੋਸ਼ਿਸ਼ ਕੀਤੀ",
+        stat_quiz_value: "12",
+        stat_perf_label: "ਪਰਫਾਰਮੈਂਸ",
+        stat_perf_value: "87%",
+
+        recent_heading: "ਹਾਲੀਆ ਸਰਗਰਮੀਆਂ",
+        activity_1_title: "Ms Lynn ਨੇ ਫੀਡਬੈਕ ਦਿੱਤਾ",
+        activity_1_time: "Behavioural report — 10/07/2023",
+        activity_2_title: "Mr Lopez ਨੇ ਫੀਡਬੈਕ ਦਿੱਤਾ",
+        activity_2_time: "Reflective essay — 10/07/2023",
+        btn_see_all: "ਸਭ ਵੇਖੋ",
+
+        charts_heading: "ਪਰਫਾਰਮੈਂਸ ਅਤੇ ਹਾਜ਼ਰੀ",
+        charts_overview: "ਸਾਰ",
+        attendance_trend_title: "ਹਾਜ਼ਰੀ ਰੁਜ਼ਾਨਾ",
+        attendance_trend_sub: "ਪਿਛਲੇ 7 ਦਿਨ",
+        attendance_rate: "ਦਰ:",
+        attendance_rate_value: "92%",
+        progress_by_cat_title: "ਸ਼੍ਰੇਣੀ ਮੁਤਾਬਕ ਅੱਗੇ ਵਧਨਾ",
+        progress_by_cat_sub: "ਪੂਰਾ ਬਣਾਮ ਬਾਕੀ",
+        perf_over_time_title: "ਸਮੇਂ ਦੇ ਨਾਲ ਪ੍ਰਦਰਸ਼ਨ",
+        perf_over_time_sub: "ਕੁਇਜ਼ ਅੰਕ - ਆਖਰੀ 6 ਕੋਸ਼ਿਸ਼ਾਂ",
+        perf_avg_value: "85%",
+
+        attendance_heading: "ਹਾਜ਼ਰੀ",
+        attendance_week_btn: "ਇਸ ਹਫ਼ਤੇ",
+        dow_mon: "Mon", dow_tue: "Tue", dow_wed: "Wed", dow_thu: "Thu", dow_fri: "Fri", dow_sat: "Sat", dow_sun: "Sun",
+        date_17: "17", date_18: "18", date_19: "19", date_20: "20", date_21: "21", date_22: "22", date_23: "23",
+        legend_on_time: "ਟਾਈਮ ਤੇ", legend_absent: "ਗੈਰਹਾਜ਼ਰ", legend_tardy: "ਦੇਰ",
+
+        recent_activities_heading: "ਹਾਲੀਆ ਸਰਗਰਮੀਆਂ",
+        recent_seeall: "ਸਭ ਵੇਖੋ",
+        recent_item_1: 'Teacher Mr Lopez left feedback on "Reflective essay"',
+        recent_item_1_time: "10:00 10/07/2023",
+        recent_item_read: "ਪੜ੍ਹੋ",
+        recent_item_2: 'Teacher Ms Lynn left a feedback on "Behavioural report"',
+        recent_item_2_time: "18:00 10/07/2023",
+        recent_item_read2: "ਪੜ੍ਹੋ",
+
+        upcoming_heading: "ਆਉਣ ਵਾਲੇ ਇਵੈਂਟ",
+        upcoming_seeall: "ਸਭ ਵੇਖੋ",
+        event1_time: "03:00 pm",
+        event1_title: "Charlie Dickenson ਨਾਲ ਪਾਠ",
+        event1_sub: "Behavioural Psychology",
+        event2_time: "04:00 pm",
+        event2_title: "Webinar",
+        event2_sub: "ਨਵੇਂ ਢੰਗ ਦੇ ਇਲਾਜ",
+
+        learning_progress_heading: "ਸਿੱਖਣ ਦੀ ਪ੍ਰਗਤੀ",
+        avg_grade_label: "ਔਸਤ ਗਰੇਡ",
+        avg_grade_value: "75%",
+        xp_label: "XP",
+        xp_value: "+340",
+
+        lp_course1: "Human Behaviour", lp_course1_score: "4.3",
+        lp_course2: "Cognitive Psychology", lp_course2_score: "4.9",
+        lp_course3: "Social Psychology", lp_course3_score: "4.0",
+
+        footer_powered: "ਨਭਾ ਡਿਜੀਟਲ ਲਰਨਿੰਗ ਇਨੀਸ਼ੀਏਟਿਵ ਦੁਆਰਾ ਸਮਰਥਿਤ",
+        footer_contact: "ਸਹਾਇਤਾ ਨਾਲ ਸੰਪਰਕ ਕਰੋ",
+        footer_feedback: "ਫੀਡਬੈਕ",
+
+        voice_heading: "🎤 ਵੌਇਸ ਕੰਟਰੋਲ",
+        voice_btn_start: "ਵੌਇਸ ਕਮਾਂਡ ਸ਼ੁਰੂ करो",
+        voice_status_click: "ਸਕ੍ਰਿਯ ਕਰਨ ਲਈ ਕਲਿਕ ਕਰੋ",
+        tts_btn_enable: "ਟੈਕਸਟ-ਟੂ-ਸਪੀਚ ਚਾਲੂ ਕਰੋ",
+        tts_status_inactive: "TTS: ਨਿਰਕਿਰਿਆਸ਼ੀਲ",
+        tts_speed_label: "ਬੋਲਣ ਦੀ ਗਤੀ",
+        tts_speed_slow: "ਧੀਮਾ",
+        tts_speed_normal: "ਸਧਾਰਨ",
+        tts_speed_fast: "ਤੇਜ਼",
+        stop_speech: "ਬੋਲਣਾ ਰੋਕੋ",
+        voice_listening: "🔴 ਸੁਣ ਰਿਹਾ ਹੈ...",
+        icon_settings: "ਸੈਟਿੰਗਜ਼",
+        icon_notifications: "ਸੂਚਨਾਵਾਂ"
+      }
+    };
+
+    /******************************
+     * Language switcher UI & translate function
+     ******************************/
+    let isDropdownOpen = false;
+    const langSwitcherBtn = document.getElementById('lang-switcher-btn');
+    const langDropdown = document.getElementById('lang-dropdown-desktop');
+    const langChevron = document.getElementById('lang-chevron');
+
+    function toggleDropdown() {
+      isDropdownOpen = !isDropdownOpen;
+      if (isDropdownOpen) {
+        langDropdown.classList.add('show');
+        langChevron.style.transform = 'rotate(180deg)';
+      } else {
+        langDropdown.classList.remove('show');
+        langChevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function closeDropdown() {
+      isDropdownOpen = false;
+      langDropdown.classList.remove('show');
+      langChevron.style.transform = 'rotate(0deg)';
+    }
+
+    langSwitcherBtn?.addEventListener('click', function(e){
+      e.stopPropagation();
+      toggleDropdown();
+    });
+
+    document.addEventListener('click', function(e){
+      if (langSwitcherBtn && langDropdown && !langSwitcherBtn.contains(e.target) && !langDropdown.contains(e.target)) {
+        closeDropdown();
+      }
+    });
+
+    function translateContent(langCode) {
+      const translations = localization[langCode] || localization.en;
+      // small display
+      const displayEl = document.getElementById('current-lang-display-desktop');
+      if (displayEl) displayEl.textContent = (translations.current_lang_display || langCode.toUpperCase());
+
+      // replace values
+      document.querySelectorAll('[data-lang]').forEach(el => {
+        const key = el.getAttribute('data-lang');
+        if (!key) return;
+        const value = translations[key];
+        if (value === undefined) {
+          // if no direct translation exists, keep existing content
+          return;
+        }
+
+        // handle greeting placeholder
+        if (typeof value === 'string' && value.indexOf('{name}') !== -1) {
+          el.textContent = value.replace(/\{name\}/g, username);
+        } else {
+          el.textContent = value;
+        }
+      });
+
+      // also update document title if key exists
+      if (translations.student_title) document.title = translations.student_title;
+
+      // persist
+      localStorage.setItem('userLang', langCode);
+      closeDropdown();
+    }
+
+    document.querySelectorAll('.lang-option').forEach(btn=>{
+      btn.addEventListener('click', function(){
+        const code = this.getAttribute('data-lang-code') || 'en';
+        translateContent(code);
+      });
+    });
+
+    // initialize language on load
+    window.addEventListener('load', () => {
+      const saved = localStorage.getItem('userLang') || 'en';
+      translateContent(saved);
+    });
+
+    /******************************
+     * Navigation functions (kept)
+     ******************************/
+    function logout(){ localStorage.removeItem('token'); window.location.href = '/'; }
+    function leaderboard(){ window.location.href = '/leader-board'; }
+    function viewAnalysis(){ window.location.href = '/student-analysis'; }
+    function viewQuiz(){ window.location.href = '/quiz-level'; }
+    function openAiDoubtSolver(){ window.location.href = '/ai-doubt-solver'; }
+    function defaullevel(){ window.location.href = '/defaultlevel'; }
+    function openRecordedLectures(){ window.location.href = '/recorded-lectures'; }
+
+    /******************************
+     * Chart.js initialization
+     ******************************/
+    // small helper colours
+    const cyan = getComputedStyle(document.documentElement).getPropertyValue('--cyan-600') || '#0891b2';
+    const ctxBar = document.getElementById('attendanceBar').getContext('2d');
+    const attendanceBar = new Chart(ctxBar, {
+      type: 'bar',
+      data: {
+        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        datasets: [{
+          label: 'Attendance',
+          data: [1,1,1,1,1,0,1],
+          backgroundColor: function(context) {
+            const index = context.dataIndex;
+            const value = context.dataset.data[index];
+            return value === 1 ? 'rgba(6,182,212,0.9)' : 'rgba(248,113,113,0.9)';
+          },
+          borderRadius: 8,
+          barThickness: 18,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#475569' } },
+          y: {
+            beginAtZero: true,
+            max: 1,
+            ticks: {
+              callback: function(value){ return value === 1 ? 'Present' : ''; },
+              color: '#475569'
+            },
+            grid: { display: false }
+          }
+        },
+        animation: { duration: 900, easing: 'easeOutQuart' }
+      }
+    });
+
+    const ctxLine = document.getElementById('performanceLine').getContext('2d');
+    const performanceLine = new Chart(ctxLine, {
+      type: 'line',
+      data: {
+        labels: ['Attempt 1','2','3','4','5','6'],
+        datasets: [{
+          label: 'Score',
+          data: [72, 78, 85, 88, 82, 90],
+          borderColor: cyan,
+          backgroundColor: 'rgba(6,182,212,0.12)',
+          tension: 0.35,
+          pointRadius: 4,
+          pointBackgroundColor: cyan,
+          fill: true,
+        }]
+      },
+      options: {
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{ legend:{ display:false } },
+        scales:{
+          x:{ grid:{ display:false }, ticks:{ color:'#475569' } },
+          y:{ beginAtZero:true, max:100, ticks:{ color:'#475569' }, grid:{ color:'rgba(15,23,42,0.04)' } }
+        },
+        animation:{ duration:1000, easing:'easeOutQuart' }
+      }
+    });
+
+    const ctxPie = document.getElementById('progressPie').getContext('2d');
+    const progressPie = new Chart(ctxPie, {
+      type: 'doughnut',
+      data: {
+        labels: ['Lessons Completed','Quizzes Completed','Modules Remaining'],
+        datasets: [{
+          data: [48, 12, 40],
+          backgroundColor: ['#06b6d4', '#8b5cf6', '#e6f6fb'],
+          borderWidth: 0,
+        }]
+      },
+      options: {
+        responsive:true,
+        maintainAspectRatio:false,
+        cutout: '60%',
+        plugins:{
+          legend: { position: 'bottom', labels:{ color:'#475569' } },
+          tooltip:{ callbacks:{ label: function(ctx){ return ctx.label + ': ' + ctx.parsed + '%'; } } }
+        },
+        animation:{ animateScale:true, duration:900 }
+      }
+    });
+
+    (function setCanvasHeights(){
+      const barEl = document.getElementById('attendanceBar');
+      const lineEl = document.getElementById('performanceLine');
+      if(barEl && barEl.parentElement) barEl.parentElement.style.height = '220px';
+      if(lineEl && lineEl.parentElement) lineEl.parentElement.style.height = '220px';
+      const pieEl = document.getElementById('progressPie');
+      if(pieEl && pieEl.parentElement) {
+        pieEl.parentElement.style.width = '200px';
+        pieEl.parentElement.style.height = '200px';
+      }
+    })();
+  </script>
+
+  <!-- Reused Voice Control System (dashboard-adapted) -->
+  <script>
+    class DashboardVoiceSystem {
+      constructor() {
+        this.synthesis = window.speechSynthesis;
+        this.recognition = null;
+        this.isListening = false;
+        this.isTTSEnabled = false;
+        this.voiceSpeed = 1;
+        this.currentUtterance = null;
+        this.hoverTimeout = null;
+        this.init();
+      }
+
+      init() {
+        this.setupSpeechRecognition();
+        this.setupControls();
+        this.setupKeyboardShortcuts();
+      }
+
+      setupSpeechRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+          console.warn('Speech recognition not supported');
+          return;
+        }
+
+        this.recognition = new SpeechRecognition();
+        this.recognition.continuous = true;
+        this.recognition.interimResults = false;
+        this.recognition.lang = 'en-US';
+
+        this.recognition.onstart = () => {
+          document.getElementById('voiceIndicator').style.display = 'block';
+        };
+
+        this.recognition.onend = () => {
+          document.getElementById('voiceIndicator').style.display = 'none';
+          if (this.isListening) {
+            setTimeout(() => {
+              try {
+                this.recognition.start();
+              } catch(e) {}
+            }, 100);
+          }
+        };
+
+        this.recognition.onresult = (event) => {
+          const last = event.results.length - 1;
+          const command = event.results[last][0].transcript.toLowerCase().trim();
+          console.log('Voice command:', command);
+          this.processVoiceCommand(command);
+        };
+
+        this.recognition.onerror = (event) => {
+          console.error('Speech recognition error:', event.error);
+          if (event.error === 'no-speech' && this.isListening) {
+            setTimeout(() => {
+              try {
+                this.recognition.start();
+              } catch(e) {}
+            }, 100);
+          }
+        };
+      }
+
+      setupControls() {
+        const toggleVoiceBtn = document.getElementById('toggleVoiceCommands');
+        const toggleTTSBtn = document.getElementById('toggleTextToSpeech');
+        const speedControl = document.getElementById('ttsSpeed');
+        const stopBtn = document.getElementById('stopSpeech');
+
+        if (toggleVoiceBtn) toggleVoiceBtn.addEventListener('click', () => this.toggleVoiceCommands());
+        if (toggleTTSBtn) toggleTTSBtn.addEventListener('click', () => this.toggleTextToSpeech());
+        if (speedControl) speedControl.addEventListener('input', (e) => { this.voiceSpeed = parseFloat(e.target.value); });
+        if (stopBtn) stopBtn.addEventListener('click', () => this.stopSpeaking());
+      }
+
+      setupKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+          const activeElement = document.activeElement;
+          const isTyping = activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'SELECT';
+          if (isTyping) return;
+
+          if (e.key.toLowerCase() === 'v') {
+            e.preventDefault();
+            this.toggleTextToSpeech();
+          }
+          if (e.key.toLowerCase() === 'o') {
+            e.preventDefault();
+            this.toggleVoiceCommands();
+          }
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            this.stopSpeaking();
+          }
+        });
+      }
+
+      toggleVoiceCommands() {
+        if (!this.recognition) {
+          this.speak('Voice commands are not supported in your browser. Please use Chrome or Edge.');
+          return;
+        }
+
+        this.isListening = !this.isListening;
+        const btn = document.getElementById('toggleVoiceCommands');
+        const status = document.getElementById('voiceCommandStatus');
+
+        if (this.isListening) {
+          try {
+            this.recognition.start();
+            btn.textContent = 'Stop Voice Commands';
+            btn.style.background = '#dc2626';
+            status.textContent = '🎤 Listening...';
+            status.style.background = '#fee2e2';
+            this.speak('Voice commands activated. You can now control the dashboard with your voice.');
+          } catch(e) {
+            console.error('Failed to start recognition:', e);
+            this.isListening = false;
+          }
+        } else {
+          this.recognition.stop();
+          btn.textContent = 'Start Voice Commands';
+          btn.style.background = '#0891b2';
+          status.textContent = 'Click to activate';
+          status.style.background = '#f3f4f6';
+          this.speak('Voice commands deactivated.');
+        }
+      }
+
+      toggleTextToSpeech() {
+        this.isTTSEnabled = !this.isTTSEnabled;
+        const btn = document.getElementById('toggleTextToSpeech');
+        const status = document.getElementById('ttsStatus');
+
+        if (this.isTTSEnabled) {
+          btn.textContent = 'Disable Text-to-Speech';
+          btn.style.background = '#0891b2';
+          btn.style.color = 'white';
+          btn.style.borderColor = '#0891b2';
+          status.textContent = 'TTS: Active ✓';
+          status.style.background = '#dcfce7';
+          status.style.color = '#166534';
+          this.speak('Text to speech enabled. Hover over any text to hear it read aloud.');
+          this.enableHoverReading();
+        } else {
+          btn.textContent = 'Enable Text-to-Speech';
+          btn.style.background = 'white';
+          btn.style.color = '#0891b2';
+          btn.style.borderColor = '#0891b2';
+          status.textContent = 'TTS: Inactive';
+          status.style.background = '#f3f4f6';
+          status.style.color = '#4b5563';
+          this.stopSpeaking();
+          this.disableHoverReading();
+          this.speak('Text to speech disabled.');
+        }
+      }
+
+      enableHoverReading() {
+        const readableElements = document.querySelectorAll('h1, h2, h3, h4, p, button, a, .action-card, .glass-card');
+        readableElements.forEach(el => {
+          el.addEventListener('mouseenter', this.handleHover);
+          el.dataset.ttsEnabled = 'true';
+        });
+      }
+
+      disableHoverReading() {
+        const readableElements = document.querySelectorAll('[data-tts-enabled="true"]');
+        readableElements.forEach(el => {
+          el.removeEventListener('mouseenter', this.handleHover);
+          delete el.dataset.ttsEnabled;
+        });
+      }
+
+      handleHover = (e) => {
+        if (!this.isTTSEnabled) return;
+        clearTimeout(this.hoverTimeout);
+        this.hoverTimeout = setTimeout(() => {
+          const el = e.target;
+          let text = '';
+
+          if (el.classList.contains('action-card')) {
+            const title = el.querySelector('h3')?.textContent || '';
+            const desc = el.querySelector('p')?.textContent || '';
+            text = `${title}. ${desc}`;
+          } else if (el.tagName === 'BUTTON') {
+            text = `Button: ${el.textContent.trim()}`;
+          } else {
+            text = el.textContent.trim();
+            if (text.length > 200) text = text.substring(0,200) + '...';
+          }
+
+          if (text && text.length > 2) this.speak(text);
+        }, 400);
+      }
+
+      processVoiceCommand(command) {
+        console.log('Processing command:', command);
+
+        if (command.includes('take quiz') || command.includes('start quiz') || command.includes('quiz')) {
+          this.speak('Opening quiz section');
+          viewQuiz();
+        }
+        else if (command.includes('digital module') || command.includes('start learning') || command.includes('learning')) {
+          this.speak('Opening digital learning module');
+          defaullevel();
+        }
+        else if (command.includes('ai doubt') || command.includes('ask ai') || command.includes('doubt solver')) {
+          this.speak('Opening AI doubt solver');
+          openAiDoubtSolver();
+        }
+        else if (command.includes('view report') || command.includes('analysis') || command.includes('report')) {
+          this.speak('Opening your analysis report');
+          viewAnalysis();
+        }
+        else if (command.includes('leaderboard') || command.includes('ranking') || command.includes('rankings')) {
+          this.speak('Opening leaderboard');
+          leaderboard();
+        }
+        else if (command.includes('lecture') || command.includes('recorded') || command.includes('video')) {
+          this.speak('Opening recorded lectures');
+          openRecordedLectures();
+        }
+        else if (command.includes('scroll down')) {
+          this.speak('Scrolling down');
+          window.scrollBy({ top: 500, behavior: 'smooth' });
+        }
+        else if (command.includes('scroll up')) {
+          this.speak('Scrolling up');
+          window.scrollBy({ top: -500, behavior: 'smooth' });
+        }
+        else if (command.includes('read this') || command.includes('read page') || command.includes('read section')) {
+          this.readCurrentSection();
+        }
+        else if (command.includes('english')) {
+          translateContent('en');
+          this.speak('Language changed to English');
+        }
+        else if (command.includes('hindi')) {
+          translateContent('hi');
+          this.speak('Language changed to Hindi');
+        }
+        else if (command.includes('punjabi') || command.includes('panjabi')) {
+          translateContent('pa');
+          this.speak('Language changed to Punjabi');
+        }
+        else if (command.includes('my stats') || command.includes('my statistics') || command.includes('performance')) {
+          this.readStats();
+        }
+        else if (command.includes('stop') || command.includes('quiet') || command.includes('silence')) {
+          this.stopSpeaking();
+        }
+        else if (command.includes('help') || command.includes('what can you do')) {
+          this.speak('You can say: take quiz, start learning, ask AI, view report, leaderboard, lectures, scroll down, scroll up, read this, my stats, or stop. You can also switch language by saying English, Hindi, or Punjabi.');
+        }
+        else {
+          this.speak('Command not recognized. Say help to hear available commands.');
+        }
+      }
+
+      readCurrentSection() {
+        const sections = document.querySelectorAll('.hero-card, .glass-card, .action-card');
+        let mostVisibleSection = null;
+        let maxVisibility = 0;
+
+        sections.forEach(section => {
+          const rect = section.getBoundingClientRect();
+          const visibility = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+          if (visibility > maxVisibility) {
+            maxVisibility = visibility;
+            mostVisibleSection = section;
+          }
+        });
+
+        if (mostVisibleSection) {
+          let text = mostVisibleSection.textContent.replace(/\s+/g, ' ').trim();
+          if (text.length > 500) text = text.substring(0,500) + '...';
+          this.speak(text);
+        } else this.speak('No readable section found');
+      }
+
+      readStats() {
+        const stats = [];
+        const heroCard = document.querySelector('.hero-card');
+        if (heroCard) {
+          const statCards = heroCard.querySelectorAll('.text-xl.font-bold');
+          statCards.forEach((stat, index) => {
+            const label = stat.parentElement.querySelector('.text-xs')?.textContent || '';
+            const value = stat.textContent;
+            if (label && value) stats.push(`${label}: ${value}`);
+          });
+        }
+
+        if (stats.length > 0) this.speak(`Here are your statistics. ${stats.join('. ')}`);
+        else this.speak('Unable to read statistics');
+      }
+
+      speak(text) {
+        this.synthesis.cancel();
+        if (!text) return;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = this.voiceSpeed;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+        utterance.lang = 'en-US';
+        this.currentUtterance = utterance;
+        this.synthesis.speak(utterance);
+      }
+
+      stopSpeaking() {
+        this.synthesis.cancel();
+        clearTimeout(this.hoverTimeout);
+      }
+    }
+
+    // init voice system
+    let dashboardVoiceSystem;
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        dashboardVoiceSystem = new DashboardVoiceSystem();
+        setTimeout(() => {
+          dashboardVoiceSystem.speak(`Welcome ${username}. Press O to activate voice commands, or V for text to speech.`);
+        }, 1200);
+      }, 500);
+    });
+  </script>
+</body>
+</html>

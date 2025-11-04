@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voice Navigation Example</title>
+</head>
+<body>
+  <h2>🎙️ Voice-controlled Navigation</h2>
+  <button id="listenBtn">Start Listening</button>
+  <p id="output">Say a command...</p>
+
+  <script>
+    // ---------- Text-to-Speech ----------
+    function speak(text) {
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = "en-IN";              // or "hi-IN" for Hindi
+      speechSynthesis.speak(msg);
+    }
+
+    // ---------- Speech-to-Text ----------
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Speech Recognition not supported in this browser (try Chrome).");
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-IN";
+      recognition.interimResults = false;
+
+      recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript.toLowerCase();
+        document.getElementById("output").innerText = "You said: " + command;
+        handleCommand(command);
+      };
+
+      recognition.onerror = () => speak("Sorry, I didn't catch that.");
+
+      // ---------- Command Logic ----------
+      function handleCommand(cmd) {
+        if (cmd.includes("math") || cmd.includes("mathematics")) {
+          speak("Opening maths course.");
+          window.location.href = "/courses/maths.html";   // <-- your maths page
+        } 
+        else if (cmd.includes("science")) {
+          speak("Opening science course.");
+          window.location.href = "/courses/science.html";
+        } 
+        else if (cmd.includes("home")) {
+          speak("Going back to home page.");
+          window.location.href = "/index.html";
+        } 
+        else {
+          speak("Command not recognized.");
+        }
+      }
+
+      // ---------- Start Listening ----------
+      document.getElementById("listenBtn").addEventListener("click", () => {
+        speak("Listening for your command.");
+        recognition.start();
+      });
+    }
+  </script>
+</body>
+</html>

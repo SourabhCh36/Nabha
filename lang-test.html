@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Shifter Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Language switcher dropdown */
+        .lang-dropdown-desktop {
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.2s ease-in-out;
+            pointer-events: none;
+        }
+        .lang-dropdown-desktop.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .lang-option {
+            transition: background-color 0.2s;
+        }
+        .lang-option:hover {
+            background-color: #f3f4f6;
+        }
+        .lang-option:first-child {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .lang-option:last-child {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+
+    <h1 class="text-2xl font-bold mb-8">Language Switcher Test</h1>
+
+    <!-- Language Switcher -->
+    <div class="relative inline-block">
+        <button id="lang-switcher-btn" class="px-3 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-cyan-600 to-cyan-500 flex items-center gap-2 hover:shadow-lg transition-shadow">
+            <i class="fas fa-globe text-white"></i>
+            <span id="current-lang-display-desktop">EN</span>
+            <i class="fas fa-chevron-down text-xs transition-transform" id="lang-chevron"></i>
+        </button>
+        <div id="lang-dropdown-desktop" class="lang-dropdown-desktop absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg border">
+            <button data-lang-code="en" class="block w-full text-left px-4 py-2 text-sm text-gray-700 lang-option">English</button>
+            <button data-lang-code="hi" class="block w-full text-left px-4 py-2 text-sm text-gray-700 lang-option">हिन्दी</button>
+            <button data-lang-code="pa" class="block w-full text-left px-4 py-2 text-sm text-gray-700 lang-option">ਪੰਜਾਬੀ</button>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <p data-lang="welcome_subtitle">Let's jump into your learning experience</p>
+        <p class="mt-2" data-lang="logo_text">Nabha Digital Learning</p>
+    </div>
+
+    <script>
+        // ---------- Localization with complete translations --------------
+        const localization = {
+            en: {
+                logo_text: "Nabha Digital Learning",
+                welcome_subtitle: "Let's jump into your learning experience",
+            },
+            hi: {
+                logo_text: "नभा डिजिटल लर्निंग",
+                welcome_subtitle: "आइए अपने सीखने के अनुभव में कूदते हैं",
+            },
+            pa: {
+                logo_text: "ਨਭਾ ਡਿਜਿਟਲ ਲਰਨਿੰਗ",
+                welcome_subtitle: "ਆਓ ਆਪਣੇ ਸਿੱਖਣ ਦੇ ਅਨੁਭਵ ਵਿੱਚ ਕੂਦੀਏ",
+            }
+        };
+
+        // Language switcher functionality
+        let isDropdownOpen = false;
+        const langSwitcherBtn = document.getElementById('lang-switcher-btn');
+        const langDropdown = document.getElementById('lang-dropdown-desktop');
+        const langChevron = document.getElementById('lang-chevron');
+        
+        console.log('Elements found:', {
+            button: !!langSwitcherBtn,
+            dropdown: !!langDropdown,
+            chevron: !!langChevron
+        });
+
+        function toggleDropdown() {
+            isDropdownOpen = !isDropdownOpen;
+            console.log('Toggling dropdown:', isDropdownOpen);
+            if (isDropdownOpen) {
+                langDropdown.classList.add('show');
+                langChevron.style.transform = 'rotate(180deg)';
+            } else {
+                langDropdown.classList.remove('show');
+                langChevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function closeDropdown() {
+            isDropdownOpen = false;
+            langDropdown.classList.remove('show');
+            langChevron.style.transform = 'rotate(0deg)';
+            console.log('Dropdown closed');
+        }
+
+        // Click handler for language switcher button
+        langSwitcherBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            console.log('Language button clicked');
+            toggleDropdown();
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!langSwitcherBtn.contains(e.target) && !langDropdown.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+
+        function translateContent(langCode){
+            const translations = localization[langCode] || localization.en;
+            console.log('Translating to:', langCode, translations);
+            document.getElementById('current-lang-display-desktop').textContent = langCode.toUpperCase();
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                if(translations[key]) {
+                    el.textContent = translations[key];
+                }
+            });
+            localStorage.setItem('userLang', langCode);
+            closeDropdown();
+        }
+
+        document.querySelectorAll('.lang-option').forEach(btn=>{
+            btn.addEventListener('click', function(){ 
+                console.log('Language option clicked:', this.getAttribute('data-lang-code'));
+                translateContent(this.getAttribute('data-lang-code')); 
+            });
+        });
+
+        // Init language on load
+        const saved = localStorage.getItem('userLang') || 'en';
+        translateContent(saved);
+    </script>
+
+</body>
+</html>

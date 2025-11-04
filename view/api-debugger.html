@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Debugger - Results Endpoint</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 20px; }
+        .section { margin: 20px 0; padding: 20px; background: #f9f9f9; border-left: 4px solid #667eea; }
+        .btn { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin: 5px 5px 5px 0; }
+        .btn:hover { background: #5a67d8; }
+        .output { background: #222; color: #0f0; padding: 15px; border-radius: 4px; margin: 10px 0; font-family: 'Courier New', monospace; font-size: 12px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word; }
+        .error { background: #fff3cd; color: #856404; padding: 15px; border-radius: 4px; margin: 10px 0; border: 1px solid #ffc107; }
+        .success { background: #d4edda; color: #155724; padding: 15px; border-radius: 4px; margin: 10px 0; border: 1px solid #28a745; }
+        .info { background: #d1ecf1; color: #0c5460; padding: 15px; border-radius: 4px; margin: 10px 0; border: 1px solid #17a2b8; }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; }
+        textarea { min-height: 100px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 API Debugger - Results Endpoint</h1>
+        
+        <div class="section">
+            <h2>1. Check Stored Credentials</h2>
+            <button class="btn" onclick="checkCredentials()">Check localStorage</button>
+            <div id="credentialsOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>2. Test Student Results API</h2>
+            <button class="btn" onclick="testStudentAPI()">Test /api/results/student/{userId}</button>
+            <div id="studentApiOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>3. Test Teacher Results API</h2>
+            <button class="btn" onclick="testTeacherAPI()">Test /api/results/all-by-teacher</button>
+            <div id="teacherApiOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>4. Manual API Test</h2>
+            <label>Endpoint:</label>
+            <input type="text" id="endpoint" value="/api/results/student/" placeholder="Enter endpoint">
+            <label>Method:</label>
+            <select id="method" style="width: 100%; padding: 8px;">
+                <option>GET</option>
+                <option>POST</option>
+            </select>
+            <label>Request Body (for POST):</label>
+            <textarea id="body" placeholder='{"key": "value"}'></textarea>
+            <button class="btn" onclick="testCustomAPI()">Send Request</button>
+            <div id="customApiOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>Results Summary</h2>
+            <div id="summary"></div>
+        </div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌ ERROR' : type === 'success' ? '✅ SUCCESS' : 'ℹ️ INFO';
+            element.textContent += `[${timestamp}] ${prefix}: ${message}\n\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function clear(elementId) {
+            document.getElementById(elementId).textContent = '';
+        }
+
+        function checkCredentials() {
+            clear('credentialsOutput');
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            log('credentialsOutput', 'Token length: ' + (token ? token.length : 0) + ' chars');
+            log('credentialsOutput', 'Token: ' + (token ? token.substring(0, 50) + '...' : 'NOT FOUND'));
+            
+            if (user) {
+                const userObj = JSON.parse(user);
+                log('credentialsOutput', 'User ID: ' + userObj._id);
+                log('credentialsOutput', 'User Name: ' + (userObj.fullName || userObj.firstName + ' ' + userObj.lastName));
+                log('credentialsOutput', 'User Type: ' + (userObj.role || 'unknown'));
+            } else {
+                log('credentialsOutput', 'USER DATA NOT FOUND', 'error');
+            }
+        }
+
+        async function testStudentAPI() {
+            clear('studentApiOutput');
+            try {
+                const token = localStorage.getItem('token');
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                
+                if (!token) {
+                    log('studentApiOutput', 'No token found', 'error');
+                    return;
+                }
+                if (!user._id) {
+                    log('studentApiOutput', 'No user ID found', 'error');
+                    return;
+                }
+
+                log('studentApiOutput', 'Testing: GET /api/results/student/' + user._id);
+                log('studentApiOutput', 'Sending request...');
+
+                const response = await fetch(`/api/results/student/${user._id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                log('studentApiOutput', 'Status: ' + response.status + ' ' + response.statusText);
+
+                const data = await response.json();
+                log('studentApiOutput', 'Response received');
+                log('studentApiOutput', 'Success: ' + data.success);
+                log('studentApiOutput', 'Results count: ' + (data.data ? data.data.length : 'NO DATA FIELD'));
+                log('studentApiOutput', 'Full Response:\n' + JSON.stringify(data, null, 2), 'success');
+
+                // Update summary
+                if (data.data && data.data.length > 0) {
+                    document.getElementById('summary').innerHTML += `<p class="success">✅ Found ${data.data.length} exam results for student</p>`;
+                } else {
+                    document.getElementById('summary').innerHTML += `<p class="error">❌ No exam results found for this student</p>`;
+                }
+
+            } catch (error) {
+                log('studentApiOutput', error.message, 'error');
+                log('studentApiOutput', 'Error stack: ' + error.stack, 'error');
+                document.getElementById('summary').innerHTML += `<p class="error">❌ API Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testTeacherAPI() {
+            clear('teacherApiOutput');
+            try {
+                const token = localStorage.getItem('token');
+                
+                if (!token) {
+                    log('teacherApiOutput', 'No token found', 'error');
+                    return;
+                }
+
+                log('teacherApiOutput', 'Testing: GET /api/results/all-by-teacher');
+                log('teacherApiOutput', 'Sending request...');
+
+                const response = await fetch('/api/results/all-by-teacher', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                log('teacherApiOutput', 'Status: ' + response.status + ' ' + response.statusText);
+
+                const data = await response.json();
+                log('teacherApiOutput', 'Response received');
+                log('teacherApiOutput', 'Success: ' + data.success);
+                log('teacherApiOutput', 'Results count: ' + (data.data ? data.data.length : 'NO DATA FIELD'));
+                log('teacherApiOutput', 'Full Response:\n' + JSON.stringify(data, null, 2), 'success');
+
+                // Update summary
+                if (data.data && data.data.length > 0) {
+                    document.getElementById('summary').innerHTML += `<p class="success">✅ Found ${data.data.length} results for teacher's exams</p>`;
+                } else {
+                    document.getElementById('summary').innerHTML += `<p class="error">❌ No results found for teacher's exams</p>`;
+                }
+
+            } catch (error) {
+                log('teacherApiOutput', error.message, 'error');
+                document.getElementById('summary').innerHTML += `<p class="error">❌ API Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testCustomAPI() {
+            clear('customApiOutput');
+            try {
+                const endpoint = document.getElementById('endpoint').value;
+                const method = document.getElementById('method').value;
+                const bodyText = document.getElementById('body').value;
+                const token = localStorage.getItem('token');
+
+                log('customApiOutput', `Testing: ${method} ${endpoint}`);
+
+                const options = {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                if (method === 'POST' && bodyText) {
+                    options.body = bodyText;
+                }
+
+                const response = await fetch(endpoint, options);
+                log('customApiOutput', `Status: ${response.status} ${response.statusText}`);
+
+                const data = await response.json();
+                log('customApiOutput', 'Response:\n' + JSON.stringify(data, null, 2), 'success');
+
+            } catch (error) {
+                log('customApiOutput', error.message, 'error');
+            }
+        }
+
+        // Initial summary
+        window.addEventListener('load', () => {
+            checkCredentials();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Candy Exam Levels</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body.candy-bg {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    overflow-x: hidden;
+}
+
+/* Glassmorphic boxes */
+.login-box, .exam-box, .result-box {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    animation: pop 0.5s ease-in-out;
+    position: relative;
+    z-index: 10;
+    color: #fff;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+h1, h2 {
+    color: #ffffff;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+}
+
+button {
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    border: none;
+    padding: 12px 25px;
+    margin: 10px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #fff;
+    font-weight: bold;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.3);
+}
+
+button:disabled {
+    background: #666;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@keyframes pop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Falling candy container */
+#candies {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.candy {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    animation: fall linear infinite;
+    opacity: 0.9;
+}
+
+@keyframes fall {
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+
+/* Map and levels */
+.map-container {
+    position: relative;
+    width: 400px;
+    margin: 0 auto;
+    min-height: 800px;
+    padding: 20px;
+}
+
+.map-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: bold;
+    text-shadow: 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.level-node {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(0,198,255,0.7);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: absolute;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.level-node:hover:not(.locked) {
+    transform: scale(1.15);
+    box-shadow: 0 0 30px rgba(0,198,255,0.9);
+}
+
+.level-node.locked {
+    background: linear-gradient(135deg, #666, #444);
+    cursor: not-allowed;
+    color: #ccc;
+    font-size: 32px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.level-node.completed {
+    background: linear-gradient(135deg, #00ff88, #00cc66);
+    box-shadow: 0 0 20px rgba(0,255,136,0.7);
+}
+
+.level-path {
+    position: absolute;
+    width: 4px;
+    background: linear-gradient(to bottom, #00c6ff, #0072ff);
+    border-radius: 2px;
+    z-index: 1;
+}
+
+.level-path.unlocked {
+    background: linear-gradient(to bottom, #00ff88, #00cc66);
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { box-shadow: 0 0 5px rgba(0,255,136,0.5); }
+    to { box-shadow: 0 0 15px rgba(0,255,136,0.9); }
+}
+
+.option-btn {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.option-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(5px);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 20px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+</style>
+</head>
+<body class="candy-bg">
+<div id="candies"></div>
+
+<!-- Level Map View -->
+<div id="levelMapView" class="map-container">
+    <h1 class="map-title">🍭 Candy Exam Journey</h1>
+    <div id="levelProgress" class="text-center mb-8">
+        <div class="bg-white bg-opacity-20 rounded-lg p-4 backdrop-blur-sm">
+            <p class="text-white text-lg">Current Progress</p>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill" style="width: 10%"></div>
+            </div>
+            <p id="progressText" class="text-white mt-2">Level 1 of 10</p>
+        </div>
+    </div>
+    <div id="mapLevels" class="relative"></div>
+</div>
+
+<!-- Exam View -->
+<div id="examView" class="hidden">
+    <div class="max-w-4xl mx-auto p-4">
+        <!-- Exam Header -->
+        <div class="exam-box">
+            <h1 id="examTitle" class="text-3xl font-bold mb-2">Level 1 Exam</h1>
+            <p id="examDescription" class="mb-4">Complete this exam to unlock the next level!</p>
+            <div class="flex flex-wrap gap-4 text-sm justify-center">
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded">Duration: 5 minutes</span>
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded">Status: Active</span>
+                <span id="questionCount" class="bg-purple-100 text-purple-800 px-3 py-1 rounded">Questions: 2</span>
+            </div>
+        </div>
+
+        <!-- Timer -->
+        <div class="exam-box">
+            <h2 class="text-lg font-semibold mb-2">Time Remaining</h2>
+            <div id="timer" class="text-2xl font-bold text-red-300">05:00</div>
+        </div>
+
+        <!-- Current Question -->
+        <div id="currentQuestion" class="exam-box">
+            <!-- Question content will be inserted here -->
+        </div>
+
+        <!-- Navigation -->
+        <div class="text-center">
+            <button id="prevBtn" onclick="previousQuestion()" class="mr-4" disabled>Previous</button>
+            <button id="nextBtn" onclick="nextQuestion()">Next</button>
+            <button id="submitBtn" onclick="submitExam()" class="hidden bg-green-600 hover:bg-green-700">Submit Exam</button>
+        </div>
+    </div>
+</div>
+
+<!-- Results View -->
+<div id="resultsView" class="hidden">
+    <div class="max-w-4xl mx-auto p-4">
+        <div class="result-box">
+            <h2 class="text-2xl font-bold mb-4">🎉 Exam Results</h2>
+            <div id="resultsContent"></div>
+            <div class="mt-6">
+                <button onclick="backToLevels()" class="bg-blue-600 hover:bg-blue-700 mr-4">Back to Levels</button>
+                <button id="retakeBtn" onclick="retakeExam()" class="bg-yellow-600 hover:bg-yellow-700">Retake Exam</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Level data with questions
+const levels = {
+    1: {
+        title: "Basic Knowledge",
+        description: "Let's start with some simple questions!",
+        /*questions: [
+            {
+                id: 1,
+                text: '🍬 What is 2 + 2?',
+                options: ['3', '4', '5', '6'],
+                correctAnswer: 1
+            },
+            {
+                id: 2,
+                text: '🍭 What is the capital of France?',
+                options: ['London', 'Paris', 'Rome', 'Madrid'],
+                correctAnswer: 1
+            }
+        ]*/
+       questions: [
+                {
+                    id: 1,
+                    text: 'Which part of the plant carries out photosynthesis?',
+                    type: 'multiple-choice',
+                    options: ['Root', 'Stem', 'Leaf', 'Flower'],
+                    correctAnswer: 2
+                },
+                {
+                    id: 2,
+                    text: 'What is the boiling point of water at sea level?',
+                    type: 'multiple-choice',
+                    options: ['0°C', '50°C', '100°C', '212°C'],
+                    correctAnswer: 2
+                },
+                {
+                    id: 3,
+                    text: 'Which gas do humans exhale during respiration?',
+                    type: 'multiple-choice',
+                    options: ['Oxygen', 'Carbon Dioxide', 'Nitrogen', 'Hydrogen'],
+                    correctAnswer: 1
+                },
+                {
+                    id: 4,
+                    text: 'Which of the following is a renewable source of energy?',
+                    type: 'multiple-choice',
+                    options: ['Coal', 'Petroleum', 'Solar Energy', 'Natural Gas'],
+                    correctAnswer: 2
+                }
+            ]
+    },
+    2: {
+        title: "Science Basics",
+        description: "Time for some science questions!",
+        questions: [
+            {
+                id: 1,
+                text: '🍩 What is the largest planet in our solar system?',
+                options: ['Mars', 'Earth', 'Jupiter', 'Saturn'],
+                correctAnswer: 2
+            },
+            {
+                id: 2,
+                text: '🍪 What is 10 × 5?',
+                options: ['45', '50', '55', '60'],
+                correctAnswer: 1
+            }
+        ]
+    },
+    3: {
+        title: "History & Nature",
+        description: "Let's test your knowledge of history and nature!",
+        questions: [
+            {
+                id: 1,
+                text: '🍫 Who invented the light bulb?',
+                options: ['Thomas Edison', 'Isaac Newton', 'Nikola Tesla', 'Albert Einstein'],
+                correctAnswer: 0
+            },
+            {
+                id: 2,
+                text: '🍯 Which is the fastest land animal?',
+                options: ['Horse', 'Lion', 'Cheetah', 'Leopard'],
+                correctAnswer: 2
+            }
+        ]
+    },
+    4: {
+        title: "Mathematics",
+        description: "Mathematical thinking challenge!",
+        questions: [
+            {
+                id: 1,
+                text: '🧮 What is 15% of 100?',
+                options: ['10', '15', '20', '25'],
+                correctAnswer: 1
+            },
+            {
+                id: 2,
+                text: '🔢 If x + 5 = 12, what is x?',
+                options: ['5', '6', '7', '8'],
+                correctAnswer: 2
+            }
+        ]
+    },
+    5: {
+        title: "Geography",
+        description: "Explore the world through questions!",
+        questions: [
+            {
+                id: 1,
+                text: '🌍 Which is the longest river in the world?',
+                options: ['Amazon', 'Nile', 'Mississippi', 'Yangtze'],
+                correctAnswer: 1
+            },
+            {
+                id: 2,
+                text: '🏔️ What is the highest mountain in the world?',
+                options: ['K2', 'Mount Everest', 'Kangchenjunga', 'Makalu'],
+                correctAnswer: 1
+            }
+        ]
+    },
+    6: {
+        title: "Literature",
+        description: "Test your knowledge of books and authors!",
+        questions: [
+            {
+                id: 1,
+                text: '📚 Who wrote "Romeo and Juliet"?',
+                options: ['Charles Dickens', 'William Shakespeare', 'Jane Austen', 'Mark Twain'],
+                correctAnswer: 1
+            },
+            {
+                id: 2,
+                text: '📖 Which book begins with "It was the best of times, it was the worst of times"?',
+                options: ['Great Expectations', 'Oliver Twist', 'A Tale of Two Cities', 'David Copperfield'],
+                correctAnswer: 2
+            }
+        ]
+    },
+    7: {
+        title: "Advanced Science",
+        description: "More challenging science concepts!",
+        questions: [
+            {
+                id: 1,
+                text: '⚛️ What is the chemical symbol for gold?',
+                options: ['Go', 'Gd', 'Au', 'Ag'],
+                correctAnswer: 2
+            },
+            {
+                id: 2,
+                text: '🔬 What is the speed of light in vacuum?',
+                options: ['300,000 km/s', '150,000 km/s', '450,000 km/s', '200,000 km/s'],
+                correctAnswer: 0
+            }
+        ]
+    },
+    8: {
+        title: "World History",
+        description: "Journey through important historical events!",
+        questions: [
+            {
+                id: 1,
+                text: '🏛️ In which year did World War II end?',
+                options: ['1944', '1945', '1946', '1947'],
+                correctAnswer: 1
+            },
+            {
+                id: 2,
+                text: '👑 Who was the first President of the United States?',
+                options: ['Thomas Jefferson', 'John Adams', 'George Washington', 'Benjamin Franklin'],
+                correctAnswer: 2
+            }
+        ]
+    },
+    9: {
+        title: "Technology & Innovation",
+        description: "Modern world and technology!",
+        questions: [
+            {
+                id: 1,
+                text: '💻 Who founded Microsoft?',
+                options: ['Steve Jobs', 'Bill Gates', 'Mark Zuckerberg', 'Larry Page'],
+                correctAnswer: 1
+            },
+            {
+                id: 2,
+                text: '🌐 What does WWW stand for?',
+                options: ['World Wide Web', 'World Wide Wait', 'World Wide Wave', 'World Wide Win'],
+                correctAnswer: 0
+            }
+        ]
+    },
+    10: {
+        title: "Final Challenge",
+        description: "The ultimate test of knowledge!",
+        questions: [
+            {
+                id: 1,
+                text: '🎯 What is the square root of 144?',
+                options: ['10', '11', '12', '13'],
+                correctAnswer: 2
+            },
+            {
+                id: 2,
+                text: '🌟 Which planet is known as the "Red Planet"?',
+                options: ['Venus', 'Mars', 'Jupiter', 'Saturn'],
+                correctAnswer: 1
+            }
+        ]
+    }
+};
+
+// Global variables
+let currentLevel = 1;
+let currentQuestionIndex = 0;
+let userAnswers = {};
+let timeRemaining = 300; // 5 minutes
+let timerInterval;
+let unlockedLevel = parseInt(sessionStorage.getItem("unlockedLevel")) || 1;
+let completedLevels = JSON.parse(sessionStorage.getItem("completedLevels")) || [];
+
+// Initialize the application
+function init() {
+    updateProgress();
+    renderLevelMap();
+    startCandyAnimation();
+}
+
+// Update progress bar
+function updateProgress() {
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const percentage = (unlockedLevel / 10) * 100;
+    
+    progressFill.style.width = percentage + '%';
+    progressText.textContent = `Level ${unlockedLevel} of 10`;
+}
+
+// Render the level map
+function renderLevelMap() {
+    const mapLevels = document.getElementById('mapLevels');
+    mapLevels.innerHTML = '';
+
+    for (let i = 1; i <= 10; i++) {
+        const node = document.createElement('div');
+        node.classList.add('level-node');
+        node.dataset.level = i;
+
+        // Position nodes in a path
+        const top = 50 + (i - 1) * 80;
+        const left = 50 + ((i % 2 === 1) ? 50 : 200) + (Math.random() * 30 - 15);
+        node.style.top = top + 'px';
+        node.style.left = left + 'px';
+
+        if (i <= unlockedLevel) {
+            node.textContent = i;
+            if (completedLevels.includes(i)) {
+                node.classList.add('completed');
+                node.innerHTML = i + '<br>✓';
+            }
+            node.addEventListener('click', () => startLevel(i));
+        } else {
+            node.classList.add('locked');
+            node.textContent = '🔒';
+        }
+
+        mapLevels.appendChild(node);
+
+        // Add connecting path to next level
+        if (i < 10) {
+            const path = document.createElement('div');
+            path.classList.add('level-path');
+            
+            const nextTop = 50 + i * 80;
+            const nextLeft = 50 + ((i + 1) % 2 === 1 ? 50 : 200) + (Math.random() * 30 - 15);
+            
+            const pathHeight = Math.sqrt(Math.pow(nextTop - top, 2) + Math.pow(nextLeft - left, 2));
+            const angle = Math.atan2(nextTop - top, nextLeft - left) * 180 / Math.PI;
+            
+            path.style.height = pathHeight + 'px';
+            path.style.left = (left + 40) + 'px';
+            path.style.top = (top + 40) + 'px';
+            path.style.transformOrigin = '0 0';
+            path.style.transform = `rotate(${angle}deg)`;
+            
+            if (i < unlockedLevel) {
+                path.classList.add('unlocked');
+            }
+            
+            mapLevels.appendChild(path);
+        }
+    }
+}
+
+// Start a specific level
+function startLevel(level) {
+    if (level > unlockedLevel) return;
+    
+    currentLevel = level;
+    currentQuestionIndex = 0;
+    userAnswers = {};
+    timeRemaining = 300;
+    
+    document.getElementById('levelMapView').classList.add('hidden');
+    document.getElementById('examView').classList.remove('hidden');
+    
+    loadExam();
+    startTimer();
+}
+
+// Load exam for current level
+function loadExam() {
+    const levelData = levels[currentLevel];
+    document.getElementById('examTitle').textContent = `Level ${currentLevel}: ${levelData.title}`;
+    document.getElementById('examDescription').textContent = levelData.description;
+    document.getElementById('questionCount').textContent = `Questions: ${levelData.questions.length}`;
+    
+    loadQuestion();
+}
+
+// Load current question
+function loadQuestion() {
+    const levelData = levels[currentLevel];
+    const question = levelData.questions[currentQuestionIndex];
+    const questionContainer = document.getElementById('currentQuestion');
+    
+    questionContainer.innerHTML = `
+        <h3 class="text-xl font-semibold mb-4">Question ${currentQuestionIndex + 1} of ${levelData.questions.length}</h3>
+        <p class="text-lg mb-6">${question.text}</p>
+        <div class="space-y-3">
+            ${question.options.map((option, index) => `
+                <button class="option-btn" onclick="selectAnswer(${index})" id="option${index}">
+                    ${option}
+                </button>
+            `).join('')}
+        </div>
+    `;
+    
+    // Highlight previously selected answer
+    if (userAnswers[question.id] !== undefined) {
+        document.getElementById(`option${userAnswers[question.id]}`).style.background = 'rgba(0, 198, 255, 0.5)';
+    }
+    
+    // Update navigation buttons
+    document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+    
+    if (currentQuestionIndex === levelData.questions.length - 1) {
+        document.getElementById('nextBtn').classList.add('hidden');
+        document.getElementById('submitBtn').classList.remove('hidden');
+    } else {
+        document.getElementById('nextBtn').classList.remove('hidden');
+        document.getElementById('submitBtn').classList.add('hidden');
+    }
+}
+
+// Select an answer
+function selectAnswer(answerIndex) {
+    const question = levels[currentLevel].questions[currentQuestionIndex];
+    userAnswers[question.id] = answerIndex;
+    
+    // Update visual feedback
+    document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.style.background = 'rgba(255, 255, 255, 0.2)';
+    });
+    document.getElementById(`option${answerIndex}`).style.background = 'rgba(0, 198, 255, 0.5)';
+}
+
+// Navigate to previous question
+function previousQuestion() {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        loadQuestion();
+    }
+}
+
+// Navigate to next question
+function nextQuestion() {
+    if (currentQuestionIndex < levels[currentLevel].questions.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion();
+    }
+}
+
+// Start timer
+function startTimer() {
+    timerInterval = setInterval(() => {
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            submitExam();
+            return;
+        }
+
+        timeRemaining--;
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        document.getElementById('timer').textContent = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+// Submit exam
+function submitExam() {
+    clearInterval(timerInterval);
+    
+    const levelData = levels[currentLevel];
+    let correctAnswers = 0;
+    
+    const results = levelData.questions.map(question => {
+        const userAnswer = userAnswers[question.id];
+        const isCorrect = userAnswer === question.correctAnswer;
+        if (isCorrect) correctAnswers++;
+        
+        return {
+            questionId: question.id,
+            questionText: question.text,
+            userAnswer: userAnswer !== undefined ? question.options[userAnswer] : 'Not answered',
+            correctAnswer: question.options[question.correctAnswer],
+            isCorrect: isCorrect
+        };
+    });
+
+    const percentage = (correctAnswers / levelData.questions.length * 100).toFixed(1);
+    const passed = percentage >= 50;
+    
+    // Update progress if passed
+    if (passed) {
+        if (!completedLevels.includes(currentLevel)) {
+            completedLevels.push(currentLevel);
+            sessionStorage.setItem("completedLevels", JSON.stringify(completedLevels));
+        }
+        
+        if (currentLevel === unlockedLevel && currentLevel < 10) {
+            unlockedLevel = currentLevel + 1;
+            sessionStorage.setItem("unlockedLevel", unlockedLevel);
+        }
+    }
+
+    showResults(results, correctAnswers, percentage, passed);
+}
+
+// Show results
+function showResults(results, correctAnswers, percentage, passed) {
+    document.getElementById('examView').classList.add('hidden');
+    document.getElementById('resultsView').classList.remove('hidden');
+
+    const resultsContent = document.getElementById('resultsContent');
+    const levelData = levels[currentLevel];
+    
+    resultsContent.innerHTML = `
+        <div class="mb-8">
+            <div class="text-6xl mb-4">${passed ? '🎉' : '😔'}</div>
+            <h3 class="text-2xl mb-4">${passed ? 'Congratulations!' : 'Keep Trying!'}</h3>
+            <div class="text-xl mb-4">
+                <p>Score: <span class="font-bold">${correctAnswers}/${levelData.questions.length}</span></p>
+                <p>Percentage: <span class="font-bold ${passed ? 'text-green-300' : 'text-red-300'}">${percentage}%</span></p>
+            </div>
+            ${passed ? 
+                (currentLevel < 10 ? '<p class="text-green-300 text-lg">🔓 Next level unlocked!</p>' : '<p class="text-gold text-lg">🏆 You completed all levels!</p>') : 
+                '<p class="text-red-300 text-lg">You need 50% or higher to unlock the next level</p>'
+            }
+        </div>
+        <div class="space-y-4 max-h-60 overflow-y-auto">
+            ${results.map((result, index) => `
+                <div class="border rounded p-4 text-left ${result.isCorrect ? 'border-green-500 bg-green-500 bg-opacity-20' : 'border-red-500 bg-red-500 bg-opacity-20'}">
+                    <p class="font-semibold mb-2">Question ${index + 1}: ${result.questionText}</p>
+                    <p>Your answer: <span class="${result.isCorrect ? 'text-green-300' : 'text-red-300'}">${result.userAnswer}</span></p>
+                    ${!result.isCorrect ? `<p>Correct answer: <span class="text-green-300">${result.correctAnswer}</span></p>` : ''}
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+// Return to level map
+function backToLevels() {
+    document.getElementById('resultsView').classList.add('hidden');
+    document.getElementById('levelMapView').classList.remove('hidden');
+    
+    updateProgress();
+    renderLevelMap();
+}
+
+// Retake current exam
+function retakeExam() {
+    document.getElementById('resultsView').classList.add('hidden');
+    startLevel(currentLevel);
+}
+
+// Candy animation
+function startCandyAnimation() {
+    const candyContainer = document.getElementById("candies");
+    const candyEmojis = ["🍬", "🍭", "🍩", "🍪", "🍫", "🍯"];
+    
+    setInterval(() => {
+        const candy = document.createElement("div");
+        candy.textContent = candyEmojis[Math.floor(Math.random() * candyEmojis.length)];
+        candy.classList.add("candy");
+        candy.style.fontSize = "30px";
+        
+        candy.style.left = Math.random() * window.innerWidth + "px";
+        candy.style.animationDuration = (3 + Math.random() * 4) + "s";
+        
+        candyContainer.appendChild(candy);
+        
+        setTimeout(() => candy.remove(), 7000);
+    }, 800);
+}
+
+// Initialize when page loads
+window.onload = init;
+</script>
+</body>
+</html>

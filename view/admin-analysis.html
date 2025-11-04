@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Analysis Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Background Pattern */
+        .pattern-bg {
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+            background-size: 200px 200px, 300px 300px;
+            animation: pattern-move 20s linear infinite;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes pattern-move {
+            0% { background-position: 0 0, 0 0; }
+            100% { background-position: 200px 200px, -300px -300px; }
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 50px 40px;
+        }
+
+        .chapter-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chapter-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .chapter-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .chapter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .chapter-title {
+            font-size: 2rem;
+            color: #1e293b;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .chapter-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .meta-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* Chart customization */
+        .chart-title {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #475569;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .chapter-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .chart-container {
+                height: 300px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+
+            .chapter-section {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Loading animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in:nth-child(1) { animation-delay: 0.1s; }
+        .fade-in:nth-child(2) { animation-delay: 0.2s; }
+        .fade-in:nth-child(3) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="pattern-bg"></div>
+    
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Teacher Analysis Dashboard</h1>
+            <p>Student Performance Analysis - Class 7 Science</p>
+        </div>
+
+        <div class="content">
+            <!-- Chapter 1: Photosynthesis -->
+            <div class="chapter-section fade-in">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">Chapter 1: Photosynthesis</h2>
+                    <div class="chapter-meta">
+                        <span class="meta-badge">Science</span>
+                        <span class="meta-badge">Class 7</span>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Student Performance Overview</div>
+                    <canvas id="photosynthesisChart"></canvas>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="photoAvg">0</div>
+                        <div class="stat-label">Average Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="photoHighest">0</div>
+                        <div class="stat-label">Highest Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="photoLowest">0</div>
+                        <div class="stat-label">Lowest Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="photoPass">0%</div>
+                        <div class="stat-label">Pass Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapter 2: Respiration -->
+            <div class="chapter-section fade-in">
+                <div class="chapter-header">
+                    <h2 class="chapter-title">Chapter 2: Respiration</h2>
+                    <div class="chapter-meta">
+                        <span class="meta-badge">Science</span>
+                        <span class="meta-badge">Class 7</span>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Student Performance Overview</div>
+                    <canvas id="respirationChart"></canvas>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="respAvg">0</div>
+                        <div class="stat-label">Average Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="respHighest">0</div>
+                        <div class="stat-label">Highest Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="respLowest">0</div>
+                        <div class="stat-label">Lowest Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="respPass">0%</div>
+                        <div class="stat-label">Pass Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dummy data for Photosynthesis chapter
+        const photosynthesisData = {
+            students: ['Aarav Kumar', 'Priya Sharma', 'Arjun Patel', 'Sneha Singh', 'Rohan Gupta'],
+            scores: [9, 8, 10, 6, 9]
+        };
+
+        // Dummy data for Respiration chapter
+        const respirationData = {
+            students: ['Aarav Kumar', 'Priya Sharma', 'Arjun Patel', 'Sneha Singh', 'Rohan Gupta'],
+            scores: [8, 8, 9, 10, 6]
+        };
+
+        // Chart configuration
+        const chartConfig = {
+            type: 'bar',
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(99, 102, 241, 0.9)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: '#6366f1',
+                        borderWidth: 1,
+                        cornerRadius: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10,
+                        grid: {
+                            color: 'rgba(99, 102, 241, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            maxRotation: 45,
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // Create Photosynthesis chart
+        const photoCtx = document.getElementById('photosynthesisChart').getContext('2d');
+        const photosynthesisChart = new Chart(photoCtx, {
+            ...chartConfig,
+            data: {
+                labels: photosynthesisData.students,
+                datasets: [{
+                    label: 'Score',
+                    data: photosynthesisData.scores,
+                    backgroundColor: [
+                        'rgba(99, 102, 241, 0.8)',
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(147, 51, 234, 0.8)',
+                        'rgba(79, 70, 229, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(99, 102, 241, 1)',
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(147, 51, 234, 1)',
+                        'rgba(79, 70, 229, 1)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    hoverBackgroundColor: [
+                        'rgba(99, 102, 241, 0.9)',
+                        'rgba(139, 92, 246, 0.9)',
+                        'rgba(59, 130, 246, 0.9)',
+                        'rgba(147, 51, 234, 0.9)',
+                        'rgba(79, 70, 229, 0.9)'
+                    ]
+                }]
+            }
+        });
+
+        // Create Respiration chart
+        const respCtx = document.getElementById('respirationChart').getContext('2d');
+        const respirationChart = new Chart(respCtx, {
+            ...chartConfig,
+            data: {
+                labels: respirationData.students,
+                datasets: [{
+                    label: 'Score',
+                    data: respirationData.scores,
+                    backgroundColor: [
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(99, 102, 241, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(34, 197, 94, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(99, 102, 241, 1)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    hoverBackgroundColor: [
+                        'rgba(16, 185, 129, 0.9)',
+                        'rgba(34, 197, 94, 0.9)',
+                        'rgba(59, 130, 246, 0.9)',
+                        'rgba(139, 92, 246, 0.9)',
+                        'rgba(99, 102, 241, 0.9)'
+                    ]
+                }]
+            }
+        });
+
+        // Calculate and display statistics with animation
+        function calculateStats(data, prefix) {
+            const scores = data.scores;
+            const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+            const highest = Math.max(...scores);
+            const lowest = Math.min(...scores);
+            const passRate = Math.round((scores.filter(score => score >= 5).length / scores.length) * 100);
+
+            // Animate the numbers
+            animateValue(prefix + 'Avg', 0, avg, 1000);
+            animateValue(prefix + 'Highest', 0, highest, 1200);
+            animateValue(prefix + 'Lowest', 0, lowest, 1400);
+            animateValue(prefix + 'Pass', 0, passRate, 1600, '%');
+        }
+
+        // Animate number counting
+        function animateValue(id, start, end, duration, suffix = '') {
+            const element = document.getElementById(id);
+            const range = end - start;
+            const increment = end > start ? 1 : -1;
+            const stepTime = Math.abs(Math.floor(duration / range));
+            
+            let current = start;
+            const timer = setInterval(() => {
+                current += increment;
+                element.textContent = current + suffix;
+                if (current === end) {
+                    clearInterval(timer);
+                }
+            }, stepTime);
+        }
+
+        // Initialize statistics with delay
+        setTimeout(() => {
+            calculateStats(photosynthesisData, 'photo');
+            calculateStats(respirationData, 'resp');
+        }, 800);
+
+        // Add entrance animations on load
+        window.addEventListener('load', () => {
+            const sections = document.querySelectorAll('.fade-in');
+            sections.forEach((section, index) => {
+                section.style.animationDelay = `${index * 0.2}s`;
+            });
+        });
+    </script>
+</body>
+</html>

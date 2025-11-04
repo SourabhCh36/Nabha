@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Exams - Online Exam System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .page-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: #999;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-refresh {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-refresh:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .exams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .exam-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .exam-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+
+        .exam-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .exam-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .exam-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #555;
+        }
+
+        .meta-item i {
+            width: 20px;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .badge-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .badge-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-draft {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn-start {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-start:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-start:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .no-exams {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .no-exams i {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .no-exams h3 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .no-exams p {
+            color: #999;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 24px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .exams-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Add this right after the opening <body> tag, before the navigation -->
+<div id="voiceControlPanel" style="position: fixed; top: 20px; right: 20px; z-index: 1000; background: white; padding: 18px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); max-width: 300px; border: 2px solid rgba(102, 126, 234, 0.2);">
+  <h3 style="margin: 0 0 14px 0; font-size: 17px; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700;">🎤 Voice Assistant</h3>
+  
+  <div style="margin-bottom: 12px;">
+    <button id="toggleVoiceCommands" style="width: 100%; padding: 11px; border-radius: 10px; font-size: 13px; cursor: pointer; background: linear-gradient(135deg, #667eea, #764ba2); border: none; color: white; font-weight: 600; transition: all 0.2s; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);">
+      Start Voice Commands
+    </button>
+    <div id="voiceCommandStatus" style="margin-top: 8px; padding: 7px; background: #f8f9ff; border-radius: 7px; font-size: 12px; text-align: center; color: #666;">
+      Click to activate
+    </div>
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <button id="toggleTextToSpeech" style="width: 100%; padding: 11px; border-radius: 10px; font-size: 13px; cursor: pointer; background: white; border: 2px solid #667eea; color: #667eea; font-weight: 600; transition: all 0.2s;">
+      Enable Text-to-Speech
+    </button>
+    <div id="ttsStatus" style="margin-top: 8px; padding: 7px; background: #f8f9ff; border-radius: 7px; font-size: 12px; text-align: center; color: #666;">
+      TTS: Inactive
+    </div>
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <label style="display: block; margin-bottom: 5px; font-size: 12px; color: #666; font-weight: 500;">Speech Speed</label>
+    <input type="range" id="ttsSpeed" min="0.5" max="2" step="0.1" value="1" style="width: 100%; accent-color: #667eea;">
+    <div style="display: flex; justify-content: space-between; font-size: 10px; color: #999; margin-top: 2px;">
+      <span>Slow</span>
+      <span>Normal</span>
+      <span>Fast</span>
+    </div>
+  </div>
+
+  <button id="stopSpeech" style="width: 100%; padding: 9px; border-radius: 8px; font-size: 12px; cursor: pointer; background: #fee2e2; border: 1px solid #fecaca; color: #dc2626; font-weight: 600; margin-bottom: 14px;">
+    <i class="fas fa-stop-circle"></i> Stop Speech
+  </button>
+
+  <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08)); padding: 11px; border-radius: 10px; font-size: 11px; line-height: 1.6;">
+    <strong style="color: #667eea; display: block; margin-bottom: 5px;">📢 Voice Commands:</strong>
+    <ul style="margin: 0; padding-left: 18px; color: #555;">
+      <li>"search [exam name]" - Find exam</li>
+      <li>"start exam [number]" - Start exam</li>
+      <li>"first exam" - Start first exam</li>
+      <li>"refresh" - Reload exams</li>
+      <li>"read all exams" - List exams</li>
+      <li>"back to dashboard" - Go back</li>
+      <li>"scroll down/up" - Navigate</li>
+    </ul>
+    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(102, 126, 234, 0.15);">
+      <strong style="color: #667eea;">⌨️ Shortcuts:</strong><br>
+      <span style="color: #666;"><strong>V</strong> - TTS | <strong>O</strong> - Voice | <strong>Esc</strong> - Stop</span>
+    </div>
+  </div>
+
+  <div id="voiceIndicator" style="margin-top: 12px; padding: 9px; background: rgba(220, 38, 38, 0.1); border-radius: 8px; text-align: center; display: none; border: 1px solid rgba(220, 38, 38, 0.2);">
+    <span style="color: #dc2626; font-size: 12px; font-weight: 600;">🔴 Listening...</span>
+  </div>
+</div>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="/student-dashboard">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">Welcome, <span id="studentName">Student</span></span>
+                <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-main">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-list me-3"></i>Available Exams</h1>
+            <p>Select an exam to begin taking the quiz</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search exams by title..." onkeyup="searchExams()">
+            </div>
+            <button class="btn-refresh" onclick="refreshExams()">
+                <i class="fas fa-sync-alt me-2"></i>Refresh
+            </button>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Loading available exams...</p>
+        </div>
+
+        <!-- Exams Grid -->
+        <div id="examsContainer" class="exams-grid" style="display: none;"></div>
+
+        <!-- No Exams Message -->
+        <div id="noExamsMessage" class="no-exams" style="display: none;">
+            <i class="fas fa-folder-open"></i>
+            <h3>No Exams Available</h3>
+            <p>There are currently no active exams available. Please check back later.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="shared/student-exams.js"></script>
+    <!-- Add this script before the closing </body> tag, after your existing scripts -->
+<script>
+  // Voice Control System for Exam Selection
+  class ExamVoiceSystem {
+    constructor() {
+      this.synthesis = window.speechSynthesis;
+      this.recognition = null;
+      this.isListening = false;
+      this.isTTSEnabled = false;
+      this.voiceSpeed = 1;
+      this.currentUtterance = null;
+      this.hoverTimeout = null;
+      this.examCards = [];
+      this.init();
+    }
+
+    init() {
+      this.setupSpeechRecognition();
+      this.setupControls();
+      this.setupKeyboardShortcuts();
+      // Wait a bit for exams to load
+      setTimeout(() => this.updateExamsList(), 2000);
+    }
+
+    setupSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      
+      if (!SpeechRecognition) {
+        console.warn('Speech recognition not supported');
+        return;
+      }
+
+      this.recognition = new SpeechRecognition();
+      this.recognition.continuous = true;
+      this.recognition.interimResults = false;
+      this.recognition.lang = 'en-US';
+
+      this.recognition.onstart = () => {
+        document.getElementById('voiceIndicator').style.display = 'block';
+      };
+
+      this.recognition.onend = () => {
+        document.getElementById('voiceIndicator').style.display = 'none';
+        if (this.isListening) {
+          setTimeout(() => {
+            try {
+              this.recognition.start();
+            } catch(e) {
+              console.log('Recognition restart failed');
+            }
+          }, 100);
+        }
+      };
+
+      this.recognition.onresult = (event) => {
+        const last = event.results.length - 1;
+        const command = event.results[last][0].transcript.toLowerCase().trim();
+        console.log('Voice command:', command);
+        this.processVoiceCommand(command);
+      };
+
+      this.recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'no-speech' && this.isListening) {
+          setTimeout(() => {
+            try {
+              this.recognition.start();
+            } catch(e) {}
+          }, 100);
+        }
+      };
+    }
+
+    setupControls() {
+      const toggleVoiceBtn = document.getElementById('toggleVoiceCommands');
+      const toggleTTSBtn = document.getElementById('toggleTextToSpeech');
+      const speedControl = document.getElementById('ttsSpeed');
+      const stopBtn = document.getElementById('stopSpeech');
+
+      if (toggleVoiceBtn) {
+        toggleVoiceBtn.addEventListener('click', () => this.toggleVoiceCommands());
+      }
+      
+      if (toggleTTSBtn) {
+        toggleTTSBtn.addEventListener('click', () => this.toggleTextToSpeech());
+      }
+      
+      if (speedControl) {
+        speedControl.addEventListener('input', (e) => {
+          this.voiceSpeed = parseFloat(e.target.value);
+        });
+      }
+
+      if (stopBtn) {
+        stopBtn.addEventListener('click', () => this.stopSpeaking());
+      }
+    }
+
+    setupKeyboardShortcuts() {
+      document.addEventListener('keydown', (e) => {
+        const activeElement = document.activeElement;
+        const isTyping = activeElement.tagName === 'INPUT' || 
+                         activeElement.tagName === 'TEXTAREA' || 
+                         activeElement.tagName === 'SELECT';
+        
+        if (isTyping) return;
+        
+        // V key to toggle text-to-speech
+        if (e.key.toLowerCase() === 'v') {
+          e.preventDefault();
+          this.toggleTextToSpeech();
+        }
+        
+        // O key to toggle voice commands
+        if (e.key.toLowerCase() === 'o') {
+          e.preventDefault();
+          this.toggleVoiceCommands();
+        }
+        
+        // Escape to stop speaking
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          this.stopSpeaking();
+        }
+      });
+    }
+
+    updateExamsList() {
+      // Get all exam cards
+      this.examCards = Array.from(document.querySelectorAll('.exam-card'));
+      console.log('Found', this.examCards.length, 'exam cards');
+    }
+
+    toggleVoiceCommands() {
+      if (!this.recognition) {
+        this.speak('Voice commands are not supported in your browser. Please use Chrome or Edge.');
+        return;
+      }
+
+      this.isListening = !this.isListening;
+      const btn = document.getElementById('toggleVoiceCommands');
+      const status = document.getElementById('voiceCommandStatus');
+
+      if (this.isListening) {
+        try {
+          this.recognition.start();
+          btn.textContent = 'Stop Voice Commands';
+          btn.style.background = '#dc2626';
+          status.textContent = '🎤 Listening...';
+          status.style.background = 'rgba(220, 38, 38, 0.1)';
+          status.style.color = '#dc2626';
+          this.updateExamsList();
+          this.speak('Voice commands activated. You can search for exams, start exams by number, or navigate the page.');
+        } catch(e) {
+          console.error('Failed to start recognition:', e);
+          this.isListening = false;
+        }
+      } else {
+        this.recognition.stop();
+        btn.textContent = 'Start Voice Commands';
+        btn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+        status.textContent = 'Click to activate';
+        status.style.background = '#f8f9ff';
+        status.style.color = '#666';
+        this.speak('Voice commands deactivated.');
+      }
+    }
+
+    toggleTextToSpeech() {
+      this.isTTSEnabled = !this.isTTSEnabled;
+      const btn = document.getElementById('toggleTextToSpeech');
+      const status = document.getElementById('ttsStatus');
+
+      if (this.isTTSEnabled) {
+        btn.textContent = 'Disable Text-to-Speech';
+        btn.style.background = '#667eea';
+        btn.style.color = 'white';
+        btn.style.borderColor = '#667eea';
+        status.textContent = 'TTS: Active ✓';
+        status.style.background = '#dcfce7';
+        status.style.color = '#166534';
+        this.speak('Text to speech enabled. Hover over exam cards to hear details.');
+        this.enableHoverReading();
+      } else {
+        btn.textContent = 'Enable Text-to-Speech';
+        btn.style.background = 'white';
+        btn.style.color = '#667eea';
+        btn.style.borderColor = '#667eea';
+        status.textContent = 'TTS: Inactive';
+        status.style.background = '#f8f9ff';
+        status.style.color = '#666';
+        this.stopSpeaking();
+        this.disableHoverReading();
+        this.speak('Text to speech disabled.');
+      }
+    }
+
+    enableHoverReading() {
+      const readableElements = document.querySelectorAll('h1, h3, p, button, .exam-card, .exam-title, .exam-description');
+      readableElements.forEach(el => {
+        el.addEventListener('mouseenter', this.handleHover);
+        el.dataset.ttsEnabled = 'true';
+      });
+    }
+
+    disableHoverReading() {
+      const readableElements = document.querySelectorAll('[data-tts-enabled="true"]');
+      readableElements.forEach(el => {
+        el.removeEventListener('mouseenter', this.handleHover);
+        delete el.dataset.ttsEnabled;
+      });
+    }
+
+    handleHover = (e) => {
+      if (!this.isTTSEnabled) return;
+      
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = setTimeout(() => {
+        const el = e.target;
+        let text = '';
+        
+        if (el.classList.contains('exam-card')) {
+          const title = el.querySelector('.exam-title')?.textContent || '';
+          const desc = el.querySelector('.exam-description')?.textContent || '';
+          const duration = el.querySelector('.meta-item:nth-child(1)')?.textContent || '';
+          const questions = el.querySelector('.meta-item:nth-child(2)')?.textContent || '';
+          text = `Exam: ${title}. ${desc}. ${duration}. ${questions}`;
+        } else if (el.tagName === 'BUTTON') {
+          text = `Button: ${el.textContent.trim()}`;
+        } else {
+          text = el.textContent.trim();
+          if (text.length > 200) {
+            text = text.substring(0, 200) + '...';
+          }
+        }
+        
+        if (text && text.length > 2) {
+          this.speak(text);
+        }
+      }, 400);
+    }
+
+    processVoiceCommand(command) {
+      console.log('Processing command:', command);
+      
+      // Update exam list
+      this.updateExamsList();
+      
+      // Search exam
+      if (command.includes('search for') || command.includes('find exam')) {
+        const searchTerm = command.replace('search for', '').replace('find exam', '').trim();
+        if (searchTerm) {
+          const searchInput = document.getElementById('searchInput');
+          if (searchInput) {
+            searchInput.value = searchTerm;
+            searchInput.dispatchEvent(new Event('keyup'));
+            this.speak(`Searching for ${searchTerm}`);
+          }
+        }
+      }
+      // Start specific exam by number
+      else if (command.includes('start exam') || command.includes('take exam')) {
+        const match = command.match(/exam\s+(\d+|one|two|three|four|five)/);
+        if (match) {
+          let examNum = match[1];
+          // Convert word to number
+          const wordToNum = { 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5 };
+          if (wordToNum[examNum]) {
+            examNum = wordToNum[examNum];
+          }
+          
+          const index = parseInt(examNum) - 1;
+          if (this.examCards[index]) {
+            this.speak(`Starting exam ${examNum}`);
+            const startBtn = this.examCards[index].querySelector('.btn-start');
+            if (startBtn) {
+              startBtn.click();
+            }
+          } else {
+            this.speak(`Exam ${examNum} not found`);
+          }
+        }
+      }
+      // Start first exam
+      else if (command.includes('first exam') || command.includes('start first')) {
+        if (this.examCards.length > 0) {
+          this.speak('Starting first exam');
+          const startBtn = this.examCards[0].querySelector('.btn-start');
+          if (startBtn) {
+            startBtn.click();
+          }
+        } else {
+          this.speak('No exams available');
+        }
+      }
+      // Read all exams
+      else if (command.includes('read all exams') || command.includes('list exams') || command.includes('show exams')) {
+        this.readAllExams();
+      }
+      // Refresh exams
+      else if (command.includes('refresh') || command.includes('reload')) {
+        this.speak('Refreshing exams');
+        if (typeof refreshExams === 'function') {
+          refreshExams();
+        }
+        setTimeout(() => this.updateExamsList(), 1000);
+      }
+      // Navigation
+      else if (command.includes('back to dashboard') || command.includes('go back') || command.includes('dashboard')) {
+        this.speak('Going back to dashboard');
+        window.location.href = '/student-dashboard';
+      }
+      else if (command.includes('logout') || command.includes('sign out')) {
+        this.speak('Logging out');
+        if (typeof logout === 'function') {
+          logout();
+        }
+      }
+      // Scroll commands
+      else if (command.includes('scroll down')) {
+        this.speak('Scrolling down');
+        window.scrollBy({ top: 500, behavior: 'smooth' });
+      }
+      else if (command.includes('scroll up')) {
+        this.speak('Scrolling up');
+        window.scrollBy({ top: -500, behavior: 'smooth' });
+      }
+      else if (command.includes('scroll to top') || command.includes('go to top')) {
+        this.speak('Scrolling to top');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      // Read current view
+      else if (command.includes('read this') || command.includes('read page')) {
+        this.readCurrentView();
+      }
+      // Count exams
+      else if (command.includes('how many exams')) {
+        const count = this.examCards.length;
+        this.speak(`There are ${count} exam${count !== 1 ? 's' : ''} available`);
+      }
+      // Help
+      else if (command.includes('help') || command.includes('what can you do')) {
+        this.speak('You can say: search for exam name, start exam number, first exam, read all exams, refresh, back to dashboard, scroll down, scroll up, or how many exams. Say stop to stop speaking.');
+      }
+      // Stop
+      else if (command.includes('stop') || command.includes('quiet') || command.includes('silence')) {
+        this.stopSpeaking();
+      }
+      else {
+        this.speak('Command not recognized. Say help to hear available commands.');
+      }
+    }
+
+    readAllExams() {
+      if (this.examCards.length === 0) {
+        this.speak('No exams available');
+        return;
+      }
+
+      let examsList = `There are ${this.examCards.length} exams available. `;
+      this.examCards.forEach((card, index) => {
+        const title = card.querySelector('.exam-title')?.textContent || '';
+        const duration = card.querySelector('.meta-item:nth-child(1)')?.textContent || '';
+        examsList += `Exam ${index + 1}: ${title}. ${duration}. `;
+      });
+      
+      this.speak(examsList);
+    }
+
+    readCurrentView() {
+      const pageHeader = document.querySelector('.page-header h1')?.textContent || '';
+      const examCount = this.examCards.length;
+      
+      let text = `${pageHeader}. There are ${examCount} exam${examCount !== 1 ? 's' : ''} available. `;
+      
+      if (examCount > 0) {
+        text += 'Say read all exams to hear the list, or say start exam followed by a number to begin.';
+      }
+      
+      this.speak(text);
+    }
+
+    speak(text) {
+      this.synthesis.cancel();
+      
+      if (!text) return;
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = this.voiceSpeed;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      utterance.lang = 'en-US';
+
+      this.currentUtterance = utterance;
+      this.synthesis.speak(utterance);
+    }
+
+    stopSpeaking() {
+      this.synthesis.cancel();
+      clearTimeout(this.hoverTimeout);
+    }
+  }
+
+  // Initialize the voice control system
+  let examVoiceSystem;
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      examVoiceSystem = new ExamVoiceSystem();
+      console.log('Exam voice control system initialized');
+      
+      // Welcome message
+      setTimeout(() => {
+        examVoiceSystem.speak('Welcome to the exam selection page. Press O to activate voice commands, or V for text to speech. Say help to hear what you can do.');
+      }, 1500);
+    }, 500);
+  });
+
+  // Re-scan for exams when they load
+  const originalContainer = document.getElementById('examsContainer');
+  if (originalContainer) {
+    const observer = new MutationObserver(() => {
+      if (examVoiceSystem) {
+        examVoiceSystem.updateExamsList();
+      }
+    });
+    observer.observe(originalContainer, { childList: true, subtree: true });
+  }
+</script>
+
+</body>
+</html>

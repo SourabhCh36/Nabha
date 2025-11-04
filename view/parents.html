@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Parent Dashboard - Nabha Digital</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Poppins',sans-serif;background:#f8f9fd;color:#0f1724}
+    .sidebar{position:fixed;left:0;top:0;height:100vh;width:260px;background:#fff;padding:28px 20px;border-right:1px solid rgba(15,23,36,0.04);z-index:1000;overflow:auto}
+    .sidebar .brand{font-weight:700;color:#0f1724;font-size:18px;margin-bottom:18px}
+    .sidebar-menu{list-style:none;padding:0;margin-top:12px}
+    .sidebar-menu li{margin-bottom:6px}
+    .sidebar-menu a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#58677a;text-decoration:none;font-weight:500}
+    .sidebar-menu a:hover,.sidebar-menu a.active{background:linear-gradient(90deg,#06b6d4,#0891b2);color:#fff}
+    .sidebar-footer{position:absolute;bottom:24px;left:20px;right:20px}
+    .create-card{background:linear-gradient(90deg,#06b6d4,#0891b2);padding:14px;border-radius:12px;color:#fff;text-align:center}
+    .create-card .avatar{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.16);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-weight:700}
+    .btn-create{background:#fff;color:#0891b2;padding:8px 12px;border-radius:10px;border:none;font-weight:600;cursor:pointer;width:100%}
+
+    .main{margin-left:260px;padding:28px}
+
+    /* animated cyan header */
+    @keyframes cyanShift{0%{background:linear-gradient(90deg,#06b6d4,#0891b2)}50%{background:linear-gradient(90deg,#0891b2,#06b6d4)}100%{background:linear-gradient(90deg,#06b6d4,#06b6d4)}}
+    .header{display:flex;justify-content:space-between;align-items:center;padding:18px;border-radius:12px;color:#fff;animation:cyanShift 9s ease-in-out infinite alternate;box-shadow:0 6px 24px rgba(6,182,212,0.06);margin-bottom:20px}
+    .header .welcome{line-height:1}
+    .header h1{font-size:20px;font-weight:700}
+    .header p{opacity:0.95}
+    .header .actions{display:flex;align-items:center;gap:12px}
+    .icon-btn{width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,0.12);display:inline-flex;align-items:center;justify-content:center;color:#fff;border:none}
+
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+    .stat{background:#fff;padding:18px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.04);border:1px solid rgba(6,182,212,0.06)}
+    .stat .label{font-size:13px;color:#64748b;margin-bottom:8px}
+    .stat .value{font-size:20px;font-weight:700;color:#0f1724}
+
+    .grid-two{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+    .card{background:#fff;padding:18px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.04);border:1px solid rgba(15,23,36,0.03);margin-bottom:14px}
+    .card h3{font-weight:700;color:#0f1724;margin-bottom:8px}
+    .small{font-size:13px;color:#64748b}
+
+    .messages .msg{display:flex;gap:12px;padding:12px;border-radius:10px;align-items:flex-start}
+    .msg:hover{background:#f7fafc}
+    .msg .avatar{width:44px;height:44px;border-radius:10px;background:#0f1724;color:#fff;display:flex;align-items:center;justify-content:center}
+
+    .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .calendar-day{padding:10px;border-radius:8px;text-align:center;font-size:14px}
+    .calendar-day.header{font-weight:700;color:#000000 text-white}
+    .calendar-day.today{background:linear-gradient(90deg,#000000,#000000);color:#fefafa}
+
+    .students-table{width:100%;border-collapse:collapse}
+    .students-table th{font-weight:600;text-align:left;padding:12px;color:#64748b;border-bottom:1px solid #eef2f7}
+    .students-table td{padding:12px;border-bottom:1px solid #fbfdff}
+    .student-avatar{width:40px;height:40px;border-radius:10px;background:linear-gradient(90deg,#06b6d4,#0891b2);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+    .notes{width:100%;min-height:100px;padding:12px;border-radius:10px;border:1px solid #e6eef3}
+
+    .fade-up{opacity:0;transform:translateY(12px);transition:all .45s cubic-bezier(.2,.9,.2,1)}
+    .fade-up.in{opacity:1;transform:none}
+
+    @media (max-width:1024px){.grid-two{grid-template-columns:1fr}.main{padding:18px}.sidebar{transform:translateX(-100%)} }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">Nabha Digital</div>
+    <ul class="sidebar-menu">
+      <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+      <li><a href="#childInfo"><i class="fas fa-child"></i> My Child</a></li>
+      <li><a href="#attendance"><i class="fas fa-calendar-check"></i> Attendance</a></li>
+      <li><a href="#performance"><i class="fas fa-chart-line"></i> Performance</a></li>
+      <li><a href="#messages"><i class="fas fa-comments"></i> Messages</a></li>
+      <li><a href="#resources"><i class="fas fa-book"></i> Resources</a></li>
+      <li><a href="#settings"><i class="fas fa-cog"></i> Settings</a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="create-card">
+        <div class="avatar">P</div>
+        <div style="margin-top:8px;font-weight:600">Parent Portal</div>
+        <div style="font-size:13px;opacity:0.9;margin-top:6px">Quick actions</div>
+        <button class="btn-create" style="margin-top:10px" id="parentQuick">Action</button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="header">
+      <div class="welcome">
+        <h1>Welcome back, <span id="parentName">Parent Name</span></h1>
+        <p id="today">Loading date...</p>
+      </div>
+      <div class="actions">
+        <button class="icon-btn" title="Search"><i class="fas fa-search"></i></button>
+        <button class="icon-btn" title="Notifications"><i class="fas fa-bell"></i><span style="position:absolute;width:8px;height:8px;background:#ff6b6b;border-radius:50%;margin-left:22px;margin-top:-28px"></span></button>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="background:#fff;padding:6px;border-radius:8px;color:#0891b2;font-weight:700">P</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="stats-grid fade-up">
+      <div class="stat">
+        <div class="label">Child Name</div>
+        <div class="value" id="childName">Aarav Sharma</div>
+      </div>
+      <div class="stat">
+        <div class="label">Current Class</div>
+        <div class="value" id="childClass">8A</div>
+      </div>
+      <div class="stat">
+        <div class="label">Attendance (YTD)</div>
+        <div class="value" id="attendancePct">92%</div>
+      </div>
+      <div class="stat">
+        <div class="label">Average Score</div>
+        <div class="value" id="avgScore">87%</div>
+      </div>
+    </section>
+
+    <div class="grid-two">
+      <div>
+        <div class="card fade-up">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <h3>Recent Messages</h3>
+            <button class="small view-all">View all</button>
+          </div>
+          <div class="messages">
+            <div class="msg">
+              <div class="avatar">T</div>
+              <div>
+                <div style="font-weight:600">Miss Priya (Math)</div>
+                <div class="small">Reminder: Chapter 5 homework submitted by 10th.</div>
+                <div class="small" style="color:#06b6d4;margin-top:6px;font-weight:600">2h ago</div>
+              </div>
+            </div>
+
+            <div class="msg">
+              <div class="avatar">N</div>
+              <div>
+                <div style="font-weight:600">School Admin</div>
+                <div class="small">Parent-teacher meeting scheduled on 25th.</div>
+                <div class="small" style="color:#06b6d4;margin-top:6px;font-weight:600">1d ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card fade-up">
+          <h3>Performance (Last 8 Weeks)</h3>
+          <div style="height:220px;display:flex;align-items:center;justify-content:center">
+            <!-- small Chart.js line placeholder -->
+            <canvas id="parentPerf" style="max-width:100%"></canvas>
+          </div>
+        </div>
+
+        <div class="card fade-up">
+          <h3>Homework & Assignments</h3>
+          <ul style="margin-top:12px;list-style:none;padding:0">
+            <li style="padding:10px;border-radius:8px;background:#f7fafc;margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-weight:600">Math - Ch.5</div>
+                  <div class="small">Due: May 10</div>
+                </div>
+                <div><button class="btn-create" style="background:linear-gradient(90deg,#06b6d4,#0891b2);color:#fff">View</button></div>
+              </div>
+            </li>
+            <li style="padding:10px;border-radius:8px;background:#f7fafc;margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-weight:600">Science - Lab Report</div>
+                  <div class="small">Due: May 14</div>
+                </div>
+                <div><button class="btn-create" style="background:linear-gradient(90deg,#06b6d4,#0891b2);color:#fff">View</button></div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <aside>
+        <div class="card fade-up">
+          <h3>Upcoming Events</h3>
+          <div style="margin-top:10px">
+            <div style="padding:10px;border-radius:8px;background:#f7fafc;margin-bottom:8px">
+              <div style="font-weight:600">Parent-Teacher Meeting</div>
+              <div class="small">May 25 • 10:00 AM</div>
+            </div>
+            <div style="padding:10px;border-radius:8px;background:#f7fafc;margin-bottom:8px">
+              <div style="font-weight:600">Sports Day</div>
+              <div class="small">June 5 • All day</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card fade-up">
+          <h3>Mini Calendar</h3>
+          <div class="calendar-grid" style="margin-top:12px">
+            <div class="calendar-day header">S</div>
+            <div class="calendar-day header">M</div>
+            <div class="calendar-day header">T</div>
+            <div class="calendar-day header">W</div>
+            <div class="calendar-day header">T</div>
+            <div class="calendar-day header">F</div>
+            <div class="calendar-day header">S</div>
+
+            <div class="calendar-day other-month">27</div>
+            <div class="calendar-day other-month">28</div>
+            <div class="calendar-day other-month">29</div>
+            <div class="calendar-day">30</div>
+            <div class="calendar-day">1</div>
+            <div class="calendar-day">2</div>
+            <div class="calendar-day">3</div>
+
+            <div class="calendar-day">4</div>
+            <div class="calendar-day">5</div>
+            <div class="calendar-day">6</div>
+            <div class="calendar-day today">7</div>
+            <div class="calendar-day">8</div>
+            <div class="calendar-day">9</div>
+            <div class="calendar-day">10</div>
+            <div class="calendar-day">11</div>
+            <div class="calendar-day">12</div>
+            <div class="calendar-day">13</div>
+            <div class="calendar-day">14</div>
+            <div class="calendar-day">15</div>
+            <div class="calendar-day">16</div>
+            <div class="calendar-day">17</div>
+            <div class="calendar-day">18</div>
+            <div class="calendar-day">19</div>
+            <div class="calendar-day">20</div>
+            <div class="calendar-day">21</div>
+            <div class="calendar-day">22</div>
+            <div class="calendar-day">23</div>
+            <div class="calendar-day">24</div>
+            <div class="calendar-day">25</div>
+            <div class="calendar-day">26</div>
+            <div class="calendar-day">27</div>
+            <div class="calendar-day">28</div>
+            <div class="calendar-day">29</div>
+            <div class="calendar-day">30</div>
+            <div class="calendar-day other-month">1</div>
+          </div>
+        </div>
+
+        <div class="card fade-up">
+          <h3>Quick Links</h3>
+          <div style="display:grid;gap:10px;margin-top:12px">
+            <button class="table-btn">View Report</button>
+            <button class="table-btn">Contact Teacher</button>
+            <button class="table-btn">School Policies</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="card fade-up">
+      <h3>Student Progress Table</h3>
+      <div style="overflow:auto;margin-top:12px">
+        <table class="students-table">
+          <thead>
+            <tr><th>#</th><th>Subject</th><th>Avg</th><th>Last Exam</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Mathematics</td><td>89%</td><td>May 2</td><td><span style="padding:6px;border-radius:8px;background:#d1fae5;color:#065f46;font-weight:600">Good</span></td></tr>
+            <tr><td>2</td><td>Science</td><td>84%</td><td>May 6</td><td><span style="padding:6px;border-radius:8px;background:#fed7d7;color:#7f1d1d;font-weight:600">Needs review</span></td></tr>
+            <tr><td>3</td><td>English</td><td>91%</td><td>May 10</td><td><span style="padding:6px;border-radius:8px;background:#c6f6d5;color:#22543d;font-weight:600">Excellent</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card fade-up">
+      <h3>Notes</h3>
+      <textarea class="notes" id="parentNotes" placeholder="Write a note to your child's teacher..."></textarea>
+    </div>
+
+    <footer style="margin-top:18px;text-align:center;color:#64748b">Powered by Nabha Digital Learning Initiative • © 2025</footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // restore date
+    document.getElementById('today').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+
+    // fade reveal
+    (function(){const o=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting) e.target.classList.add('in')})},{threshold:0.12});document.querySelectorAll('.fade-up').forEach(el=>o.observe(el))})();
+
+    // small line chart for performance
+    const ctx = document.getElementById('parentPerf').getContext('2d');
+    new Chart(ctx,{type:'line',data:{labels:['W1','W2','W3','W4','W5','W6','W7','W8'],datasets:[{label:'Average',data:[78,82,80,85,86,88,87,89],tension:0.36,borderWidth:2,pointRadius:3,borderColor:'#06b6d4',backgroundColor:'rgba(6,182,212,0.08)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#64748b'}},y:{grid:{color:'rgba(15,23,36,0.04)'},ticks:{color:'#64748b'},suggestedMin:60,suggestedMax:100}}}});
+
+    // notes save locally
+    const notesEl = document.getElementById('parentNotes');
+    notesEl.value = localStorage.getItem('parent_notes') || '';
+    notesEl.addEventListener('blur', ()=> localStorage.setItem('parent_notes', notesEl.value));
+
+    // quick actions (placeholders)
+    document.getElementById('parentQuick').addEventListener('click', ()=> alert('Quick action (placeholder)'));
+
+    // dynamic parent name from query param or localStorage
+    (function(){const p=new URLSearchParams(window.location.search);const name=p.get('parent')||localStorage.getItem('parent_name')||'Parent Name';document.getElementById('parentName').textContent=name;localStorage.setItem('parent_name',name)})();
+  </script>
+</body>
+</html>

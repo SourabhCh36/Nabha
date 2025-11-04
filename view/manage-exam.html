@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Exams - Online Exam System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="public/manageque.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/admin-dashboard">
+                <i class="fas fa-arrow-left me-2"></i>Online Quiz Management System - Teacher
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">Welcome, <span id="adminName">Teacher</span></span>
+                <button class="btn btn-outline-light" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-main">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-clipboard-list me-3"></i>Quiz Management</h1>
+            <p>Create, edit, and manage quizzes for the kids</p>
+            <div class="context-info">
+                <div class="context-item">
+                    <label>Teacher ID</label>
+                    <span id="teacherIdDisplay">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Tabs Navigation -->
+            <div class="nav nav-tabs mb-4" id="teacherTabs" role="tablist">
+                <button class="nav-link active" id="exams-tab" data-bs-toggle="tab" data-bs-target="#exams-pane" type="button" role="tab" aria-controls="exams-pane" aria-selected="true">
+                    <i class="fas fa-list me-2"></i>My Exams
+                </button>
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics-pane" type="button" role="tab" aria-controls="analytics-pane" aria-selected="false" onclick="loadPerformanceData()">
+                    <i class="fas fa-chart-bar me-2"></i>Performance Analytics
+                </button>
+            </div>
+
+            <!-- Exams Tab Content -->
+            <div class="tab-content" id="teacherTabContent">
+                <div class="tab-pane fade show active" id="exams-pane" role="tabpanel" aria-labelledby="exams-tab">
+            <!-- Controls -->
+            <div class="controls">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search exams...">
+                </div>
+                <button class="btn-custom btn-create-exam me-3" onclick="createNewExam()">
+                    <i class="fas fa-plus me-2"></i>Create New Exam
+                </button>
+                <button class="btn btn-outline-primary" onclick="refreshExams()">
+                    <i class="fas fa-sync-alt me-2"></i>Refresh
+                </button>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="alert alert-danger" style="display: none;" role="alert"></div>
+            
+            <!-- Loading Message -->
+            <div id="loadingMessage" class="loading">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Loading exams...</p>
+            </div>
+
+            <!-- Exams Container -->
+            <div id="examsContainer" class="exams-grid" style="display: none;">
+                <!-- Exams will be loaded here dynamically -->
+            </div>
+
+            <!-- No Exams Message -->
+            <div id="noExamsMessage" class="no-exams" style="display: none;">
+                <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                <h3>No Exams Found</h3>
+                <p>No exams available for the current context. Create your first exam!</p>
+                <button class="btn btn-primary mt-3" onclick="createNewExam()">
+                    <i class="fas fa-plus me-2"></i>Create New Exam
+                </button>
+            </div>
+                </div>
+
+                <!-- Performance Analytics Tab Content -->
+                <div class="tab-pane fade" id="analytics-pane" role="tabpanel" aria-labelledby="analytics-tab">
+                    <!-- Performance Dashboard -->
+                    <div id="performanceDashboard">
+                        <!-- Statistics Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-muted">Total Students</h6>
+                                        <h2 class="text-primary" id="totalStudents">0</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-muted">Total Submissions</h6>
+                                        <h2 class="text-info" id="totalSubmissions">0</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-muted">Pass Rate</h6>
+                                        <h2 class="text-success" id="passRate">0%</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-muted">Average Score</h6>
+                                        <h2 class="text-warning" id="avgScore">0%</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label">Filter by Exam</label>
+                                <select class="form-select" id="examFilterSelect" onchange="filterPerformanceData()">
+                                    <option value="">All Exams</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Search Student</label>
+                                <input type="text" class="form-control" id="studentSearchInput" placeholder="Search by name or ID..." onkeyup="filterPerformanceData()">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn btn-primary w-100" onclick="loadPerformanceData()">
+                                    <i class="fas fa-sync-alt me-2"></i>Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Results Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Exam Title</th>
+                                        <th>Score</th>
+                                        <th>Percentage</th>
+                                        <th>Status</th>
+                                        <th>Submission Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="performanceTableBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            <i class="fas fa-spinner fa-spin"></i> Loading performance data...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- No Data Message -->
+                        <div id="noDataMessage" class="alert alert-info" style="display: none;">
+                            <i class="fas fa-info-circle me-2"></i>No student submissions found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Exam Modal -->
+    <div class="modal fade" id="examModal" tabindex="-1" aria-labelledby="examModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="examModalTitle">
+                        <i class="fas fa-plus-circle me-2"></i>Create New Exam
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="examForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="examTitle" class="form-label">
+                                        <i class="fas fa-heading me-2"></i>Exam Title *
+                                    </label>
+                                    <input type="text" class="form-control" id="examTitle" required placeholder="Enter exam title">
+                                    <small class="form-text text-muted">e.g., Mathematics Final Exam</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="examDuration" class="form-label">
+                                        <i class="fas fa-clock me-2"></i>Duration (minutes) *
+                                    </label>
+                                    <input type="number" class="form-control" id="examDuration" required min="1" max="480" placeholder="e.g., 30">
+                                    <small class="form-text text-muted">Maximum 480 minutes (8 hours)</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="examStatus" class="form-label">
+                                        <i class="fas fa-tag me-2"></i>Status *
+                                    </label>
+                                    <select class="form-select" id="examStatus" required>
+                                        <option value="">Select Status</option>
+                                        <option value="draft">📝 Draft</option>
+                                        <option value="active">✓ Active</option>
+                                        <option value="inactive">✕ Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-info-circle me-2"></i>Exam Details
+                                    </label>
+                                    <div class="alert alert-light border">
+                                        <small>
+                                            <strong>Draft:</strong> Not visible to students<br>
+                                            <strong>Active:</strong> Ready for students<br>
+                                            <strong>Inactive:</strong> Archived
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="examDescription" class="form-label">
+                                <i class="fas fa-file-alt me-2"></i>Description
+                            </label>
+                            <textarea class="form-control" id="examDescription" rows="3" placeholder="Enter exam description (optional)" maxlength="500"></textarea>
+                            <small class="form-text text-muted" id="charCount">0/500 characters</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="saveExam()">
+                        <i class="fas fa-save me-2"></i>Save Exam
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Management Modal -->
+    <div class="modal fade" id="questionModal" tabindex="-1" aria-labelledby="questionModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="questionModalTitle">Manage Questions</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <button class="btn btn-success" onclick="addNewQuestion()">
+                                <i class="fas fa-plus me-2"></i>Add New Question
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Add Question Form -->
+                    <div class="card mb-4" id="addQuestionCard" style="display: none;">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="fas fa-question-circle me-2"></i>Add New Question</h6>
+                        </div>
+                        <div class="card-body">
+                            <form id="questionForm">
+                                <!-- Question Input Method Selection -->
+                                <div class="mb-3">
+                                    <label class="form-label">Question Input Method *</label>
+                                    <div class="btn-group w-100" role="group" aria-label="Question input method">
+                                        <input type="radio" class="btn-check" name="questionMethod" id="methodText" value="text" checked>
+                                        <label class="btn btn-outline-primary" for="methodText">
+                                            <i class="fas fa-keyboard me-2"></i>Type Question
+                                        </label>
+                                        <input type="radio" class="btn-check" name="questionMethod" id="methodPhoto" value="photo">
+                                        <label class="btn btn-outline-primary" for="methodPhoto">
+                                            <i class="fas fa-camera me-2"></i>Upload Photo
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Text Question Input -->
+                                <div class="mb-3" id="textQuestionContainer">
+                                    <label for="questionText" class="form-label">Question Text *</label>
+                                    <textarea class="form-control" id="questionText" rows="3" placeholder="Enter your question here"></textarea>
+                                </div>
+
+                                <!-- Photo Question Input -->
+                                <div class="mb-3" id="photoQuestionContainer" style="display: none;">
+                                    <label for="questionPhoto" class="form-label">Upload Question Photo *</label>
+                                    <input type="file" class="form-control" id="questionPhoto" accept="image/*">
+                                    <div class="form-text">Maximum file size: 5MB. Supported formats: JPG, PNG, GIF</div>
+                                    <div class="mt-3" id="photoPreview" style="display: none;">
+                                        <img id="previewImage" src="" alt="Question Preview" class="img-thumbnail" style="max-width: 100%; max-height: 300px;">
+                                        <div class="mt-2">
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePhoto()">
+                                                <i class="fas fa-trash me-1"></i>Remove Photo
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Question Type -->
+                                <div class="mb-3">
+                                    <label for="questionType" class="form-label">Question Type *</label>
+                                    <select class="form-select" id="questionType" required>
+                                        <option value="">Select Type</option>
+                                        <option value="multiple-choice">Multiple Choice</option>
+                                        <option value="true-false">True/False</option>
+                                        <option value="descriptive">Descriptive</option>
+                                    </select>
+                                </div>
+
+                                <!-- Marks/Points -->
+                                <div class="mb-3">
+                                    <label for="questionMarks" class="form-label">Marks/Points *</label>
+                                    <input type="number" class="form-control" id="questionMarks" min="1" max="100" value="1" required>
+                                    <div class="form-text">Points to be awarded for correct answer (1-100)</div>
+                                </div>
+                                
+                                <!-- Options Container -->
+                                <div id="optionsContainer" class="mb-3">
+                                    <label class="form-label">Options</label>
+                                    <div class="row" id="optionsList">
+                                        <!-- Options will be added here dynamically -->
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-primary" onclick="saveQuestion()">
+                                        <i class="fas fa-save me-2"></i>Save Question
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="cancelAddQuestion()">
+                                        <i class="fas fa-times me-2"></i>Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Questions List -->
+                    <div id="questionsList">
+                        <!-- Questions will be loaded here dynamically -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="shared/manage-questions.js"></script>
+    <script src="shared/manage-exam.js"></script>
+    <script>
+        // Performance Analytics Functions
+        let allResults = [];
+        let allExams = [];
+
+        async function loadPerformanceData() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('Please log in first');
+                    return;
+                }
+
+                const response = await fetch('/api/results/all-by-teacher', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                allResults = data.data || data.results || [];
+
+                // Extract unique exams for filter
+                const examsSet = new Set();
+                allResults.forEach(result => {
+                    if (result.examId && result.examId.title) {
+                        examsSet.add(JSON.stringify({id: result.examId._id, title: result.examId.title}));
+                    }
+                });
+                allExams = Array.from(examsSet).map(e => JSON.parse(e));
+
+                // Populate exam filter
+                populateExamFilter();
+
+                // Display all data
+                displayPerformanceData(allResults);
+            } catch (error) {
+                console.error('Error loading performance data:', error);
+                document.getElementById('performanceTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-danger py-4">
+                            <i class="fas fa-exclamation-circle me-2"></i>Error loading data. Please try again.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function populateExamFilter() {
+            const select = document.getElementById('examFilterSelect');
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">All Exams</option>';
+            
+            allExams.forEach(exam => {
+                const option = document.createElement('option');
+                option.value = exam.id;
+                option.textContent = exam.title;
+                select.appendChild(option);
+            });
+            
+            select.value = currentValue;
+        }
+
+        function filterPerformanceData() {
+            const examFilter = document.getElementById('examFilterSelect').value;
+            const searchText = document.getElementById('studentSearchInput').value.toLowerCase();
+
+            let filtered = allResults;
+
+            // Filter by exam
+            if (examFilter) {
+                filtered = filtered.filter(result => result.examId._id === examFilter);
+            }
+
+            // Filter by student name or ID
+            if (searchText) {
+                filtered = filtered.filter(result => {
+                    const fullName = result.studentId.fullName || `${result.studentId.firstName || ''} ${result.studentId.lastName || ''}`.trim();
+                    const studentName = fullName.toLowerCase();
+                    const studentId = result.studentId._id.toLowerCase();
+                    return studentName.includes(searchText) || studentId.includes(searchText);
+                });
+            }
+
+            displayPerformanceData(filtered);
+        }
+
+        function displayPerformanceData(results) {
+            const tableBody = document.getElementById('performanceTableBody');
+            const noDataMsg = document.getElementById('noDataMessage');
+
+            if (results.length === 0) {
+                tableBody.innerHTML = '';
+                noDataMsg.style.display = 'block';
+                updateStatsCards([], allResults); // Show overall stats
+                return;
+            }
+
+            noDataMsg.style.display = 'none';
+            tableBody.innerHTML = results.map(result => {
+                const studentName = result.studentId.fullName || `${result.studentId.firstName || ''} ${result.studentId.lastName || ''}`.trim();
+                return `
+                <tr>
+                    <td><strong>${studentName}</strong></td>
+                    <td>${result.examId.title}</td>
+                    <td>${result.score}/${result.totalMarks}</td>
+                    <td>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar ${result.percentage >= 50 ? 'bg-success' : 'bg-danger'}" 
+                                 role="progressbar" style="width: ${result.percentage}%" 
+                                 aria-valuenow="${result.percentage}" aria-valuemin="0" aria-valuemax="100">
+                                ${result.percentage}%
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge ${result.passed ? 'bg-success' : 'bg-danger'}">
+                            ${result.passed ? 'PASSED' : 'FAILED'}
+                        </span>
+                    </td>
+                    <td>${new Date(result.submittedAt).toLocaleDateString()}</td>
+                </tr>
+            `;
+            }).join('');
+
+            updateStatsCards(results, allResults);
+        }
+
+        function updateStatsCards(filteredResults, allResultsData) {
+            // Use filtered data for count-based stats, all data for percentages
+            const displayData = filteredResults.length > 0 ? filteredResults : allResultsData;
+            const countData = filteredResults.length > 0 ? filteredResults : allResultsData;
+
+            // Total unique students
+            const uniqueStudents = new Set(countData.map(r => r.studentId._id));
+            document.getElementById('totalStudents').textContent = uniqueStudents.size;
+
+            // Total submissions
+            document.getElementById('totalSubmissions').textContent = countData.length;
+
+            // Pass rate
+            const passCount = countData.filter(r => r.passed).length;
+            const passRate = countData.length > 0 ? Math.round((passCount / countData.length) * 100) : 0;
+            document.getElementById('passRate').textContent = passRate + '%';
+
+            // Average score
+            const avgScore = countData.length > 0 ?
+                Math.round(countData.reduce((sum, r) => sum + r.percentage, 0) / countData.length) : 0;
+            document.getElementById('avgScore').textContent = avgScore + '%';
+        }
+    </script>
+</body>
+</html>

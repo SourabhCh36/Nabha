@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Start & Shutdown Adventure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 50%, #A5D6A7 100%);
+            color: #2e7d32;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 5px solid #4CAF50;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.8em;
+            color: #4CAF50;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            color: #558b2f;
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        .game-container {
+            max-width: 1000px;
+            padding: 25px;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 25px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            padding: 18px 35px;
+            background: linear-gradient(135deg, #81c784, #66bb6a);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.3em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+            font-family: inherit;
+            border: 4px solid transparent;
+        }
+
+        .mode-btn:hover, .mode-btn.active {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
+            background: linear-gradient(135deg, #4CAF50, #43a047);
+            border-color: #ffffff;
+        }
+
+        .computer-simulation {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 35px;
+            margin: 25px 0;
+            border: 5px solid #4CAF50;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 900px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .computer-simulation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, rgba(76, 175, 80, 0.03) 0%, rgba(129, 199, 132, 0.03) 50%, rgba(165, 214, 167, 0.03) 100%);
+            animation: rotate 30s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(76, 175, 80, 0.2);
+            border: 3px solid #81c784;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            color: #4CAF50;
+        }
+
+        .step.active {
+            background: #4CAF50;
+            color: white;
+            transform: scale(1.3);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .step.completed {
+            background: #81c784;
+            border-color: #66bb6a;
+            color: white;
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 249, 250, 0.9));
+            padding: 25px;
+            border-radius: 20px;
+            margin: 25px 0;
+            text-align: center;
+            font-size: 1.2em;
+            line-height: 1.6;
+            color: #2e7d32;
+            border: 3px solid #81c784;
+            font-weight: 500;
+        }
+
+        .computer-setup {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .computer-part {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 20px;
+            border-radius: 20px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.8);
+            border: 3px solid transparent;
+        }
+
+        .computer-part:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #81c784;
+        }
+
+        .computer-part.clickable {
+            border: 4px solid #4CAF50;
+            animation: glow 2s infinite;
+            box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .computer-part.clicked {
+            border: 4px solid #ff9800;
+            background: rgba(255, 152, 0, 0.2);
+            animation: none;
+        }
+
+        @keyframes glow {
+            0% { 
+                box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+                transform: scale(1.05);
+            }
+            50% { 
+                box-shadow: 0 0 40px rgba(76, 175, 80, 0.8);
+                transform: scale(1.1);
+            }
+            100% { 
+                box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+                transform: scale(1.05);
+            }
+        }
+
+        .part-image {
+            width: 140px;
+            height: 120px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .part-label {
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: center;
+            color: #2e7d32;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .screen {
+            width: 350px;
+            height: 240px;
+            background: #000;
+            border: 8px solid #424242;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+            color: #4CAF50;
+            font-size: 16px;
+            text-align: center;
+            line-height: 1.4;
+            position: relative;
+            margin: 25px auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .screen.off {
+            background: #1a1a1a;
+            color: transparent;
+        }
+
+        .screen.booting {
+            background: #000;
+            color: #4CAF50;
+            animation: screenFlicker 0.5s ease-in-out;
+        }
+
+        .screen.desktop {
+            background: linear-gradient(135deg, #81c784, #66bb6a);
+            color: #fff;
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        @keyframes screenFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .power-button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #616161;
+            border: 4px solid #757575;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 22px;
+            color: #e0e0e0;
+            position: absolute;
+            top: 50px;
+            left: 85px;
+        }
+
+        .power-button.on {
+            background: #4CAF50;
+            border-color: #43a047;
+            color: white;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+        }
+
+        .power-button:hover {
+            transform: scale(1.15);
+        }
+
+        .start-button {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            width: 70px;
+            height: 30px;
+            background: #4CAF50;
+            border: 2px solid #43a047;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .start-button.show {
+            display: flex;
+        }
+
+        .start-button:hover {
+            background: #43a047;
+            transform: scale(1.05);
+        }
+
+        .start-menu {
+            position: absolute;
+            bottom: 40px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            padding: 12px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 140px;
+        }
+
+        .start-menu.show {
+            display: flex;
+        }
+
+        .menu-item {
+            padding: 10px 15px;
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid transparent;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-weight: bold;
+        }
+
+        .menu-item:hover {
+            background: rgba(76, 175, 80, 0.4);
+            border-color: #4CAF50;
+        }
+
+        .feedback {
+            text-align: center;
+            margin: 25px 0;
+            padding: 20px;
+            border-radius: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            min-height: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(129, 199, 132, 0.2));
+            color: #2e7d32;
+            border: 3px solid #4CAF50;
+        }
+
+        .feedback.error {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.2), rgba(239, 83, 80, 0.2));
+            color: #c62828;
+            border: 3px solid #f44336;
+        }
+
+        .feedback.info {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.2), rgba(66, 165, 245, 0.2));
+            color: #1565c0;
+            border: 3px solid #2196F3;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 25px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.3);
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 152, 0, 0.4);
+        }
+
+        .loading-bar {
+            width: 250px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            margin: 15px auto;
+            overflow: hidden;
+            display: none;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #81c784);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .celebration-emoji {
+            position: absolute;
+            font-size: 2.5em;
+            animation: celebrate 3s ease-in-out infinite;
+        }
+
+        .celebration-emoji:nth-child(1) { top: 10%; right: 10%; animation-delay: 0s; }
+        .celebration-emoji:nth-child(2) { top: 15%; left: 8%; animation-delay: 1s; }
+        .celebration-emoji:nth-child(3) { bottom: 20%; right: 8%; animation-delay: 2s; }
+        .celebration-emoji:nth-child(4) { bottom: 25%; left: 12%; animation-delay: 0.5s; }
+
+        @keyframes celebrate {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            25% { transform: translateY(-10px) rotate(10deg) scale(1.1); }
+            50% { transform: translateY(-5px) rotate(-5deg) scale(1.05); }
+            75% { transform: translateY(-8px) rotate(5deg) scale(1.08); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .computer-setup {
+                gap: 20px;
+            }
+            
+            .screen {
+                width: 300px;
+                height: 200px;
+                font-size: 14px;
+            }
+            
+            .part-image {
+                width: 120px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💻 Computer Start & Shutdown Adventure! 🔌</h1>
+        <p>Learn how to properly start and turn off a computer safely! 🌟</p>
+    </div>
+
+    <!-- Celebration emojis -->
+    <div class="celebration-emoji">🎉</div>
+    <div class="celebration-emoji">⭐</div>
+    <div class="celebration-emoji">🎊</div>
+    <div class="celebration-emoji">✨</div>
+
+    <div class="game-container">
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setMode('startup')">🚀 Startup Adventure</button>
+            <button class="mode-btn" onclick="setMode('shutdown')">💤 Shutdown Quest</button>
+        </div>
+
+        <div class="computer-simulation">
+            <div class="step-indicator" id="stepIndicator">
+                <!-- Steps will be added dynamically -->
+            </div>
+
+            <div class="instructions" id="instructions">
+                Click on the glowing parts in the correct order to start the computer! ✨
+            </div>
+
+            <div class="computer-setup">
+                <!-- Monitor -->
+                <div class="computer-part" id="monitor" onclick="clickPart('monitor')">
+                    <svg class="part-image" viewBox="0 0 200 150">
+                        <rect x="10" y="20" width="180" height="100" fill="#424242" stroke="#666" stroke-width="3" rx="8"/>
+                        <rect x="20" y="30" width="160" height="80" fill="#000" id="monitorScreen"/>
+                        <rect x="80" y="120" width="40" height="15" fill="#757575" rx="7"/>
+                        <rect x="90" y="135" width="20" height="10" fill="#9e9e9e"/>
+                        <rect x="60" y="145" width="80" height="3" fill="#bdbdbd" rx="1"/>
+                        <circle cx="170" cy="35" r="4" fill="#4CAF50" id="monitorPower"/>
+                    </svg>
+                    <div class="part-label">📺 Monitor</div>
+                </div>
+
+                <!-- CPU -->
+                <div class="computer-part" id="cpu" onclick="clickPart('cpu')">
+                    <svg class="part-image" viewBox="0 0 150 200">
+                        <rect x="10" y="20" width="130" height="160" fill="#424242" stroke="#666" stroke-width="3" rx="10"/>
+                        <rect x="20" y="30" width="110" height="15" fill="#212121"/>
+                        <rect x="25" y="32" width="100" height="11" fill="#616161"/>
+                        <circle cx="40" cy="60" r="8" fill="#388e3c" id="powerLED"/>
+                        <circle cx="65" cy="60" r="6" fill="#fbc02d" opacity="0" id="activityLED"/>
+                        <rect x="20" y="80" width="25" height="30" fill="#212121"/>
+                        <rect x="55" y="80" width="25" height="30" fill="#212121"/>
+                        <rect x="90" y="80" width="25" height="30" fill="#212121"/>
+                        <rect x="125" y="80" width="10" height="15" fill="#616161"/>
+                    </svg>
+                    <div class="power-button" id="powerButton">⚡</div>
+                    <div class="part-label">🖥️ Computer</div>
+                </div>
+            </div>
+
+            <div class="screen" id="screen">
+                <div id="screenContent">Computer is OFF 💤</div>
+                <div class="start-button" id="startButton" onclick="openStartMenu()">Start</div>
+                <div class="start-menu" id="startMenu">
+                    <div class="menu-item" onclick="selectMenuItem('shutdown')">💤 Shut Down</div>
+                    <div class="menu-item" onclick="selectMenuItem('restart')">🔄 Restart</div>
+                    <div class="menu-item" onclick="selectMenuItem('cancel')">❌ Cancel</div>
+                </div>
+                <div class="loading-bar" id="loadingBar">
+                    <div class="loading-progress" id="loadingProgress"></div>
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <button class="restart-btn" onclick="resetSimulation()">🔄 Reset Adventure</button>
+             <button class="restart-btn" onclick="resetSimulation()">Back To the Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'startup';
+        let currentStep = 0;
+        let computerState = 'off'; // off, starting, on, shuttingdown
+        let gameCompleted = false;
+
+        const startupSteps = [
+            {
+                instruction: "First, turn on the monitor by clicking the monitor! The screen needs power to show you what's happening! 📺✨",
+                target: 'monitor',
+                feedback: "Awesome! The monitor is now on and ready to display everything! 🌟"
+            },
+            {
+                instruction: "Now click the power button on the computer case to wake up the computer! 💻⚡",
+                target: 'cpu',
+                feedback: "Perfect! You pressed the power button! The computer is starting up like magic! 🎉"
+            },
+            {
+                instruction: "Great job! Now wait and watch the computer boot up completely. This is so exciting! 🚀",
+                target: 'wait',
+                feedback: "Fantastic! The computer has successfully started and is ready for fun activities! 🎊"
+            }
+        ];
+
+        const shutdownSteps = [
+            {
+                instruction: "Click on the 'Start' button in the bottom corner of the screen to open the menu! 🖱️",
+                target: 'start',
+                feedback: "Great! The Start menu is now open! Look at all those options! 📋"
+            },
+            {
+                instruction: "Click on 'Shut Down' to tell the computer to turn off safely! This is very important! 💤",
+                target: 'shutdown',
+                feedback: "Perfect! You chose the safe shutdown option! The computer will close everything properly! ✅"
+            },
+            {
+                instruction: "Now wait patiently for the computer to shut down completely. Never force it off! ⏳",
+                target: 'wait',
+                feedback: "Excellent patience! The computer has shut down safely! 🌙"
+            },
+            {
+                instruction: "Finally, turn off the monitor to save energy and keep it safe! 📺💚",
+                target: 'monitor',
+                feedback: "Wonderful! You're being eco-friendly by turning off the monitor! 🌱"
+            }
+        ];
+
+        function setMode(mode) {
+            currentMode = mode;
+            resetSimulation();
+            
+            // Update mode buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (mode === 'shutdown') {
+                // Set computer to 'on' state for shutdown simulation
+                computerState = 'on';
+                updateScreen();
+            }
+        }
+
+        function resetSimulation() {
+            currentStep = 0;
+            gameCompleted = false;
+            computerState = currentMode === 'startup' ? 'off' : 'on';
+            
+            // Reset visual elements
+            document.querySelectorAll('.computer-part').forEach(part => {
+                part.classList.remove('clickable', 'clicked');
+            });
+            
+            // Hide loading bar
+            document.getElementById('loadingBar').style.display = 'none';
+            
+            updateStepIndicator();
+            updateInstructions();
+            updateScreen();
+            clearFeedback();
+        }
+
+        function updateStepIndicator() {
+            const steps = currentMode === 'startup' ? startupSteps : shutdownSteps;
+            const indicator = document.getElementById('stepIndicator');
+            
+            indicator.innerHTML = '';
+            steps.forEach((step, index) => {
+                const stepEl = document.createElement('div');
+                stepEl.className = 'step';
+                if (index < currentStep) stepEl.classList.add('completed');
+                if (index === currentStep) stepEl.classList.add('active');
+                stepEl.textContent = index + 1;
+                indicator.appendChild(stepEl);
+            });
+        }
+
+        function updateInstructions() {
+            const steps = currentMode === 'startup' ? startupSteps : shutdownSteps;
+            const instructionsEl = document.getElementById('instructions');
+            
+            if (currentStep < steps.length) {
+                instructionsEl.textContent = steps[currentStep].instruction;
+                
+                // Highlight the target part
+                document.querySelectorAll('.computer-part').forEach(part => {
+                    part.classList.remove('clickable');
+                });
+                
+                const targetPart = steps[currentStep].target;
+                if (targetPart !== 'wait' && targetPart !== 'start' && targetPart !== 'shutdown') {
+                    const targetEl = document.getElementById(targetPart);
+                    if (targetEl) {
+                        targetEl.classList.add('clickable');
+                    }
+                }
+                
+                // Special handling for start button and shutdown menu
+                if (targetPart === 'start' && computerState === 'on') {
+                    const startBtn = document.getElementById('startButton');
+                    startBtn.style.border = '3px solid #4CAF50';
+                    startBtn.style.animation = 'glow 2s infinite';
+                }
+                
+                if (targetPart === 'shutdown') {
+                    setTimeout(() => {
+                        const shutdownOption = document.querySelector('.menu-item');
+                        if (shutdownOption) {
+                            shutdownOption.style.border = '3px solid #4CAF50';
+                            shutdownOption.style.animation = 'glow 2s infinite';
+                        }
+                    }, 100);
+                }
+            } else {
+                instructionsEl.innerHTML = `🎉 Amazing! You completed the ${currentMode} adventure perfectly! You're a computer expert! 🏆`;
+                gameCompleted = true;
+                
+                // Add celebration
+                document.querySelectorAll('.celebration-emoji').forEach(emoji => {
+                    emoji.style.animation = 'celebrate 1s ease-in-out infinite';
+                });
+            }
+        }
+
+        function updateScreen() {
+            const screen = document.getElementById('screen');
+            const content = document.getElementById('screenContent');
+            const startButton = document.getElementById('startButton');
+            const powerLED = document.getElementById('powerLED');
+            const activityLED = document.getElementById('activityLED');
+            const monitorScreen = document.getElementById('monitorScreen');
+            const monitorPower = document.getElementById('monitorPower');
+            const loadingBar = document.getElementById('loadingBar');
+            
+            switch (computerState) {
+                case 'off':
+                    screen.className = 'screen off';
+                    content.textContent = '';
+                    startButton.classList.remove('show');
+                    powerLED.setAttribute('fill', '#616161');
+                    activityLED.setAttribute('opacity', '0');
+                    monitorScreen.setAttribute('fill', '#000');
+                    monitorPower.setAttribute('fill', '#616161');
+                    loadingBar.style.display = 'none';
+                    break;
+                    
+                case 'starting':
+                    screen.className = 'screen booting';
+                    powerLED.setAttribute('fill', '#4CAF50');
+                    activityLED.setAttribute('opacity', '1');
+                    monitorScreen.setAttribute('fill', '#0d4f14');
+                    monitorPower.setAttribute('fill', '#4CAF50');
+                    loadingBar.style.display = 'block';
+                    this.bootSequence();
+                    break;
+                    
+                case 'on':
+                    screen.className = 'screen desktop';
+                    content.innerHTML = '🖥️ Welcome!<br/>Computer is Ready! 🌟';
+                    startButton.classList.add('show');
+                    powerLED.setAttribute('fill', '#4CAF50');
+                    activityLED.setAttribute('opacity', '0.5');
+                    monitorScreen.setAttribute('fill', '#66bb6a');
+                    monitorPower.setAttribute('fill', '#4CAF50');
+                    loadingBar.style.display = 'none';
+                    break;
+                    
+                case 'shuttingdown':
+                    screen.className = 'screen booting';
+                    content.textContent = '💤 Shutting down safely...';
+                    startButton.classList.remove('show');
+                    powerLED.setAttribute('fill', '#ff9800');
+                    loadingBar.style.display = 'block';
+                    this.shutdownSequence();
+                    break;
+            }
+        }
+
+        function bootSequence() {
+            const content = document.getElementById('screenContent');
+            const loadingProgress = document.getElementById('loadingProgress');
+            const messages = [
+                '🚀 Starting up...',
+                '📂 Loading system files...',
+                '🔧 Initializing hardware...',
+                '🪟 Starting Windows...',
+                '✨ Almost ready...'
+            ];
+            
+            let messageIndex = 0;
+            let progress = 0;
+            
+            const showMessage = () => {
+                if (messageIndex < messages.length) {
+                    content.textContent = messages[messageIndex];
+                    progress = ((messageIndex + 1) / messages.length) * 100;
+                    loadingProgress.style.width = progress + '%';
+                    messageIndex++;
+                    setTimeout(showMessage, 1000);
+                } else {
+                    computerState = 'on';
+                    updateScreen();
+                    if (currentMode === 'startup' && currentStep === 1) {
+                        setTimeout(() => {
+                            nextStep();
+                        }, 1500);
+                    }
+                }
+            };
+            showMessage();
+        }
+
+        function shutdownSequence() {
+            const content = document.getElementById('screenContent');
+            const loadingProgress = document.getElementById('loadingProgress');
+            const messages = [
+                '💾 Saving your work...',
+                '📱 Closing programs...',
+                '💤 Going to sleep...'
+            ];
+            
+            let messageIndex = 0;
+            let progress = 0;
+            
+            const showMessage = () => {
+                if (messageIndex < messages.length) {
+                    content.textContent = messages[messageIndex];
+                    progress = ((messageIndex + 1) / messages.length) * 100;
+                    loadingProgress.style.width = progress + '%';
+                    messageIndex++;
+                    setTimeout(showMessage, 1200);
+                } else {
+                    computerState = 'off';
+                    updateScreen();
+                    if (currentMode === 'shutdown' && currentStep === 2) {
+                        setTimeout(() => {
+                            nextStep();
+                        }, 1000);
+                    }
+                }
+            };
+            showMessage();
+        }
+
+        function clickPart(partName) {
+            const steps = currentMode === 'startup' ? startupSteps : shutdownSteps;
+            
+            if (currentStep >= steps.length || gameCompleted) return;
+            
+            const expectedTarget = steps[currentStep].target;
+            
+            if (partName === expectedTarget) {
+                // Correct click
+                const partEl = document.getElementById(partName);
+                partEl.classList.remove('clickable');
+                partEl.classList.add('clicked');
+                
+                showFeedback(steps[currentStep].feedback, 'success');
+                
+                // Handle specific actions
+                if (partName === 'cpu' && currentMode === 'startup') {
+                    computerState = 'starting';
+                    document.getElementById('powerButton').classList.add('on');
+                    updateScreen();
+                } else if (partName === 'monitor') {
+                    if (currentMode === 'startup') {
+                        document.getElementById('monitorScreen').setAttribute('fill', '#1a1a1a');
+                        document.getElementById('monitorPower').setAttribute('fill', '#4CAF50');
+                    } else {
+                        document.getElementById('monitorScreen').setAttribute('fill', '#000');
+                        document.getElementById('monitorPower').setAttribute('fill', '#616161');
+                    }
+                } else if (partName === 'cpu' && currentMode === 'shutdown') {
+                    document.getElementById('powerButton').classList.remove('on');
+                    document.getElementById('powerLED').setAttribute('fill', '#616161');
+                }
+                
+                setTimeout(() => {
+                    nextStep();
+                }, 2000);
+                
+            } else {
+                // Wrong click
+                showFeedback(`Oops! That's not the right step yet! ${steps[currentStep].instruction}`, 'error');
+            }
+        }
+
+        function openStartMenu() {
+            if (currentMode !== 'shutdown' || computerState !== 'on') return;
+            
+            const startMenu = document.getElementById('startMenu');
+            const startButton = document.getElementById('startButton');
+            
+            if (startMenu.classList.contains('show')) {
+                startMenu.classList.remove('show');
+                startButton.style.border = '2px solid #43a047';
+                startButton.style.animation = 'none';
+            } else {
+                startMenu.classList.add('show');
+                
+                // Check if this is the expected step
+                const steps = shutdownSteps;
+                if (currentStep < steps.length && steps[currentStep].target === 'start') {
+                    showFeedback(steps[currentStep].feedback, 'success');
+                    startButton.style.border = '2px solid #43a047';
+                    startButton.style.animation = 'none';
+                    setTimeout(() => {
+                        nextStep();
+                    }, 1500);
+                }
+            }
+        }
+
+        function selectMenuItem(action) {
+            const startMenu = document.getElementById('startMenu');
+            startMenu.classList.remove('show');
+            
+            if (action === 'shutdown') {
+                const steps = shutdownSteps;
+                if (currentStep < steps.length && steps[currentStep].target === 'shutdown') {
+                    computerState = 'shuttingdown';
+                    updateScreen();
+                    showFeedback(steps[currentStep].feedback, 'success');
+                    
+                    // Clear any existing animations on menu items
+                    document.querySelectorAll('.menu-item').forEach(item => {
+                        item.style.border = '2px solid transparent';
+                        item.style.animation = 'none';
+                    });
+                    
+                    setTimeout(() => {
+                        nextStep();
+                    }, 2000);
+                }
+            } else if (action === 'cancel') {
+                showFeedback('No problem! Try clicking Shut Down when you want to safely turn off the computer! 😊', 'info');
+            } else if (action === 'restart') {
+                showFeedback('Restart would work too! But for this adventure, let\'s practice shutting down! 🔄', 'info');
+            }
+        }
+
+        function nextStep() {
+            currentStep++;
+            updateStepIndicator();
+            updateInstructions();
+            clearFeedback();
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+        }
+
+        function clearFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+        }
+        function goToDashboard() {
+            window.location.href = '/student-dashboard'; // Change this URL to your actual dashboard URL
+        }
+        // Initialize the game
+        resetSimulation();
+    </script>
+</body>
+</html>

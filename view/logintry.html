@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animated Login / Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #07111d;
+      overflow: hidden;
+    }
+
+    .wrapper {
+      position: relative;
+      width: 900px;
+      height: 550px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 0 20px cyan, 0 0 40px cyan inset;
+      background: #07111d;
+      perspective: 2000px;
+    }
+
+    .inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 1s ease-in-out;
+    }
+
+    .wrapper.active .inner {
+      transform: rotateY(180deg);
+    }
+
+    /* Panels */
+    .panel {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 60px;
+      color: #fff;
+    }
+
+    /* Cyan left panel (login view) */
+    .panel.login {
+      background: linear-gradient(135deg, #00ffff, #0099cc);
+    }
+
+    /* Cyan right panel (register view mirror) */
+    .panel.register {
+      background: linear-gradient(135deg, #00ffff, #0099cc);
+      transform: rotateY(180deg);
+    }
+
+    .content {
+      width: 40%;
+    }
+
+    .content h2 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      color:#000
+    }
+
+    .content p {
+      font-size: 0.9em;
+      color: #555454;
+      line-height: 1.6;
+    }
+
+    /* Form container */
+    .form-box {
+      width: 50%;
+      background: #08121f;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,255,255,0.4);
+      padding: 40px;
+      text-align: center;
+      animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-box h2 {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .input-box {
+      position: relative;
+      margin: 20px 0;
+      border-bottom: 2px solid cyan;
+    }
+
+    .input-box input {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 1em;
+    }
+
+    .input-box label {
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      color: #aaa;
+      pointer-events: none;
+      transition: 0.3s;
+    }
+
+    .input-box input:focus ~ label,
+    .input-box input:valid ~ label {
+      top: -10px;
+      color: cyan;
+      font-size: 0.85em;
+    }
+
+    .input-box i {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: cyan;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(90deg, #00ffff, #0099cc);
+      border: none;
+      outline: none;
+      border-radius: 25px;
+      color: #000;
+      font-weight: 600;
+      font-size: 1em;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: linear-gradient(90deg, #0099cc, #00ffff);
+    }
+
+    .toggle-link {
+      margin-top: 15px;
+      font-size: 0.9em;
+    }
+
+    .toggle-link a {
+      color: cyan;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .toggle-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Add this right after the opening <body> tag -->
+<div id="voiceControlPanel" style="position: fixed; top: 20px; right: 20px; z-index: 1000; background: #08121f; padding: 15px; border-radius: 12px; box-shadow: 0 0 15px rgba(0,255,255,0.4); max-width: 280px; border: 1px solid cyan;">
+  <h3 style="margin: 0 0 12px 0; font-size: 16px; color: cyan;">🎤 Voice Login</h3>
+  
+  <div style="margin-bottom: 12px;">
+    <button id="toggleVoiceCommands" style="width: 100%; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; background: linear-gradient(90deg, #00ffff, #0099cc); border: none; color: #000; font-weight: 600;">
+      Start Voice Login
+    </button>
+    <div id="voiceCommandStatus" style="margin-top: 8px; padding: 6px; background: rgba(0,255,255,0.1); border-radius: 6px; font-size: 12px; text-align: center; color: #aaa;">
+      Click to activate
+    </div>
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <button id="toggleTextToSpeech" style="width: 100%; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; background: transparent; border: 2px solid cyan; color: cyan; font-weight: 600;">
+      Enable Text-to-Speech
+    </button>
+    <div id="ttsStatus" style="margin-top: 8px; padding: 6px; background: rgba(0,255,255,0.1); border-radius: 6px; font-size: 12px; text-align: center; color: #aaa;">
+      TTS: Inactive
+    </div>
+  </div>
+
+  <div style="background: rgba(0,255,255,0.1); padding: 10px; border-radius: 8px; font-size: 11px; line-height: 1.5; color: #aaa;">
+    <strong style="color: cyan;">Voice Commands:</strong>
+    <ul style="margin: 6px 0 0 0; padding-left: 16px;">
+      <li>"login" - Switch to login</li>
+      <li>"register" - Switch to register</li>
+      <li>"my name is [name]" - Enter name</li>
+      <li>"class [number]" - Select class</li>
+      <li>"submit" - Submit form</li>
+    </ul>
+    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,255,255,0.2);">
+      <strong style="color: cyan;">Shortcuts:</strong><br>
+      <strong>V</strong> - TTS | <strong>O</strong> - Voice | <strong>Esc</strong> - Stop
+    </div>
+  </div>
+
+  <div id="voiceIndicator" style="margin-top: 12px; padding: 8px; background: rgba(220, 38, 38, 0.2); border-radius: 6px; text-align: center; display: none;">
+    <span style="color: #ff4444; font-size: 12px;">🔴 Listening...</span>
+  </div>
+</div>
+
+<!-- Add this script before the closing </body> tag, after your existing scripts -->
+<script>
+  // Voice Control System for Login
+  class VoiceLoginSystem {
+    constructor() {
+      this.synthesis = window.speechSynthesis;
+      this.recognition = null;
+      this.isListening = false;
+      this.isTTSEnabled = false;
+      this.voiceSpeed = 1;
+      this.currentUtterance = null;
+      this.hoverTimeout = null;
+      this.init();
+    }
+
+    init() {
+      this.setupSpeechRecognition();
+      this.setupControls();
+      this.setupKeyboardShortcuts();
+      this.setupTextToSpeechHover();
+    }
+
+    setupSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      
+      if (!SpeechRecognition) {
+        console.warn('Speech recognition not supported');
+        return;
+      }
+
+      this.recognition = new SpeechRecognition();
+      this.recognition.continuous = true;
+      this.recognition.interimResults = false;
+      this.recognition.lang = 'en-US';
+
+      this.recognition.onstart = () => {
+        document.getElementById('voiceIndicator').style.display = 'block';
+      };
+
+      this.recognition.onend = () => {
+        document.getElementById('voiceIndicator').style.display = 'none';
+        if (this.isListening) {
+          setTimeout(() => {
+            try {
+              this.recognition.start();
+            } catch(e) {
+              console.log('Recognition restart failed');
+            }
+          }, 100);
+        }
+      };
+
+      this.recognition.onresult = (event) => {
+        const last = event.results.length - 1;
+        const command = event.results[last][0].transcript.toLowerCase().trim();
+        console.log('Voice command:', command);
+        this.processVoiceCommand(command);
+      };
+
+      this.recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'no-speech' && this.isListening) {
+          setTimeout(() => {
+            try {
+              this.recognition.start();
+            } catch(e) {}
+          }, 100);
+        }
+      };
+    }
+
+    setupControls() {
+      const toggleVoiceBtn = document.getElementById('toggleVoiceCommands');
+      const toggleTTSBtn = document.getElementById('toggleTextToSpeech');
+
+      if (toggleVoiceBtn) {
+        toggleVoiceBtn.addEventListener('click', () => this.toggleVoiceCommands());
+      }
+      
+      if (toggleTTSBtn) {
+        toggleTTSBtn.addEventListener('click', () => this.toggleTextToSpeech());
+      }
+    }
+
+    setupKeyboardShortcuts() {
+      document.addEventListener('keydown', (e) => {
+        const activeElement = document.activeElement;
+        const isTyping = activeElement.tagName === 'INPUT' || 
+                         activeElement.tagName === 'TEXTAREA' || 
+                         activeElement.tagName === 'SELECT';
+        
+        if (isTyping) return;
+        
+        // V key to toggle text-to-speech
+        if (e.key.toLowerCase() === 'v') {
+          e.preventDefault();
+          this.toggleTextToSpeech();
+        }
+        
+        // O key to toggle voice commands
+        if (e.key.toLowerCase() === 'o') {
+          e.preventDefault();
+          this.toggleVoiceCommands();
+        }
+        
+        // Escape to stop speaking
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          this.stopSpeaking();
+        }
+      });
+    }
+
+    setupTextToSpeechHover() {
+      // Will be enabled when TTS is activated
+    }
+
+    toggleVoiceCommands() {
+      if (!this.recognition) {
+        this.speak('Voice commands are not supported in your browser. Please use Chrome or Edge.');
+        return;
+      }
+
+      this.isListening = !this.isListening;
+      const btn = document.getElementById('toggleVoiceCommands');
+      const status = document.getElementById('voiceCommandStatus');
+
+      if (this.isListening) {
+        try {
+          this.recognition.start();
+          btn.textContent = 'Stop Voice Login';
+          btn.style.background = '#dc2626';
+          status.textContent = '🎤 Listening...';
+          status.style.background = 'rgba(220, 38, 38, 0.2)';
+          status.style.color = '#ff4444';
+          this.speak('Voice login activated. Say login or register to switch forms. Say your name to fill the name field.');
+        } catch(e) {
+          console.error('Failed to start recognition:', e);
+          this.isListening = false;
+        }
+      } else {
+        this.recognition.stop();
+        btn.textContent = 'Start Voice Login';
+        btn.style.background = 'linear-gradient(90deg, #00ffff, #0099cc)';
+        status.textContent = 'Click to activate';
+        status.style.background = 'rgba(0,255,255,0.1)';
+        status.style.color = '#aaa';
+        this.speak('Voice login deactivated.');
+      }
+    }
+
+    toggleTextToSpeech() {
+      this.isTTSEnabled = !this.isTTSEnabled;
+      const btn = document.getElementById('toggleTextToSpeech');
+      const status = document.getElementById('ttsStatus');
+
+      if (this.isTTSEnabled) {
+        btn.textContent = 'Disable Text-to-Speech';
+        btn.style.background = 'cyan';
+        btn.style.color = '#000';
+        status.textContent = 'TTS: Active ✓';
+        status.style.background = 'rgba(0,255,255,0.2)';
+        status.style.color = 'cyan';
+        this.speak('Text to speech enabled. Hover over text to hear it.');
+        this.enableHoverReading();
+      } else {
+        btn.textContent = 'Enable Text-to-Speech';
+        btn.style.background = 'transparent';
+        btn.style.color = 'cyan';
+        status.textContent = 'TTS: Inactive';
+        status.style.background = 'rgba(0,255,255,0.1)';
+        status.style.color = '#aaa';
+        this.stopSpeaking();
+        this.disableHoverReading();
+        this.speak('Text to speech disabled.');
+      }
+    }
+
+    enableHoverReading() {
+      const readableElements = document.querySelectorAll('h2, p, label, button, a, .btn');
+      readableElements.forEach(el => {
+        el.addEventListener('mouseenter', this.handleHover);
+        el.dataset.ttsEnabled = 'true';
+      });
+    }
+
+    disableHoverReading() {
+      const readableElements = document.querySelectorAll('[data-tts-enabled="true"]');
+      readableElements.forEach(el => {
+        el.removeEventListener('mouseenter', this.handleHover);
+        delete el.dataset.ttsEnabled;
+      });
+    }
+
+    handleHover = (e) => {
+      if (!this.isTTSEnabled) return;
+      
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = setTimeout(() => {
+        const text = e.target.textContent.trim();
+        if (text && text.length > 1) {
+          this.speak(text);
+        }
+      }, 300);
+    }
+
+    processVoiceCommand(command) {
+      console.log('Processing command:', command);
+      
+      const wrapper = document.getElementById('wrapper');
+      
+      // Switch between login and register
+      if (command.includes('login') || command.includes('sign in')) {
+        wrapper.classList.remove('active');
+        this.speak('Switched to login form');
+      }
+      else if (command.includes('register') || command.includes('sign up') || command.includes('signup')) {
+        wrapper.classList.add('active');
+        this.speak('Switched to register form');
+      }
+      // Fill name field
+      else if (command.includes('my name is')) {
+        const name = command.replace('my name is', '').trim();
+        const capitalizedName = name.split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+        
+        const isLoginView = !wrapper.classList.contains('active');
+        const nameInput = isLoginView ? 
+          document.getElementById('loginFullName') : 
+          document.getElementById('registerFullName');
+        
+        if (nameInput) {
+          nameInput.value = capitalizedName;
+          this.speak(`Name set to ${capitalizedName}`);
+        }
+      }
+      // Voice command: select/open class (robust: handles digits & words)
+else if (command.includes('class')) {
+  try {
+    console.log('class command detected. raw command:', command);
+
+    // helper: convert some number words to digits
+    const wordsToNumber = (w) => {
+      w = (w || '').trim().toLowerCase();
+      const map = {
+        'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
+        'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
+        'eleven': 11, 'twelve': 12
+      };
+      // remove ordinal endings
+      w = w.replace(/(st|nd|rd|th)$/,'');
+      if (map[w] !== undefined) return map[w];
+      // try parse digits inside
+      const n = parseInt(w.replace(/[^\d]/g,''), 10);
+      return isNaN(n) ? null : n;
+    };
+
+    // try to directly capture digits first
+    let classNum = null;
+    const digitMatch = command.match(/class[\s:-]*([0-9]{1,2})/i);
+    if (digitMatch) {
+      classNum = parseInt(digitMatch[1], 10);
+    } else {
+      // capture the word(s) after 'class'
+      const after = command.match(/class\s+([a-zA-Z\- ]{1,20})/i);
+      if (after && after[1]) {
+        classNum = wordsToNumber(after[1]);
+      }
+    }
+
+    console.log('parsed classNum:', classNum);
+
+    if (!classNum) {
+      // maybe user said "class ten" with surrounding words — fallback: find any number word in entire command
+      const wordNumberMatch = command.match(/\b(six|seven|eight|nine|ten|one|two|three|four|five|eleven|twelve)\b/i);
+      if (wordNumberMatch) classNum = wordsToNumber(wordNumberMatch[1]);
+    }
+
+    if (!classNum) {
+      this.speak('Please say a class number, for example "select class 6" or "open class 10".');
+      return;
+    }
+
+    // normalize number to the format used in option values, e.g. "Class-6"
+    const normalizedValue = `Class-${classNum}`;
+
+    // which dropdown to target: login or register (based on current view)
+    const wrapperEl = document.getElementById('wrapper');
+    const isLoginView = !wrapperEl?.classList.contains('active');
+    const selectDropdown = isLoginView ? document.getElementById('loginStd') : document.getElementById('registerStd');
+
+    if (!selectDropdown) {
+      console.warn('Dropdown not found. Is the select ID correct?');
+      this.speak('Class dropdown not found on this page.');
+      return;
+    }
+
+    // try match by option.value first
+    let optionToSelect = Array.from(selectDropdown.options).find(opt => opt.value === normalizedValue);
+
+    // if not found by value, try matching by displayed text (contains number)
+    if (!optionToSelect) {
+      optionToSelect = Array.from(selectDropdown.options).find(opt => {
+        const txt = (opt.textContent || opt.innerText || '').toLowerCase();
+        return txt.includes(String(classNum)) || txt.includes(`class ${classNum}`) || txt.includes(`${classNum}`);
+      });
+    }
+
+    console.log('optionToSelect:', optionToSelect);
+
+    if (optionToSelect) {
+      selectDropdown.value = optionToSelect.value;
+      // trigger change so existing handlers run
+      selectDropdown.dispatchEvent(new Event('change', { bubbles: true }));
+      this.speak(`Class ${classNum} selected`);
+    } else {
+      this.speak(`Class ${classNum} is not available in the dropdown.`);
+    }
+  } catch (err) {
+    console.error('Error handling class voice command:', err);
+    this.speak('There was an error selecting the class. Please try again.');
+  }
+}
+
+      // Date of birth (for register form)
+      else if (command.includes('date of birth') || command.includes('birthday')) {
+        this.speak('Please type your date of birth manually');
+      }
+      // Submit form
+      else if (command.includes('submit') || command.includes('login now') || command.includes('register now')) {
+        const isLoginView = !wrapper.classList.contains('active');
+        const form = isLoginView ? 
+          document.getElementById('loginForm') : 
+          document.getElementById('registerForm');
+        
+        if (form) {
+          this.speak('Submitting form');
+          form.requestSubmit();
+        }
+      }
+      // Clear form
+      else if (command.includes('clear') || command.includes('reset')) {
+        const isLoginView = !wrapper.classList.contains('active');
+        const form = isLoginView ? 
+          document.getElementById('loginForm') : 
+          document.getElementById('registerForm');
+        
+        if (form) {
+          form.reset();
+          this.speak('Form cleared');
+        }
+      }
+      // Help
+      else if (command.includes('help')) {
+        this.speak('Available commands: Say login or register to switch forms. Say my name is followed by your name. Say class followed by a number. Say submit to submit the form.');
+      }
+      // Stop
+      else if (command.includes('stop') || command.includes('quiet')) {
+        this.stopSpeaking();
+      }
+      else {
+        this.speak('Command not recognized. Say help for available commands.');
+      }
+    }
+
+    speak(text) {
+      this.synthesis.cancel();
+      
+      if (!text) return;
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = this.voiceSpeed;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      utterance.lang = 'en-US';
+
+      this.currentUtterance = utterance;
+      this.synthesis.speak(utterance);
+    }
+
+    stopSpeaking() {
+      this.synthesis.cancel();
+      clearTimeout(this.hoverTimeout);
+    }
+  }
+
+  // Initialize the voice control system
+  let voiceLoginSystem;
+  window.addEventListener('load', () => {
+    voiceLoginSystem = new VoiceLoginSystem();
+    console.log('Voice login system initialized');
+    
+    // Welcome message
+    setTimeout(() => {
+      voiceLoginSystem.speak('Welcome to Nabha Digital Learning. Press O to activate voice login, or V for text to speech.');
+    }, 1000);
+  });
+</script>
+  <div class="wrapper" id="wrapper">
+    <div class="inner">
+      <!-- LOGIN PANEL -->
+      <div class="panel login">
+        <div class="content">
+          <h2>WELCOME!</h2>
+          <p>Hope, You and your Family have a Great Day</p>
+        </div>
+
+        <div class="form-box">
+          <h2>Login</h2>
+          <form id="loginForm">
+            <div class="input-box">
+              <input type="text" id="loginFullName" required>
+              <label>Full Name</label>
+              <i class="fa fa-user"></i>
+            </div>
+            <div class="input-box">
+              <select id="loginStd" required style="background: transparent; border: none; outline: none; color: #fff; width: 100%; padding: 10px; border-bottom: 2px solid cyan;">
+                <option value="" style="background: #08121f; color: #fff;">Select Class</option>
+                <option value="Class-6" style="background: #08121f; color: #fff;">Class-6</option>
+                <option value="Class-7" style="background: #08121f; color: #fff;">Class-7</option>
+                <option value="Class-8" style="background: #08121f; color: #fff;">Class-8</option>
+                <option value="Class-9" style="background: #08121f; color: #fff;">Class-9</option>
+                <option value="Class-10" style="background: #08121f; color: #fff;">Class-10</option>
+              </select>
+            </div>
+            <button type="submit" class="btn">Login</button>
+          </form>
+          <div id="loginMessage"></div>
+          <div class="toggle-link">
+            Don't have an account? <a href="#" id="showRegister">Register</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGISTER PANEL (MIRROR) -->
+      <div class="panel register">
+        <div class="content">
+          <h2>WELCOME!</h2>
+          <p>Hope, You and your Family have a Great Day</p>
+        </div>
+
+        <div class="form-box">
+          <h2>Sign Up</h2>
+          <form id="registerForm">
+            <div class="input-box">
+              <input type="text" id="registerFullName" required>
+              <label>Full Name</label>
+              <i class="fa fa-user"></i>
+            </div>
+            <div class="input-box">
+              <input type="date" id="registerDOB" required>
+              <label>Date of Birth</label>
+              <i class="fa fa-calendar"></i>
+            </div>
+            <div class="input-box">
+              <select id="registerStd" required style="background: transparent; border: none; outline: none; color: #fff; width: 100%; padding: 10px; border-bottom: 2px solid cyan;">
+                <option value="" style="background: #08121f; color: #fff;">Select Class</option>
+                <option value="Class-6" style="background: #08121f; color: #fff;">Class-6</option>
+                <option value="Class-7" style="background: #08121f; color: #fff;">Class-7</option>
+                <option value="Class-8" style="background: #08121f; color: #fff;">Class-8</option>
+                <option value="Class-9" style="background: #08121f; color: #fff;">Class-9</option>
+                <option value="Class-10" style="background: #08121f; color: #fff;">Class-10</option>
+              </select>
+            </div>
+            <button type="submit" class="btn">Register</button>
+          </form>
+          <div id="registerMessage"></div>
+          <div class="toggle-link">
+            Already have an account? <a href="#" id="showLogin">Login</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script>
+    const wrapper = document.getElementById('wrapper');
+    const showRegister = document.getElementById('showRegister');
+    const showLogin = document.getElementById('showLogin');
+
+    showRegister.addEventListener('click', (e) => {
+      e.preventDefault();
+      wrapper.classList.add('active');
+    });
+
+    showLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      wrapper.classList.remove('active');
+    });
+  </script>
+
+  <script>
+    // LOGIN HANDLER
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const fullName = document.getElementById('loginFullName').value;
+      const std = document.getElementById('loginStd').value;
+      const messageDiv = document.getElementById('loginMessage');
+
+      messageDiv.innerHTML = '';
+      if (!fullName || !std) {
+        showLoginMessage('Please fill in all fields', 'danger');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ fullName, std})
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          showLoginMessage('Login successful! Redirecting...', 'success');
+
+          setTimeout(() => {
+            location.replace(data.redirectUrl);
+          }, 600);
+        } else {
+          showLoginMessage(data.message || 'Login failed', 'danger');
+        }
+      } catch (err) {
+        console.error('Login error:', err);
+        showLoginMessage('Network error. Please try again.', 'danger');
+      }
+    });
+
+    function showLoginMessage(message, type) {
+      const messageDiv = document.getElementById('loginMessage');
+      messageDiv.innerHTML = `<div class="alert alert-${type}" style="margin-top: 10px; padding: 10px; border-radius: 5px; color: #fff; background: ${type === 'success' ? '#28a745' : '#dc3545'};">${message}</div>`;
+    }
+
+    // REGISTER HANDLER
+    document.getElementById('registerForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const fullName = document.getElementById('registerFullName').value;
+      const DOB = document.getElementById('registerDOB').value;
+      const std = document.getElementById('registerStd').value;
+      const messageDiv = document.getElementById('registerMessage');
+
+      messageDiv.innerHTML = '';
+      if (!fullName || !DOB || !std) {
+        showRegisterMessage('Please fill in all fields', 'danger');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ fullName, DOB, std})
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          showRegisterMessage('Registration successful! Redirecting to login...', 'success');
+          document.getElementById('registerForm').reset();
+
+          setTimeout(() => {
+            wrapper.classList.remove('active');
+          }, 1500);
+        } else {
+          showRegisterMessage(data.message || 'Registration failed', 'danger');
+        }
+      } catch (err) {
+        console.error('Register error:', err);
+        showRegisterMessage('Network error. Please try again.', 'danger');
+      }
+    });
+
+    function showRegisterMessage(message, type) {
+      const messageDiv = document.getElementById('registerMessage');
+      messageDiv.innerHTML = `<div class="alert alert-${type}" style="margin-top: 10px; padding: 10px; border-radius: 5px; color: #fff; background: ${type === 'success' ? '#28a745' : '#dc3545'};">${message}</div>`;
+    }
+
+    // Redirect if already logged in
+    window.addEventListener('load', function () {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+      if (!token || !user._id) return;
+
+      let url = '/student-dashboard';
+      if (!sessionStorage.getItem('redirectedOnce')) {
+        sessionStorage.setItem('redirectedOnce', '1');
+        location.replace(url);
+      }
+    });
+  </script>
+  
+</body>
+</html>
